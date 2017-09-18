@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="margin">16dp</dimen>
+    <dimen name="margin_large">24dp</dimen>
+    <dimen name="keyline_associated_content">80dp</dimen>
+
+    <dimen name="fab_diameter">60dp</dimen>
+
+    <!-- General Dimensions for text -->
+    <dimen name="text_h1">55sp</dimen>
+    <dimen name="text_h2">20sp</dimen>
+
+    <!-- Login Activity -->
+    <dimen name="input_bar_width">300dp</dimen>
+    <dimen name="top_panel_height">200dp</dimen>
+
+    <!-- Main Activity -->
+    <dimen name="slide_window_height">300dp</dimen>
+</resources>

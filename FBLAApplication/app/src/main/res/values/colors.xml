@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary50">#E1F5FE</color>
+    <color name="colorPrimary100">#B3E5FC</color>
+    <color name="colorPrimary300">#4FC3F7</color>
+    <color name="colorPrimary500">#03A9F4</color>
+    <color name="colorPrimary700">#0288D1</color>
+
+    <color name="colorAccent100">#B9F6CA</color>
+    <color name="colorAccent200">#69F0AE</color>
+    <color name="colorAccent400">#00E676</color>
+
+    <color name="colorSecondaryText">#8A8A8A</color>
+    <color name="colorInvalid">#FF0000</color>
+
+    <color name="scrim_end">#00000000</color>
+    <color name="scrim_center">#66000000</color>
+    <color name="scrim_start">#CC000000</color>
+</resources>

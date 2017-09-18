@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="match_parent"
+        format="integer"
+        type="dimen">-1</item>
+
+    <item name="wrap_content"
+        format="integer"
+        type="dimen">-2</item>
+
+    <dimen name="margin">10dp</dimen>
+    <dimen name="margin_large">16dp</dimen>
+    <dimen name="keyline_associated_content">60dp</dimen>
+
+    <dimen name="fab_diameter">50dp</dimen>
+
+    <!-- General dimensions for vertical spacing -->
+    <dimen name="vs_status_bar">24dp</dimen>
+    <dimen name="vs_toolbar">56dp</dimen>
+    <dimen name="vs_subtitle_bar">48dp</dimen>
+    <dimen name="vs_list_item">72dp</dimen>
+
+    <!-- General dimensions for text -->
+    <dimen name="text_h1">35sp</dimen>
+    <dimen name="text_h2">17sp</dimen>
+    <dimen name="text">12sp</dimen>
+
+    <!-- Login Activity -->
+    <dimen name="input_bar_width">200dp</dimen>
+    <dimen name="top_panel_height">150dp</dimen>
+    <dimen name="title_padding">30dp</dimen>
+    <dimen name="fab_offset">30dp</dimen>
+    <dimen name="panel_width">@dimen/match_parent</dimen>
+
+    <!-- Main Activity -->
+    <dimen name="navbar_width">240dp</dimen>
+    <dimen name="profile_diameter">100dp</dimen>
+    <dimen name="slide_window_height">200dp</dimen>
+    <dimen name="category_height">120dp</dimen>
+    <dimen name="book_width">69dp</dimen> <!-- Width should be 68.75% of height -->
+    <dimen name="book_height">100dp</dimen>
+    <dimen name="book_star_diameter">15dp</dimen>
+</resources>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/margin_large">
+
+        <LinearLayout
+            android:layout_width="@dimen/panel_width"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center">
+
+            <!-- Top portion of screen w/ welcome-->
+            <include layout = "@layout/login_top_panel"/>
+
+            <!-- Bottom portion of screen -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/l_fl_bottom_panel">
+                 <include layout = "@layout/login_bottom_panel"/>
+            </FrameLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_anchorGravity="bottom|right|end"
+        android:layout_margin="@dimen/fab_offset"
+        app:layout_anchor="@id/l_fl_bottom_panel">
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="@dimen/fab_diameter"
+            android:layout_height="@dimen/fab_diameter"
+            app:fabSize="normal"
+            android:src="@drawable/ic_check"
+            android:scaleType="center"
+            android:id="@+id/l_fab_bottom"
+            app:rippleColor="@color/colorPrimary700"
+            android:onClick="login"
+            android:transitionName="@string/trans_bottom_fab"/>
+        <ProgressBar
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:visibility="gone"
+            android:id="@+id/l_progressbar"/>
+    </RelativeLayout>
+
+</android.support.design.widget.CoordinatorLayout>

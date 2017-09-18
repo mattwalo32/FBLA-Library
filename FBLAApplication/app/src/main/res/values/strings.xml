@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">FBLA Application</string>
+    <string name="preference_file_key">FBLAApplicationUserData</string>
+
+    <!-- Login Activity -->
+    <string name="login_message">Welcome Back</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="create_account">Create Account</string>
+
+    <!-- CreateAccount Activity -->
+    <string name="name">Name</string>
+    <string name="school_id">School ID</string>
+
+    <!-- Transition Names -->
+    <string name="trans_create_account">trans_create_account</string>
+    <string name="trans_top_panel">trans_top_panel</string>
+    <string name="trans_bottom_panel">trans_bottom_panel</string>
+    <string name="trans_tv_email">trans_tv_email</string>
+    <string name="trans_et_email">trans_et_email</string>
+    <string name="trans_tv_password">trans_tv_password</string>
+    <string name="trans_et_password">trans_et_password</string>
+    <string name="trans_bottom_fab">trans_bottom_fab</string>
+
+</resources>

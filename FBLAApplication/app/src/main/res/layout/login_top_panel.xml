@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:id="@+id/l_fl_top_panel"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/top_panel_height"
+    android:background="@color/colorPrimary500"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:transitionName="@string/trans_top_panel">
+
+    <TextView
+        android:id="@+id/l_tv_welcome_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center_horizontal"
+        android:padding="@dimen/title_padding"
+        android:text="@string/login_message"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/text_h1" />
+
+</FrameLayout>

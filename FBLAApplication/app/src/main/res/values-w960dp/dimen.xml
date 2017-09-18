@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dimensions for text sizes -->
+    <dimen name="text_h1">60sp</dimen>
+    <dimen name="text_h2">30sp</dimen>
+    <dimen name="text">20sp</dimen>
+
+    <!-- Dimensions for Login Activity -->
+    <dimen name="input_bar_width">350dp</dimen>
+</resources>

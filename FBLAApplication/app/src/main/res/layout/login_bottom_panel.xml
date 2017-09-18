@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:id="@+id/l_ll_bottom_panel"
+    android:transitionName="@string/trans_bottom_panel"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:layout_gravity="start"
+        android:padding="@dimen/margin"
+        android:textSize="@dimen/text_h2"
+        android:textColor="@color/colorSecondaryText"
+        android:text="@string/email"
+        android:id="@+id/l_tv_email"
+        android:transitionName="@string/trans_tv_email"/>
+
+    <android.support.v7.widget.AppCompatEditText
+        android:layout_width="@dimen/input_bar_width"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_associated_content"
+        android:layout_marginLeft="@dimen/keyline_associated_content"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:inputType="textEmailAddress"
+        android:backgroundTint="@color/colorPrimary300"
+        android:textColor="@color/colorPrimary300"
+        android:textColorHighlight="@color/colorPrimary500"
+        android:id="@+id/l_et_email"
+        android:transitionName="@string/trans_et_email"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:layout_gravity="start"
+        android:padding="@dimen/margin"
+        android:textSize="@dimen/text_h2"
+        android:textColor="@color/colorSecondaryText"
+        android:text="@string/password"
+        android:id="@+id/l_tv_password"
+        android:transitionName="@string/trans_tv_password"/>
+
+    <android.support.v7.widget.AppCompatEditText
+        android:layout_width="@dimen/input_bar_width"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_associated_content"
+        android:layout_marginLeft="@dimen/keyline_associated_content"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:inputType="textPassword"
+        android:backgroundTint="@color/colorPrimary300"
+        android:textColor="@color/colorPrimary300"
+        android:textColorHighlight="@color/colorPrimary500"
+        android:id="@+id/l_et_password"
+        android:transitionName="@string/trans_et_password"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="@dimen/margin"
+        android:layout_margin="@dimen/margin_large"
+        android:textSize="@dimen/text_h2"
+        android:textColor="@color/colorPrimary300"
+        android:text="@string/create_account"
+        android:id="@+id/l_tv_create_account"
+        android:onClick="launchCreateAccount"
+        android:transitionName="@string/trans_create_account"/>
+
+</LinearLayout>

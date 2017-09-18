@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:id="@+id/ca_fl_top_panel"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/top_panel_height"
+    android:background="@color/colorPrimary500"
+    android:transitionName="@string/trans_top_panel"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:id="@+id/ca_tv_create_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center_horizontal"
+        android:padding="@dimen/title_padding"
+        android:text="@string/create_account"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/text_h1"
+        android:transitionName="@string/trans_create_account"/>
+
+</FrameLayout>
