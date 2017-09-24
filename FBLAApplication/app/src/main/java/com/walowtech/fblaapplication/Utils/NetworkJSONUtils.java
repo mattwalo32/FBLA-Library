@@ -1,6 +1,8 @@
 package com.walowtech.fblaapplication.Utils;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -10,9 +12,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -152,5 +156,20 @@ public class NetworkJSONUtils {
             return null;
         }
         return json;
+    }
+
+    public static Bitmap downloadBitmap(Context context, String url){
+        Bitmap bitmap = null;
+
+        try {
+            InputStream is = new java.net.URL(url).openStream();
+            bitmap = BitmapFactory.decodeStream(is);
+        }catch(MalformedURLException MURLE){
+            ErrorUtils.errorDialog(context, "URL Error", "There was an error with the URL request. Please try again later.");
+        }catch(IOException IOE){
+            ErrorUtils.errorDialog(context, "Connection Error", "There was an error with your network connection. Check your connection and retry.");
+        }
+
+        return bitmap;
     }
 }

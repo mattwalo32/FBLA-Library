@@ -41,4 +41,7 @@
     <dimen name="book_width">69dp</dimen> <!-- Width should be 68.75% of height -->
     <dimen name="book_height">100dp</dimen>
     <dimen name="book_star_diameter">15dp</dimen>
+    <dimen name="border_width">4dp</dimen>
+    <dimen name="small_progress_size">20dp</dimen>
+    <dimen name="large_progress_size">50dp</dimen>
 </resources>

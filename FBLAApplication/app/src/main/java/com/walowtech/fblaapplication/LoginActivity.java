@@ -58,6 +58,8 @@ import java.net.URL;
 //Created 9/10/2017
 public class LoginActivity extends Activity implements LoaderManager.LoaderCallbacks{
 
+
+    //TODO check app version
     private final String LOG_TAG = "LoginActivity";
 
     private boolean bypassInputs = false;
@@ -159,7 +161,7 @@ public class LoginActivity extends Activity implements LoaderManager.LoaderCallb
 
     @Override
     public void onLoadFinished(Loader loader, Object data) {
-        if(data != null || data != "") {
+        if(data != null && data != " ") {
             try {
                 jsonResponse = new JSONObject(data.toString());
                 parseJSON(jsonResponse);

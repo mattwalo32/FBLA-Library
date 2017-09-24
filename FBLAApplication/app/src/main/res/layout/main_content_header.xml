@@ -6,18 +6,9 @@
     android:layout_height="@dimen/slide_window_height"
     android:layout_marginBottom="@dimen/margin_large">
 
-    <ImageView
+    <android.support.v4.view.ViewPager
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@color/colorPrimary100"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:gravity="center_horizontal"
-        android:text="Test caption to go with test image"
-        android:textSize="@dimen/text_h2"
-        android:textColor="@android:color/white"
-        android:background="@drawable/scrim"/>
+        android:id="@+id/m_view_pager"/>
 
 </RelativeLayout>

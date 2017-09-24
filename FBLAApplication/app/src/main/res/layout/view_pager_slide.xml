@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/slide_window_height"
+        android:id="@+id/slide_image"
+        app:srcCompat="@drawable/border"
+        android:scaleType="centerCrop"/>
+
+    <ProgressBar
+        android:layout_width="@dimen/large_progress_size"
+        android:layout_height="@dimen/large_progress_size"
+        android:id="@+id/pb_slideshow"
+        android:layout_centerInParent="true"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center_horizontal"
+        android:text="Test caption to go with test image"
+        android:textSize="@dimen/text_h2"
+        android:textColor="@android:color/white"
+        android:background="@drawable/scrim"
+        android:layout_alignBottom="@id/slide_image"
+        android:id="@+id/tv_slideshow"/>
+
+</RelativeLayout>

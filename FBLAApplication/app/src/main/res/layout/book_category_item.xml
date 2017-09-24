@@ -1,18 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="@dimen/book_width"
     android:layout_height="@dimen/book_height"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#F0F0F0"
-    android:layout_margin="@dimen/margin">
+    android:layout_margin="@dimen/margin"
+    android:id="@+id/m_rl_book">
 
-    <ImageView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/testimage"
-        android:scaleType="centerCrop"
-        android:id="@+id/m_iv_book_cover"/>
+        android:layout_height="match_parent">
+        <android.support.v7.widget.AppCompatImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:id="@+id/m_iv_book_cover" />
+        <ProgressBar
+            android:layout_width="@dimen/small_progress_size"
+            android:layout_height="@dimen/small_progress_size"
+            android:layout_centerInParent="true"
+            android:id="@+id/m_pb_book_progress"/>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,11 +37,11 @@
             android:textColor="@android:color/white"
             tools:text="4.3"
             android:id="@+id/m_tv_rating"/>
-        <ImageView
+        <android.support.v7.widget.AppCompatImageView
             android:layout_width="@dimen/book_star_diameter"
             android:layout_height="@dimen/book_star_diameter"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_stars_10dp"
+            app:srcCompat="@drawable/ic_stars_10dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="5dp"/>
     </LinearLayout>

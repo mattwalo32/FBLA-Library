@@ -6,7 +6,10 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@android:color/white"
-    android:padding="@dimen/margin">
+    android:padding="@dimen/margin"
+    android:clipToPadding="false"
+    android:clipChildren="false"
+    android:id="@+id/m_ll_subject_row">
 
     <TextView
         android:layout_width="match_parent"

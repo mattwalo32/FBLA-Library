@@ -1,5 +1,7 @@
 package com.walowtech.fblaapplication;
 
+import android.graphics.Bitmap;
+
 /**
  * The class for a book object.
  *
@@ -20,6 +22,7 @@ public class Book {
     public String GID, title, subTitle, textSnippet, subject, description, authors,
             bookDetails, thumbnail, smallThumbnail, ISBN10, ISBN13, WaitingList,
             WaitingListSize;
+    public Bitmap coverSmall = null;
 
     public Book(String subject, String title, String GID, String smallThumbnail, float averageRating){
         this.subject = subject;
