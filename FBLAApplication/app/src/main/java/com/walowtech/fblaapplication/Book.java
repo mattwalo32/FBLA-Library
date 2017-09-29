@@ -1,6 +1,7 @@
 package com.walowtech.fblaapplication;
 
 import android.graphics.Bitmap;
+import android.widget.ImageView;
 
 /**
  * The class for a book object.
@@ -23,6 +24,8 @@ public class Book {
             bookDetails, thumbnail, smallThumbnail, ISBN10, ISBN13, WaitingList,
             WaitingListSize;
     public Bitmap coverSmall = null;
+
+    ImageView imageView = null;
 
     public Book(String subject, String title, String GID, String smallThumbnail, float averageRating){
         this.subject = subject;

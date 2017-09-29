@@ -16,6 +16,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import static com.walowtech.fblaapplication.MainActivity.mainContent;
+import static com.walowtech.fblaapplication.MainActivity.subjectsLastVis;
+
 /**
  * Downloads an image from a URL.
  *
@@ -63,8 +66,12 @@ public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
         forceLoad();
     }
 
+
     @Override
     public JSONObject loadInBackground() {
+        MainActivity.subjectsLastVis = mainContent.getLastVisiblePosition();
+        Log.i("LoginActivity", "LastVis: " + subjectsLastVis);
+
         //Loops through each category
         for(i=0; i < categories.size(); i++) {
 
@@ -72,23 +79,34 @@ public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
             for(j=0; j < categories.get(i).books.size(); j++) {
                 String url = categories.get(i).books.get(j).smallThumbnail;
                 if(url != null && !url.equals("")) {
-                    categories.get(i).books.get(j).coverSmall = MainActivity.categories.get(i).books.get(j).coverSmall = NetworkJSONUtils.downloadBitmap(context, url);
+                    image = NetworkJSONUtils.downloadBitmap(context, url);
+                    categories.get(i).books.get(j).coverSmall = image;
                 }else {
+                    Log.i("LoginActivity", "NULL URL");
                     //TODO set no image image
                 }
-
+               //Updates on the UI thread to prevent crash
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                         if(i < categories.size()) {
+                             MainActivity.updateUIImage(i, j, image);
+                        }
+                    }
+                });
             }
 
             //Updates on the UI thread to prevent crash
-            activity.runOnUiThread(new Runnable() {
+           /* activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    MainActivity.updateUIImage();
+                    if(i < categories.size()) {
+                        MainActivity.updateUIImage(i, j, image);
+                    }
                 }
-            });
+            });*/
 
         }
-
         return null;
     }
 }

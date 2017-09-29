@@ -4,6 +4,7 @@
     <color name="colorPrimary100">#B3E5FC</color>
     <color name="colorPrimary300">#4FC3F7</color>
     <color name="colorPrimary500">#03A9F4</color>
+    <color name="colorPrimary600">#0292e5</color>
     <color name="colorPrimary700">#0288D1</color>
 
     <color name="colorAccent100">#B9F6CA</color>

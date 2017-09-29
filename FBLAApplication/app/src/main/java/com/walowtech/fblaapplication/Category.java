@@ -1,5 +1,7 @@
 package com.walowtech.fblaapplication;
 
+import android.view.View;
+
 import java.util.ArrayList;
 
 /**
@@ -11,6 +13,7 @@ public class Category {
 
     public ArrayList<Book> books = new ArrayList<>();
     public String categoryName;
+    MainActivity.BookAdapter bookAdapter;
 
     public Category(ArrayList<Book> books, String categoryName){
         this.books = books;

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Top of nav -->
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimary50"
+    android:id="@+id/m_profile_box"
+    android:padding="@dimen/margin">
+    <ImageView
+        android:layout_width="@dimen/profile_diameter"
+        android:layout_height="@dimen/profile_diameter"
+        android:background="@drawable/circle"
+        app:srcCompat="@drawable/ic_account_circle_100dp"
+        android:id="@+id/m_iv_large_profile"/>
+    <TextView
+        android:id="@+id/m_tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_h2"
+        android:textColor="@android:color/black"
+        android:layout_below="@id/m_iv_large_profile"
+        android:textStyle="bold"
+        android:text="Firstname Lastname"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text"
+        android:textColor="@color/colorSecondaryText"
+        android:layout_below="@id/m_tv_name"
+        android:text="Emailadress@domain.com"/>
+</RelativeLayout>

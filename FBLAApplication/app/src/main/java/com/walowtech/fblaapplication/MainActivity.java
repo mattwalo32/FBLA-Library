@@ -1,6 +1,5 @@
 package com.walowtech.fblaapplication;
 
-import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Loader;
@@ -8,17 +7,18 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -27,11 +27,13 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.walowtech.fblaapplication.Utils.DownloadImageLoader;
 import com.walowtech.fblaapplication.Utils.DownloadJSONLoader;
 import com.walowtech.fblaapplication.Utils.ErrorUtils;
+import com.walowtech.fblaapplication.Utils.NavbarAdapter;
 import com.walowtech.fblaapplication.Utils.NetworkJSONUtils;
 import com.walowtech.fblaapplication.Utils.SlideshowAdapter;
 
@@ -42,7 +44,9 @@ import org.json.JSONObject;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 /**
  * The main activity of the app.
@@ -58,19 +62,28 @@ import java.util.List;
  */
 
 //Created 9/15/2017
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks, NavigationView.OnNavigationItemSelectedListener {
+
+    private DrawerLayout navDrawer;
 
     private JSONObject jsonResponse;
 
     public static ListView mainContent;
+    private ViewGroup mainContentHeader;
+
+    private LinearLayout navItemsLayout;
+    private ListView navItems;
+    private ViewGroup navHeader;
 
     public static SubjectAdapter subjectAdapter;
-    private ViewGroup mainContentHeader;
 
     public static Typeface handWriting;
 
     private final int ELEVATION_SUBJECT = 6;
     private final int ELEVATION_BOOK = 8;
+
+    public NavbarAdapter navbarAdapter;
+    ArrayList<NavbarItem> navbarItems = new ArrayList<>();
 
     public static RecyclerView recyclerView;
 
@@ -101,24 +114,53 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private final int DOWNLOAD_JSON_LOADER = 0;
     private final int DOWNLOAD_IMAGE_LOADER = 1;
 
+    public static int subjectsFirstVis;
+    public static int subjectsLastVis;
+
     public static  ArrayList<Category> categories;
-    private ArrayList<Book> books = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Initialize main content
         mainContent = (ListView) findViewById(R.id.m_lv_main_content);
         LayoutInflater inflater = getLayoutInflater();
         mainContentHeader = (ViewGroup)inflater.inflate(R.layout.main_content_header, mainContent, false);
+
         mainContent.addHeaderView(mainContentHeader, null, false);
+        categories = new ArrayList<>();
+
+        for(int i = 0; i < 7; i++){
+            ArrayList<Book> tempBooks = new ArrayList<>();
+            for (int j = 0; j < Integer.valueOf(VALUE_NUM_RESULTS); j++) {
+                tempBooks.add(new Book(null, null, null, null, 0f));
+            }
+            categories.add(new Category(tempBooks, "Loading"));
+        }
+        subjectAdapter = new SubjectAdapter(this, categories);
+        mainContent.setAdapter(subjectAdapter);
 
         handWriting = Typeface.createFromAsset(getAssets(), "fonts/hand_writing.ttf");
 
+        //Initialize ViewPager
         viewPager = (ViewPager)mainContentHeader.findViewById(R.id.m_view_pager);
         slideshowAdapter = new SlideshowAdapter(this, new int[]{R.drawable.testimage, R.drawable.testimage, R.drawable.testimage});
         viewPager.setAdapter(slideshowAdapter);
+
+        //Initialize the nav drawer
+        navItemsLayout = (LinearLayout) findViewById(R.id.m_ll_nav);
+        navDrawer = (DrawerLayout) findViewById(R.id.m_nav_drawer);
+        navItems = (ListView) findViewById(R.id.m_lv_nav);
+        navHeader = (ViewGroup)inflater.inflate(R.layout.navbar_header, navItems, false);
+        navItems.addHeaderView(navHeader, null, false);
+
+        setNavbarItems();
+        navbarAdapter = new NavbarAdapter(this, navbarItems);
+        navItems.setAdapter(navbarAdapter);
+
+        configActionBar();
 
         if(NetworkJSONUtils.checkInternetConnection(this)) {
             fetchBookData();
@@ -126,6 +168,51 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
         }
         //TODO show image for no image
+
+    }
+
+    private void configActionBar(){
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(false);
+
+        actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_drawable));
+
+        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        View v = layoutInflater.inflate(R.layout.actionbar_layout, null);
+
+        actionBar.setCustomView(v);
+
+        actionBar.setDisplayShowHomeEnabled(true);
+
+        ImageView icon = (ImageView) v.findViewById(R.id.ic_menu);
+        icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("LoginActivity", "touched");
+                if(navItemsLayout.getVisibility() == VISIBLE) {
+                    navItemsLayout.setVisibility(GONE);
+                }else{
+                    navItemsLayout.setVisibility(VISIBLE);
+                }
+                //TODO handle touch
+            }
+        });
+
+        SearchView searchView = (SearchView) v.findViewById(R.id.menu_search);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Log.i("LoginActivity", "Text Changed");
+                //TODO update list
+                return false;
+            }
+        });
     }
 
     @Override
@@ -156,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             getLoaderManager().destroyLoader(loader.getId());
         }else if(loader.getId() == DOWNLOAD_IMAGE_LOADER) {
             //recyclerView.getAdapter().notifyAll();
-            subjectAdapter.notifyDataSetChanged();
+            //subjectAdapter.notifyDataSetChanged();
         }
     }
 
@@ -165,14 +252,40 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     }
 
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        return false;
+    }
+
+    //TODO doc
+    private void setNavbarItems(){
+        navbarItems.add(new NavbarItem(R.drawable.ic_account_black, "Account"));
+        navbarItems.add(new NavbarItem(R.drawable.ic_account_black, "Settings"));
+        navbarItems.add(new NavbarItem(R.drawable.ic_account_black, "Information"));
+        navbarItems.add(new NavbarItem(R.drawable.ic_account_black, "Fees"));
+        navbarItems.add(new NavbarItem(R.drawable.ic_account_black, "Logout"));
+    }
+
     /**
      * Updates book image.
      *
      * Method is invoked to update the book image from the UI thread.
      * Changing the image from any non-UI thread would crash the application.
      */
-    public static void updateUIImage(){
-        subjectAdapter.notifyDataSetChanged();
+    public static void updateUIImage(int i, int j, Bitmap bitmap){
+
+//TODO fix
+        if(i <= subjectsLastVis){
+            subjectAdapter.notifyDataSetChanged();
+        }else {
+            try {
+                //TODO fix
+                categories.get(i).bookAdapter.notifyItemRangeChanged(j-1, j+1);
+            } catch (NullPointerException e) {
+                Log.i("LoginActivity", "EXCEPTION THROWN in " + i + ", " + j);
+                //TODO catch
+            }
+        }
     }
 
     /**
@@ -227,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 JSONObject jsonResponse = json.getJSONObject(KEY_JSON);
                 int numSubjects = jsonResponse.getInt(KEY_NUM_SUBJECTS);
 
-               categories = new ArrayList<>();
+               categories.clear();
 
                 //iterate through subjects
                 for(int i = 0; i < numSubjects + 1; i++){
@@ -251,8 +364,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                     categories.add(new Category(tempBooks, curSubjKey));
                 }
-
-                getLoaderManager().initLoader(DOWNLOAD_IMAGE_LOADER, null, this);
             }
         }catch(JSONException JSONE){
             ErrorUtils.errorDialog(this, "Server Error", "The data from the server could not be read correctly. Please try again later.");
@@ -260,9 +371,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             return;
         }
 
-        subjectAdapter = new SubjectAdapter(this, categories);
-        mainContent.setAdapter(subjectAdapter);
-
+        getLoaderManager().initLoader(DOWNLOAD_IMAGE_LOADER, null, this);
     }
 
     /**
@@ -304,9 +413,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             Category subject = getItem(position);
-            if(convertView == null){
+            if(convertView == null)
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.book_category, parent, false);
-            }
+
 
             TextView tvSubjectTitle = (TextView) convertView.findViewById(R.id.m_tv_title);
             LinearLayout subjectRow = (LinearLayout) convertView.findViewById(R.id.m_ll_subject_row);
@@ -317,6 +426,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             recyclerView = (RecyclerView) convertView.findViewById(R.id.m_rv_books);
             bookAdapter = new BookAdapter(getContext(), subject.books);
+
+            categories.get(position).bookAdapter = bookAdapter;
+
             recyclerView.setAdapter(bookAdapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
@@ -335,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      *
      * Created 9/18/17
      */
-    private class BookAdapter extends RecyclerView.Adapter<BookAdapter.MyViewHolder>{
+    public class BookAdapter extends RecyclerView.Adapter<BookAdapter.MyViewHolder>{
 
         private LayoutInflater inflater;
         ArrayList<Book> books = new ArrayList<>();
@@ -358,9 +470,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             holder.rating.setText(Float.toString(currentBook.averageRating));
             holder.rating.setTypeface(handWriting);
 
+            books.get(position).imageView = holder.image;
+
             if(currentBook.coverSmall != null) {
                 holder.image.setImageBitmap(currentBook.coverSmall);
-                holder.progressBar.setVisibility(View.GONE);
+                holder.progressBar.setVisibility(GONE);
             }
 
             setElevation(holder.book, ELEVATION_BOOK);

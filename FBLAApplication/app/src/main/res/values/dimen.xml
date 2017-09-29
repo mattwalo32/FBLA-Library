@@ -44,4 +44,5 @@
     <dimen name="border_width">4dp</dimen>
     <dimen name="small_progress_size">20dp</dimen>
     <dimen name="large_progress_size">50dp</dimen>
+    <dimen name="navbar_item_height">50dp</dimen>
 </resources>
