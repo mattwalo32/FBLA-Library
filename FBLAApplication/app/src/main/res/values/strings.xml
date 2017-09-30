@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">FBLA Application</string>
     <string name="preference_file_key">FBLAApplicationUserData</string>
+    <string name="string_empty"></string>
 
     <!-- Login Activity -->
     <string name="login_message">Welcome Back</string>

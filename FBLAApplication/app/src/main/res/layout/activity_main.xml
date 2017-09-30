@@ -28,13 +28,6 @@
         </LinearLayout>
 
     <!-- Nav Layout -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:visibility="gone"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:id="@+id/m_ll_nav">
-
         <ListView
             android:layout_width="@dimen/navbar_width"
             android:layout_height="match_parent"
@@ -42,23 +35,6 @@
             android:divider="@android:color/transparent"
             android:dividerHeight="0dp"
             android:background="@color/colorPrimary100"
-            android:id="@+id/m_lv_nav">
-
-        </ListView>
-
-        <!-- Top of nav -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary100"
-            android:id="@+id/m_profile_box">
-            <ImageView
-                android:layout_width="@dimen/profile_diameter"
-                android:layout_height="@dimen/profile_diameter"
-                android:background="@drawable/circle"
-                app:srcCompat="@drawable/ic_account_circle_100dp"/>
-        </FrameLayout>
-
-    </LinearLayout>
+            android:id="@+id/nav_layout" />
 
 </android.support.v4.widget.DrawerLayout>

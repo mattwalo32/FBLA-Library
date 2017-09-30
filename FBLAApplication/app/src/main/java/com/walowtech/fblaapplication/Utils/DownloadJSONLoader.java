@@ -40,8 +40,10 @@ public class DownloadJSONLoader extends AsyncTaskLoader<JSONObject> {
 
     @Override
     public JSONObject loadInBackground() {
+        Log.i("LoginActivity", "DOWNLOADING STARTED FROM " + url.toString());
         InputStream is = NetworkJSONUtils.retrieveInputStream(context, url);
         JSONObject jsonObject = NetworkJSONUtils.retrieveJSON(context, is);
+        Log.i("LoginActivity", "DOWNLOADING FINISHED FROM " + url.toString());
         return jsonObject;
     }
 }

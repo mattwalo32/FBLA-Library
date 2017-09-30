@@ -1,6 +1,7 @@
 package com.walowtech.fblaapplication.Utils;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v4.view.PagerAdapter;
 import android.transition.Slide;
 import android.util.Log;
@@ -14,6 +15,9 @@ import android.widget.TextView;
 
 import com.walowtech.fblaapplication.MainActivity;
 import com.walowtech.fblaapplication.R;
+import com.walowtech.fblaapplication.ViewPagerItem;
+
+import java.util.ArrayList;
 
 import static android.view.View.GONE;
 
@@ -28,18 +32,18 @@ import static android.view.View.GONE;
 //Created 9/23/17
 public class SlideshowAdapter extends PagerAdapter {
 
-    private int[] imageResources = {R.drawable.testimage};
+    private ArrayList<ViewPagerItem> slides;
     private Context context;
     private LayoutInflater layoutInflater;
 
-    public SlideshowAdapter(Context context, int[] imageResources){
+    public SlideshowAdapter(Context context, ArrayList<ViewPagerItem> slides){
         this.context = context;
-        this.imageResources = imageResources;
+        this.slides = slides;
     }
 
     @Override
     public int getCount() {
-        return imageResources.length;
+        return slides.size();
     }
 
     @Override
@@ -49,6 +53,8 @@ public class SlideshowAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
+        ViewPagerItem curSlide = slides.get(position);
+
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View itemView = layoutInflater.inflate(R.layout.view_pager_slide, container, false);
 
@@ -56,8 +62,8 @@ public class SlideshowAdapter extends PagerAdapter {
         TextView textView = (TextView) itemView.findViewById(R.id.tv_slideshow);
         ProgressBar progressBar = (ProgressBar) itemView.findViewById(R.id.pb_slideshow);
 
-        imageView.setImageResource(imageResources[position]);
-        textView.setText("TEST FOR THIS");
+        imageView.setImageBitmap(curSlide.image);
+        textView.setText(curSlide.description);
         textView.setTypeface(MainActivity.handWriting);
         progressBar.setVisibility(GONE);
 

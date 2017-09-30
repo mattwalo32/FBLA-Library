@@ -7,18 +7,13 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -33,7 +28,6 @@ import android.widget.TextView;
 import com.walowtech.fblaapplication.Utils.DownloadImageLoader;
 import com.walowtech.fblaapplication.Utils.DownloadJSONLoader;
 import com.walowtech.fblaapplication.Utils.ErrorUtils;
-import com.walowtech.fblaapplication.Utils.NavbarAdapter;
 import com.walowtech.fblaapplication.Utils.NetworkJSONUtils;
 import com.walowtech.fblaapplication.Utils.SlideshowAdapter;
 
@@ -46,7 +40,6 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
 
 /**
  * The main activity of the app.
@@ -61,19 +54,15 @@ import static android.view.View.VISIBLE;
  * @since 1.0
  */
 
-//Created 9/15/2017
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks, NavigationView.OnNavigationItemSelectedListener {
+//TODO clean up loaders
 
-    private DrawerLayout navDrawer;
+//Created 9/15/2017
+public class MainActivity extends NavDrawerActivity implements LoaderManager.LoaderCallbacks {
 
     private JSONObject jsonResponse;
 
-    public static ListView mainContent;
+    private ListView mainContent;
     private ViewGroup mainContentHeader;
-
-    private LinearLayout navItemsLayout;
-    private ListView navItems;
-    private ViewGroup navHeader;
 
     public static SubjectAdapter subjectAdapter;
 
@@ -82,10 +71,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private final int ELEVATION_SUBJECT = 6;
     private final int ELEVATION_BOOK = 8;
 
-    public NavbarAdapter navbarAdapter;
-    ArrayList<NavbarItem> navbarItems = new ArrayList<>();
-
-    public static RecyclerView recyclerView;
+    private RecyclerView recyclerView;
 
     private final String KEY_AVERAGE_RATING = "AverageRating";
     private final String KEY_GID = "GID";
@@ -96,6 +82,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private final String KEY_SUCCESS = "Success";
     private final String KEY_TITLE = "Title";
 
+    private final String KEY_DESCRIPTION = "Description";
+    private final String KEY_SLIDESHOW_IMAGE = "Image";
+    private final String KEY_LINKED_ITEM = "LinkedItem";
+    private final String KEY_SHORT_DESCRIPTION = "ShortDescription";
+
     private final String BASE_URL = "walowtech.com";
     private final String PARAM_ACTION = "ACTION";
     private final String PARAM_NUM_RESULTS = "NUMOFRESULTS";
@@ -103,18 +94,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private final String PATH1 = "FBLALibrary";
     private final String PATH2 = "api.php";
     private final String SCHEME = "https";
-    private final String VALUE_ACTION = "ACTION_RETRIEVE_TOP_BOOKS_BY_CATEGORY";
+    private final String VALUE_ACTION_BOOKS = "ACTION_RETRIEVE_TOP_BOOKS_BY_CATEGORY";
+    private final String VALUE_ACTION_MESSAGE = "ACTION_RETRIEVE_DAILY_MESSAGE";
     private final String VALUE_NUM_RESULTS = "15";
 
     private URL requestURL;
 
     private ViewPager viewPager;
-    private SlideshowAdapter slideshowAdapter;
+    public SlideshowAdapter slideshowAdapter;
+    public static ArrayList<ViewPagerItem> slideshows = new ArrayList<>();
 
-    private final int DOWNLOAD_JSON_LOADER = 0;
-    private final int DOWNLOAD_IMAGE_LOADER = 1;
+    private final int DOWNLOAD_BOOK_JSON_LOADER = 0;
+    private final int DOWNLOAD_SLIDE_JSON_LOADER = 1;
+    private final int DOWNLOAD_BOOK_IMAGE_LOADER = 2;
+    private final int DOWNLOAD_SLIDE_IMAGE_LOADER = 3;
+    public static int downloadType;
 
-    public static int subjectsFirstVis;
     public static int subjectsLastVis;
 
     public static  ArrayList<Category> categories;
@@ -123,6 +118,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        configActionBar();
+        super.onCreateDrawer();
 
         //Initialize main content
         mainContent = (ListView) findViewById(R.id.m_lv_main_content);
@@ -146,23 +143,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         //Initialize ViewPager
         viewPager = (ViewPager)mainContentHeader.findViewById(R.id.m_view_pager);
-        slideshowAdapter = new SlideshowAdapter(this, new int[]{R.drawable.testimage, R.drawable.testimage, R.drawable.testimage});
-        viewPager.setAdapter(slideshowAdapter);
 
-        //Initialize the nav drawer
-        navItemsLayout = (LinearLayout) findViewById(R.id.m_ll_nav);
-        navDrawer = (DrawerLayout) findViewById(R.id.m_nav_drawer);
-        navItems = (ListView) findViewById(R.id.m_lv_nav);
-        navHeader = (ViewGroup)inflater.inflate(R.layout.navbar_header, navItems, false);
-        navItems.addHeaderView(navHeader, null, false);
-
-        setNavbarItems();
-        navbarAdapter = new NavbarAdapter(this, navbarItems);
-        navItems.setAdapter(navbarAdapter);
-
-        configActionBar();
 
         if(NetworkJSONUtils.checkInternetConnection(this)) {
+            fetchSlideData();
             fetchBookData();
         }else{
             ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
@@ -175,6 +159,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+
 
         actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_drawable));
 
@@ -183,21 +170,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         actionBar.setCustomView(v);
 
-        actionBar.setDisplayShowHomeEnabled(true);
-
-        ImageView icon = (ImageView) v.findViewById(R.id.ic_menu);
-        icon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i("LoginActivity", "touched");
-                if(navItemsLayout.getVisibility() == VISIBLE) {
-                    navItemsLayout.setVisibility(GONE);
-                }else{
-                    navItemsLayout.setVisibility(VISIBLE);
-                }
-                //TODO handle touch
-            }
-        });
 
         SearchView searchView = (SearchView) v.findViewById(R.id.menu_search);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -218,17 +190,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public Loader<JSONObject> onCreateLoader(int id, Bundle args) {
         jsonResponse = null;
-        if(id == DOWNLOAD_JSON_LOADER)
+        subjectsLastVis = mainContent.getLastVisiblePosition();
+
+        if(id == DOWNLOAD_BOOK_JSON_LOADER || id== DOWNLOAD_SLIDE_JSON_LOADER) {
             return new DownloadJSONLoader(this, requestURL);
-        else if(id == DOWNLOAD_IMAGE_LOADER)
-            return new DownloadImageLoader(this, categories, this);
+        }else if(id == DOWNLOAD_BOOK_IMAGE_LOADER || id == DOWNLOAD_SLIDE_IMAGE_LOADER) {
+            if (downloadType == 0)
+                return new DownloadImageLoader(this, this, categories, null, this);
+            else if(downloadType == 1)
+                return new DownloadImageLoader(this, this, null, slideshows, this);
+        }
         return null;
 
     }
 
     @Override
     public void onLoadFinished(Loader loader, Object data) {
-        if(loader.getId() == DOWNLOAD_JSON_LOADER) {
+        if(loader.getId() == DOWNLOAD_BOOK_JSON_LOADER || loader.getId() == DOWNLOAD_SLIDE_JSON_LOADER) {
             if (data != null && data != " ") {
                 try {
                     jsonResponse = new JSONObject(data.toString());
@@ -240,30 +218,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 ErrorUtils.errorDialog(this, "Could not connect to server", "No information was retrieved from the server. Please try again later.");
             }
 
+            //Loader must be destroied for different URLs to be downloaded from
             getLoaderManager().destroyLoader(loader.getId());
-        }else if(loader.getId() == DOWNLOAD_IMAGE_LOADER) {
-            //recyclerView.getAdapter().notifyAll();
-            //subjectAdapter.notifyDataSetChanged();
+        }else if(loader.getId() == DOWNLOAD_BOOK_IMAGE_LOADER || loader.getId() == DOWNLOAD_SLIDE_IMAGE_LOADER) {
+
+            //Loader must be destroied for future calls of different download types to work
+            getLoaderManager().destroyLoader(loader.getId());
         }
     }
 
     @Override
     public void onLoaderReset(Loader loader) {
 
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        return false;
-    }
-
-    //TODO doc
-    private void setNavbarItems(){
-        navbarItems.add(new NavbarItem(R.drawable.ic_account_black, "Account"));
-        navbarItems.add(new NavbarItem(R.drawable.ic_account_black, "Settings"));
-        navbarItems.add(new NavbarItem(R.drawable.ic_account_black, "Information"));
-        navbarItems.add(new NavbarItem(R.drawable.ic_account_black, "Fees"));
-        navbarItems.add(new NavbarItem(R.drawable.ic_account_black, "Logout"));
     }
 
     /**
@@ -288,8 +254,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
+//TODO doc
+    public void updateViewPagerImage(){
+        slideshowAdapter = new SlideshowAdapter(this, slideshows);
+        viewPager.setAdapter(slideshowAdapter);
+    }
+
     /**
-     * Initiates the fetching of the top book data.
+     * Initiates variables for the fetching of the top book data.
      *
      * A URL is created that fetches information about
      * the top books. The URL is passed to DownloadImageLoader
@@ -301,13 +273,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             return;
         }
 
+        Log.i("LoginActivity", "Book data being fetched");
+
         Uri.Builder builder = new Uri.Builder();
         builder.scheme(SCHEME)
                 .authority(BASE_URL)
                 .appendPath(PATH0)
                 .appendPath(PATH1)
                 .appendPath(PATH2)
-                .appendQueryParameter(PARAM_ACTION, VALUE_ACTION)
+                .appendQueryParameter(PARAM_ACTION, VALUE_ACTION_BOOKS)
                 .appendQueryParameter(PARAM_NUM_RESULTS, VALUE_NUM_RESULTS)
                 .build();
         String urlString = builder.toString();
@@ -319,7 +293,40 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             return;
         }
 
-        getLoaderManager().initLoader(DOWNLOAD_JSON_LOADER, null, this);
+        getLoaderManager().initLoader(DOWNLOAD_BOOK_JSON_LOADER, null, this);
+    }
+
+    /**
+     * Initalizes variables for fetching slideshow data
+     *
+     * A URL is created that is passed to DownloadImageLoader
+     * after the loader is initialized. This URL is the location
+     * of the JSON regarding the slides.
+     */
+    public void fetchSlideData(){
+        if(!NetworkJSONUtils.checkInternetConnection(this)) {
+            ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
+            return;
+        }
+
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme(SCHEME)
+                .authority(BASE_URL)
+                .appendPath(PATH0)
+                .appendPath(PATH1)
+                .appendPath(PATH2)
+                .appendQueryParameter(PARAM_ACTION, VALUE_ACTION_MESSAGE)
+                .build();
+        String urlString = builder.toString();
+
+        try{
+            requestURL = new URL(urlString);
+        }catch(MalformedURLException MURLE){
+            ErrorUtils.errorDialog(this, "There was an error with the url", "Currently the server can not be reached. Make sure your username and password are entered correctly");
+            return;
+        }
+
+        getLoaderManager().initLoader(DOWNLOAD_SLIDE_JSON_LOADER, null, this);
     }
 
     /**
@@ -334,6 +341,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * @param json The JSON to be parsed.
      */
     private void parseBookJSON(JSONObject json){
+        Log.i("LoginActivity", "JSON recieved");
         try {
             int success = json.getInt(KEY_SUCCESS);
             if(success == 1) {
@@ -364,6 +372,27 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                     categories.add(new Category(tempBooks, curSubjKey));
                 }
+
+
+                downloadType = 0;
+                Log.i("LoginActivity", "Image started");
+                getLoaderManager().initLoader(DOWNLOAD_BOOK_IMAGE_LOADER, null, this);
+            }else if(success == 3){
+                JSONArray jsonResponse = json.getJSONArray(KEY_JSON);
+                slideshows.clear();
+
+                for(int i=0; i < jsonResponse.length(); i++){
+                    JSONObject curSlide = (JSONObject)jsonResponse.get(i);
+                    String shortDescription = curSlide.getString(KEY_SHORT_DESCRIPTION);
+                    String description = curSlide.getString(KEY_DESCRIPTION);
+                    String linkedItem = curSlide.getString(KEY_LINKED_ITEM);
+                    String image = curSlide.getString(KEY_SLIDESHOW_IMAGE);
+
+                    slideshows.add(new ViewPagerItem(shortDescription, description, linkedItem, image));
+                }
+
+                downloadType = 1;
+                getLoaderManager().initLoader(DOWNLOAD_SLIDE_IMAGE_LOADER, null, this);
             }
         }catch(JSONException JSONE){
             ErrorUtils.errorDialog(this, "Server Error", "The data from the server could not be read correctly. Please try again later.");
@@ -371,7 +400,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             return;
         }
 
-        getLoaderManager().initLoader(DOWNLOAD_IMAGE_LOADER, null, this);
     }
 
     /**

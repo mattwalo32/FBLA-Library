@@ -8,15 +8,11 @@ import android.util.Log;
 
 import com.walowtech.fblaapplication.Category;
 import com.walowtech.fblaapplication.MainActivity;
+import com.walowtech.fblaapplication.ViewPagerItem;
 
 import org.json.JSONObject;
 
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-
-import static com.walowtech.fblaapplication.MainActivity.mainContent;
 import static com.walowtech.fblaapplication.MainActivity.subjectsLastVis;
 
 /**
@@ -36,10 +32,13 @@ import static com.walowtech.fblaapplication.MainActivity.subjectsLastVis;
 public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
 
     ArrayList<Category> categories;
+    ArrayList<ViewPagerItem> slides;
     Context context;
     ArrayList<Bitmap> response;
     Activity activity;
     Bitmap image;
+
+    MainActivity mainActivity;
 
     int i;
     int j;
@@ -52,11 +51,13 @@ public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
      *                   the books and their images to download
      * @param activity The activity of the calling class
      */
-    public DownloadImageLoader(Context context, ArrayList<Category> categories, Activity activity){
+    public DownloadImageLoader(Context context, MainActivity mainActivity, ArrayList<Category> categories, ArrayList<ViewPagerItem> slides, Activity activity){
         super(context);
+        this.mainActivity = mainActivity;
         this.categories = categories;
         this.context = context;
         this.activity = activity;
+        this.slides = slides;
 
         response = new ArrayList<>();
     }
@@ -69,42 +70,47 @@ public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
 
     @Override
     public JSONObject loadInBackground() {
-        MainActivity.subjectsLastVis = mainContent.getLastVisiblePosition();
-        Log.i("LoginActivity", "LastVis: " + subjectsLastVis);
+        if(MainActivity.downloadType == 0) {
+            //Loops through each category
+            for (i = 0; i < categories.size(); i++) {
 
-        //Loops through each category
-        for(i=0; i < categories.size(); i++) {
-
-            //Loops through each subject
-            for(j=0; j < categories.get(i).books.size(); j++) {
-                String url = categories.get(i).books.get(j).smallThumbnail;
-                if(url != null && !url.equals("")) {
-                    image = NetworkJSONUtils.downloadBitmap(context, url);
-                    categories.get(i).books.get(j).coverSmall = image;
-                }else {
-                    Log.i("LoginActivity", "NULL URL");
-                    //TODO set no image image
-                }
-               //Updates on the UI thread to prevent crash
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                         if(i < categories.size()) {
-                             MainActivity.updateUIImage(i, j, image);
-                        }
+                //Loops through each subject
+                for (j = 0; j < categories.get(i).books.size(); j++) {
+                    String url = categories.get(i).books.get(j).smallThumbnail;
+                    if (url != null && !url.equals("")) {
+                        image = NetworkJSONUtils.downloadBitmap(context, url);
+                        categories.get(i).books.get(j).coverSmall = image;
+                    } else {
+                        Log.i("LoginActivity", "NULL URL");
+                        //TODO set no image image
                     }
-                });
-            }
+                    //Updates on the UI thread to prevent crash
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (i < categories.size()) {
+                                MainActivity.updateUIImage(i, j, image);
+                            }
+                        }
+                    });
+                }
 
-            //Updates on the UI thread to prevent crash
-           /* activity.runOnUiThread(new Runnable() {
+            }
+        }else if(MainActivity.downloadType == 1){
+                for(int i = 0; i < slides.size(); i++) {
+                    String url = slides.get(i).imageURL;
+                    image = NetworkJSONUtils.downloadBitmap(context, url);
+
+
+                    slides.get(i).image = image;
+                }
+
+            activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if(i < categories.size()) {
-                        MainActivity.updateUIImage(i, j, image);
-                    }
+                    mainActivity.updateViewPagerImage();
                 }
-            });*/
+            });
 
         }
         return null;
