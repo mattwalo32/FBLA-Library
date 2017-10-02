@@ -41,6 +41,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -61,6 +62,7 @@ import static android.view.View.GONE;
  */
 
 //TODO clean up loaders
+//TODO if internet changes app crashes
 
 //Created 9/15/2017
 public class MainActivity extends NavDrawerActivity implements LoaderManager.LoaderCallbacks {
@@ -168,6 +170,9 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
         //Initialize ViewPager
         viewPager = (ViewPager)mainContentHeader.findViewById(R.id.m_view_pager);
+        ArrayList<ViewPagerItem> initSlide = new ArrayList<>();
+        initSlide.add(new ViewPagerItem("Loading ...", null, null, null));
+        viewPager.setAdapter(new SlideshowAdapter(this, initSlide));
 
         //Check for internet connection
         if(NetworkJSONUtils.checkInternetConnection(this)) {
@@ -261,7 +266,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
             return;
         }
 
-        //Start loader
+        //Restart loader is used instead of init loader so that if screen is rotated, loader is guarenteed to restart
         getLoaderManager().restartLoader(DOWNLOAD_SEARCH_JSON_LOADER, null, this);
     }
 
@@ -409,8 +414,8 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
             return;
         }
 
-        //Start loader
-        getLoaderManager().initLoader(DOWNLOAD_BOOK_JSON_LOADER, null, this);
+        //Restart loader is used instead of init loader so that if screen is rotated, loader is guarenteed to restart
+        getLoaderManager().restartLoader(DOWNLOAD_BOOK_JSON_LOADER, null, this);
     }
 
     /**
@@ -446,8 +451,8 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
             return;
         }
 
-        //Start loader
-        getLoaderManager().initLoader(DOWNLOAD_SLIDE_JSON_LOADER, null, this);
+        //Restart loader is used instead of init loader so that if screen is rotated, loader is guarenteed to restart
+        getLoaderManager().restartLoader(DOWNLOAD_SLIDE_JSON_LOADER, null, this);
     }
 
     /**
@@ -498,7 +503,8 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
                 //DownloadType 0 means books being downloaded
                 downloadType = 0;
-                getLoaderManager().initLoader(DOWNLOAD_BOOK_IMAGE_LOADER, null, this);
+                //Restart loader is used instead of init loader so that if screen is rotated, loader is guarenteed to restart
+                getLoaderManager().restartLoader(DOWNLOAD_BOOK_IMAGE_LOADER, null, this);
 
                 //If success = 3 it is a response related to slides
             }else if(success == 3){
@@ -518,7 +524,8 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
                 //DownloadType 1 means slide being downloaded
                 downloadType = 1;
-                getLoaderManager().initLoader(DOWNLOAD_SLIDE_IMAGE_LOADER, null, this);
+                //Restart loader is used instead of init loader so that if screen is rotated, loader is guarenteed to restart
+                getLoaderManager().restartLoader(DOWNLOAD_SLIDE_IMAGE_LOADER, null, this);
             }else if(success == 4){
                 //Clear previous search results
                 searchResults.clear();
@@ -590,20 +597,29 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            Category subject = getItem(position);
+        public View getView(final int position, View convertView, ViewGroup parent) {
+            final Category subject = getItem(position);
             if(convertView == null)
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.book_category, parent, false);
 
             //Get Views
             TextView tvSubjectTitle = (TextView) convertView.findViewById(R.id.m_tv_title);
+            TextView tvMore = (TextView) convertView.findViewById(R.id.m_tv_more);
             LinearLayout subjectRow = (LinearLayout) convertView.findViewById(R.id.m_ll_subject_row);
 
             setElevation(subjectRow, ELEVATION_SUBJECT);
 
+            tvMore.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.i("LoginActivity", "MORE ON SUBJ " + position + " (" + subject.categoryName + ")");
+                }
+            });
+
             //Set text and typeface
             tvSubjectTitle.setText(subject.categoryName);
             tvSubjectTitle.setTypeface(handWriting);
+            tvMore.setTypeface(handWriting);
 
             //Get RecyclerView and create adapter with horizontal layout
             recyclerView = (RecyclerView) convertView.findViewById(R.id.m_rv_books);
@@ -647,9 +663,9 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
         }
 
         @Override
-        public void onBindViewHolder(BookAdapter.MyViewHolder holder, int position) {
+        public void onBindViewHolder(BookAdapter.MyViewHolder holder, final int position) {
             //Get current item and set text, typeface, and image
-            Book currentBook = books.get(position);
+            final Book currentBook = books.get(position);
             holder.rating.setText(Float.toString(currentBook.averageRating));
             holder.rating.setTypeface(handWriting);
 
@@ -659,6 +675,15 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
             if(currentBook.coverSmall != null) {
                 holder.image.setImageBitmap(currentBook.coverSmall);
                 holder.progressBar.setVisibility(GONE);
+            }
+
+            if(currentBook.GID != null){
+                currentBook.imageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.i("LoginActivity", "BOOK PRESSED AT " + currentBook.subject + ", " + position + ". GID: " + currentBook.GID);
+                    }
+                });
             }
 
             //Set books elevation

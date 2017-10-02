@@ -62,10 +62,12 @@ public class SlideshowAdapter extends PagerAdapter {
         TextView textView = (TextView) itemView.findViewById(R.id.tv_slideshow);
         ProgressBar progressBar = (ProgressBar) itemView.findViewById(R.id.pb_slideshow);
 
-        imageView.setImageBitmap(curSlide.image);
         textView.setText(curSlide.description);
         textView.setTypeface(MainActivity.handWriting);
-        progressBar.setVisibility(GONE);
+        if(curSlide.image != null) {
+            progressBar.setVisibility(GONE);
+            imageView.setImageBitmap(curSlide.image);
+        }
 
         container.addView(itemView);
 

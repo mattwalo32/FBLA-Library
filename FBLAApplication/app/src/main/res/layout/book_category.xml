@@ -11,13 +11,28 @@
     android:clipChildren="false"
     android:id="@+id/m_ll_subject_row">
 
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="Book Category"
-        android:textSize="@dimen/text_h2"
-        android:textColor="@android:color/black"
-        android:id="@+id/m_tv_title"/>
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Book Category"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/text_h2"
+            android:textColor="@android:color/black"
+            android:id="@+id/m_tv_title"/>
+
+        <TextView
+            android:id="@+id/m_tv_more"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:paddingLeft="@dimen/margin"
+            android:text="@string/more"
+            android:textColor="@color/colorPrimary300"
+            android:textSize="@dimen/text_h2"/>
+    </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"

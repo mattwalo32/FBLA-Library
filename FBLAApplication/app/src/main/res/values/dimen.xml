@@ -23,7 +23,7 @@
 
     <!-- General dimensions for text -->
     <dimen name="text_h1">35sp</dimen>
-    <dimen name="text_h2">17sp</dimen>
+    <dimen name="text_h2">19sp</dimen>
     <dimen name="text">12sp</dimen>
 
     <!-- Login Activity -->

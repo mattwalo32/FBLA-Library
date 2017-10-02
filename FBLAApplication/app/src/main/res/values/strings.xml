@@ -23,4 +23,7 @@
     <string name="trans_et_password">trans_et_password</string>
     <string name="trans_bottom_fab">trans_bottom_fab</string>
 
+    <!-- Main -->
+    <string name="more">More</string>
+
 </resources>
