@@ -24,10 +24,11 @@ import java.util.ArrayList;
 public class NavDrawerActivity extends AppCompatActivity {
 
     public DrawerLayout drawerLayout;
-    private ListView drawerList;
+    public ListView drawerList;
     public NavbarAdapter navbarAdapter;
     public ArrayList<NavbarItem> navbarItems = new ArrayList<>();
     public ActionBarDrawerToggle toggle;
+    public View header;
 
     protected void onCreateDrawer(){
         drawerLayout = (DrawerLayout) findViewById(R.id.m_nav_drawer);
@@ -47,15 +48,15 @@ public class NavDrawerActivity extends AppCompatActivity {
         drawerLayout.addDrawerListener(toggle);
 
         navbarItems.add(new NavbarItem(R.drawable.ic_account_black, "Account"));
-        navbarItems.add(new NavbarItem(R.drawable.ic_account_black, "Settings"));
-        navbarItems.add(new NavbarItem(R.drawable.ic_account_black, "Information"));
-        navbarItems.add(new NavbarItem(R.drawable.ic_account_black, "Fees"));
-        navbarItems.add(new NavbarItem(R.drawable.ic_account_black, "Logout"));
+        navbarItems.add(new NavbarItem(R.drawable.ic_settings_black, "Settings"));
+        navbarItems.add(new NavbarItem(R.drawable.ic_info_black, "Information"));
+        navbarItems.add(new NavbarItem(R.drawable.ic_fees_black, "Fees"));
+        navbarItems.add(new NavbarItem(R.drawable.ic_logout_black, "Logout"));
 
         navbarAdapter = new NavbarAdapter(this, navbarItems);
 
         drawerList = (ListView) findViewById(R.id.nav_layout);
-        View header = getLayoutInflater().inflate(R.layout.navbar_header, null);
+        header = getLayoutInflater().inflate(R.layout.navbar_header, null);
         drawerList.addHeaderView(header, null, false);
 
         drawerList.setAdapter(navbarAdapter);

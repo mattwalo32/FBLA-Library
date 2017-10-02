@@ -1,17 +1,23 @@
 package com.walowtech.fblaapplication;
 
 import android.app.LoaderManager;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Loader;
+import android.content.SharedPreferences;
+import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
+import android.widget.CursorAdapter;
+import android.widget.SimpleCursorAdapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,6 +69,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
     private ListView mainContent;
     private ViewGroup mainContentHeader;
+    private SearchView searchBar;
 
     public static SubjectAdapter subjectAdapter;
 
@@ -73,6 +80,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
     private RecyclerView recyclerView;
 
+    //Books
     private final String KEY_AVERAGE_RATING = "AverageRating";
     private final String KEY_GID = "GID";
     private final String KEY_JSON = "JSON";
@@ -82,32 +90,45 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
     private final String KEY_SUCCESS = "Success";
     private final String KEY_TITLE = "Title";
 
+    //Slides
     private final String KEY_DESCRIPTION = "Description";
     private final String KEY_SLIDESHOW_IMAGE = "Image";
     private final String KEY_LINKED_ITEM = "LinkedItem";
     private final String KEY_SHORT_DESCRIPTION = "ShortDescription";
 
     private final String BASE_URL = "walowtech.com";
+
     private final String PARAM_ACTION = "ACTION";
     private final String PARAM_NUM_RESULTS = "NUMOFRESULTS";
+    private final String PARAM_UID = "UID";
+    private final String PARAM_SEARCH_QUERY = "SEARCHSTRING";
+    private final String PARAM_SEARCH_ITEM = "SEARCHITEM";
+
     private final String PATH0 = "apis";
     private final String PATH1 = "FBLALibrary";
     private final String PATH2 = "api.php";
     private final String SCHEME = "https";
+
     private final String VALUE_ACTION_BOOKS = "ACTION_RETRIEVE_TOP_BOOKS_BY_CATEGORY";
     private final String VALUE_ACTION_MESSAGE = "ACTION_RETRIEVE_DAILY_MESSAGE";
+    private final String VALUE_ACTION_SEARCH = "ACTION_RETRIEVE_BOOK_DATA";
     private final String VALUE_NUM_RESULTS = "15";
+    private int VALUE_UID;
+    private String VALUE_SEARCH_QUERY;
+    private String VALUE_SEARCH_ITEM = "TITLE";
 
     private URL requestURL;
 
     private ViewPager viewPager;
     public SlideshowAdapter slideshowAdapter;
     public static ArrayList<ViewPagerItem> slideshows = new ArrayList<>();
+    public static ArrayList<Book> searchResults = new ArrayList<>();
 
     private final int DOWNLOAD_BOOK_JSON_LOADER = 0;
     private final int DOWNLOAD_SLIDE_JSON_LOADER = 1;
     private final int DOWNLOAD_BOOK_IMAGE_LOADER = 2;
     private final int DOWNLOAD_SLIDE_IMAGE_LOADER = 3;
+    private final int DOWNLOAD_SEARCH_JSON_LOADER = 4;
     public static int downloadType;
 
     public static int subjectsLastVis;
@@ -125,10 +146,12 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
         mainContent = (ListView) findViewById(R.id.m_lv_main_content);
         LayoutInflater inflater = getLayoutInflater();
         mainContentHeader = (ViewGroup)inflater.inflate(R.layout.main_content_header, mainContent, false);
-
         mainContent.addHeaderView(mainContentHeader, null, false);
+
+        //Create empty ArrayList to hold subjects and books
         categories = new ArrayList<>();
 
+        //Populates the main screen with empty books
         for(int i = 0; i < 7; i++){
             ArrayList<Book> tempBooks = new ArrayList<>();
             for (int j = 0; j < Integer.valueOf(VALUE_NUM_RESULTS); j++) {
@@ -137,6 +160,8 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
             categories.add(new Category(tempBooks, "Loading"));
         }
         subjectAdapter = new SubjectAdapter(this, categories);
+
+        //Set adapter
         mainContent.setAdapter(subjectAdapter);
 
         handWriting = Typeface.createFromAsset(getAssets(), "fonts/hand_writing.ttf");
@@ -144,35 +169,46 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
         //Initialize ViewPager
         viewPager = (ViewPager)mainContentHeader.findViewById(R.id.m_view_pager);
 
-
+        //Check for internet connection
         if(NetworkJSONUtils.checkInternetConnection(this)) {
+            //Retrieve JSON for ViewPager
             fetchSlideData();
+            //Retrieve JSON for book data
             fetchBookData();
         }else{
             ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
         }
         //TODO show image for no image
 
+        setNames();
     }
 
+    /**
+     * Configures the actionbar
+     *
+     * The layout of the actionbar is inflated and listeners
+     * are set on the toggle button and SearchView
+     */
     private void configActionBar(){
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.m_toolbar);
+         setSupportActionBar(toolbar);
 
+        //Set NavDrawer Toggle Listener
+        ImageView toggleIcon = (ImageView) toolbar.findViewById(R.id.toggle_icon);
+        toggleIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //If drawer open close it, if open close it
+                if(drawerLayout.isDrawerOpen(drawerList))
+                    drawerLayout.closeDrawer(drawerList);
+                else
+                    drawerLayout.openDrawer(drawerList);
+            }
+        });
 
-        actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_drawable));
-
-        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        View v = layoutInflater.inflate(R.layout.actionbar_layout, null);
-
-        actionBar.setCustomView(v);
-
-
-        SearchView searchView = (SearchView) v.findViewById(R.id.menu_search);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        //Set SearchView listener
+        searchBar = (SearchView) toolbar.findViewById(R.id.menu_search);
+        searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -180,19 +216,63 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                Log.i("LoginActivity", "Text Changed");
-                //TODO update list
+                updateSearchResults(newText);
                 return false;
             }
         });
     }
 
+    /**
+     * TODO doc
+     * @param searchQuery
+     */
+    public void updateSearchResults(String searchQuery){
+        Log.i("LoginActivity", searchQuery);
+        //Check for internet connection
+        if(!NetworkJSONUtils.checkInternetConnection(this)) {
+            ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
+            return;
+        }
+
+        //Get UID
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        VALUE_UID = sharedPref.getInt("UID", -1);
+        VALUE_SEARCH_QUERY = searchQuery;
+
+        //Build Uri that fetches book data
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme(SCHEME)
+                .authority(BASE_URL)
+                .appendPath(PATH0)
+                .appendPath(PATH1)
+                .appendPath(PATH2)
+                .appendQueryParameter(PARAM_ACTION, VALUE_ACTION_SEARCH)
+                .appendQueryParameter(PARAM_SEARCH_ITEM, VALUE_SEARCH_ITEM)
+                .appendQueryParameter(PARAM_SEARCH_QUERY, VALUE_SEARCH_QUERY)
+                .appendQueryParameter(PARAM_UID, Integer.toString(VALUE_UID))
+                .build();
+        String urlString = builder.toString();
+
+        //Try to create URL from Uri
+        try{
+            requestURL = new URL(urlString);
+        }catch(MalformedURLException MURLE){
+            ErrorUtils.errorDialog(this, "There was an error with the url", "Currently the server can not be reached. Make sure your username and password are entered correctly");
+            return;
+        }
+
+        //Start loader
+        getLoaderManager().restartLoader(DOWNLOAD_SEARCH_JSON_LOADER, null, this);
+    }
+
     @Override
     public Loader<JSONObject> onCreateLoader(int id, Bundle args) {
+        //Set previous response to null to ensure new data
         jsonResponse = null;
         subjectsLastVis = mainContent.getLastVisiblePosition();
 
-        if(id == DOWNLOAD_BOOK_JSON_LOADER || id== DOWNLOAD_SLIDE_JSON_LOADER) {
+        //Return appropriate loader for different ID types
+        if(id == DOWNLOAD_BOOK_JSON_LOADER || id == DOWNLOAD_SLIDE_JSON_LOADER || id == DOWNLOAD_SEARCH_JSON_LOADER) {
             return new DownloadJSONLoader(this, requestURL);
         }else if(id == DOWNLOAD_BOOK_IMAGE_LOADER || id == DOWNLOAD_SLIDE_IMAGE_LOADER) {
             if (downloadType == 0)
@@ -201,12 +281,12 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
                 return new DownloadImageLoader(this, this, null, slideshows, this);
         }
         return null;
-
     }
 
     @Override
     public void onLoadFinished(Loader loader, Object data) {
-        if(loader.getId() == DOWNLOAD_BOOK_JSON_LOADER || loader.getId() == DOWNLOAD_SLIDE_JSON_LOADER) {
+        //Preform proper actions based on loader that finished
+        if(loader.getId() == DOWNLOAD_BOOK_JSON_LOADER || loader.getId() == DOWNLOAD_SLIDE_JSON_LOADER || loader.getId() == DOWNLOAD_SEARCH_JSON_LOADER) {
             if (data != null && data != " ") {
                 try {
                     jsonResponse = new JSONObject(data.toString());
@@ -233,9 +313,38 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
     }
 
     /**
+     * Sets name and email in the DrawerLayout header
+     *
+     * The name and email are retrieved from SharedPreferences
+     * then are set to the TextViews. The typeface is also
+     * set to the strings that are modified.
+     */
+    public void setNames(){
+        //Get SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        String nameString = sharedPreferences.getString("NAME", "Firstname Lastname");
+        String emailString = sharedPreferences.getString("EMAIL", "Email@gmail.com");
+
+        //Retrieve Views
+        TextView name = (TextView) header.findViewById(R.id.nav_tv_name);
+        TextView email = (TextView) header.findViewById(R.id.nav_tv_email);
+
+        //Set View text
+        name.setText(nameString);
+        email.setText(emailString);
+
+        //Set View typeface
+        name.setTypeface(handWriting);
+        email.setTypeface(handWriting);
+    }
+
+    /**
      * Updates book image.
      *
      * Method is invoked to update the book image from the UI thread.
+     * The rows that are visible when this method is invoked must be updated
+     * by notifying the subject adapter of the data set changing. All other rows are updated
+     * by notifying the book adapter of a small range changed.
      * Changing the image from any non-UI thread would crash the application.
      */
     public static void updateUIImage(int i, int j, Bitmap bitmap){
@@ -248,13 +357,19 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
                 //TODO fix
                 categories.get(i).bookAdapter.notifyItemRangeChanged(j-1, j+1);
             } catch (NullPointerException e) {
-                Log.i("LoginActivity", "EXCEPTION THROWN in " + i + ", " + j);
+                //Log.i("LoginActivity", "EXCEPTION THROWN in " + i + ", " + j);
                 //TODO catch
             }
         }
     }
 
 //TODO doc
+
+    /**
+     * Updates the images in the ViewPager.
+     *
+     * The adapter is initialized and the adapter is set.
+     */
     public void updateViewPagerImage(){
         slideshowAdapter = new SlideshowAdapter(this, slideshows);
         viewPager.setAdapter(slideshowAdapter);
@@ -263,18 +378,18 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
     /**
      * Initiates variables for the fetching of the top book data.
      *
-     * A URL is created that fetches information about
+     * First connection is checked. A URL is created that fetches information about
      * the top books. The URL is passed to DownloadImageLoader
      * upon the loader being initialized
      */
     public void fetchBookData(){
+        //Check for internet connection
         if(!NetworkJSONUtils.checkInternetConnection(this)) {
             ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
             return;
         }
 
-        Log.i("LoginActivity", "Book data being fetched");
-
+        //Build Uri that fetches book data
         Uri.Builder builder = new Uri.Builder();
         builder.scheme(SCHEME)
                 .authority(BASE_URL)
@@ -286,6 +401,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
                 .build();
         String urlString = builder.toString();
 
+        //Try to create URL from Uri
         try{
             requestURL = new URL(urlString);
         }catch(MalformedURLException MURLE){
@@ -293,22 +409,25 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
             return;
         }
 
+        //Start loader
         getLoaderManager().initLoader(DOWNLOAD_BOOK_JSON_LOADER, null, this);
     }
 
     /**
      * Initalizes variables for fetching slideshow data
      *
-     * A URL is created that is passed to DownloadImageLoader
+     * First connection is checked. A URL is created that is passed to DownloadImageLoader
      * after the loader is initialized. This URL is the location
      * of the JSON regarding the slides.
      */
     public void fetchSlideData(){
+        //Check for internet connection
         if(!NetworkJSONUtils.checkInternetConnection(this)) {
             ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
             return;
         }
 
+        //Build Uri
         Uri.Builder builder = new Uri.Builder();
         builder.scheme(SCHEME)
                 .authority(BASE_URL)
@@ -319,6 +438,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
                 .build();
         String urlString = builder.toString();
 
+        //Try to create URL from Uri
         try{
             requestURL = new URL(urlString);
         }catch(MalformedURLException MURLE){
@@ -326,6 +446,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
             return;
         }
 
+        //Start loader
         getLoaderManager().initLoader(DOWNLOAD_SLIDE_JSON_LOADER, null, this);
     }
 
@@ -341,9 +462,10 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
      * @param json The JSON to be parsed.
      */
     private void parseBookJSON(JSONObject json){
-        Log.i("LoginActivity", "JSON recieved");
+        //Try to parse JSON
         try {
             int success = json.getInt(KEY_SUCCESS);
+            //If success = 1 It is a response related to books
             if(success == 1) {
                 JSONObject jsonResponse = json.getJSONObject(KEY_JSON);
                 int numSubjects = jsonResponse.getInt(KEY_NUM_SUBJECTS);
@@ -374,13 +496,16 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
                 }
 
 
+                //DownloadType 0 means books being downloaded
                 downloadType = 0;
-                Log.i("LoginActivity", "Image started");
                 getLoaderManager().initLoader(DOWNLOAD_BOOK_IMAGE_LOADER, null, this);
+
+                //If success = 3 it is a response related to slides
             }else if(success == 3){
                 JSONArray jsonResponse = json.getJSONArray(KEY_JSON);
                 slideshows.clear();
 
+                //Iterate through all JSONObjects in JSONArray
                 for(int i=0; i < jsonResponse.length(); i++){
                     JSONObject curSlide = (JSONObject)jsonResponse.get(i);
                     String shortDescription = curSlide.getString(KEY_SHORT_DESCRIPTION);
@@ -391,9 +516,30 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
                     slideshows.add(new ViewPagerItem(shortDescription, description, linkedItem, image));
                 }
 
+                //DownloadType 1 means slide being downloaded
                 downloadType = 1;
                 getLoaderManager().initLoader(DOWNLOAD_SLIDE_IMAGE_LOADER, null, this);
+            }else if(success == 4){
+                //Clear previous search results
+                searchResults.clear();
+                JSONArray jsonResponse = json.getJSONArray(KEY_JSON);
+
+                Log.i("LoginActivity", "SEARCH RESULTS");
+                    //Iterate through all books that were found
+                    for(int i = 0; i < jsonResponse.length(); i++){
+                        JSONObject curBook = (JSONObject) jsonResponse.get(i);
+
+                        String GID = curBook.getString(KEY_GID);
+                        String title = curBook.getString(KEY_TITLE);
+                        String thumbnail = curBook.getString(KEY_SMALL_THUMBNAIL);
+
+                        searchResults.add(new Book(null, title, GID, thumbnail, 0f));
+                        Log.i("LoginActivity", "\n" + searchResults.get(i).title);
+                    }
+                    showSearchSuggestions();
             }
+            //TODO case for no success
+            //Exception thrown when bad JSON is recieved
         }catch(JSONException JSONE){
             ErrorUtils.errorDialog(this, "Server Error", "The data from the server could not be read correctly. Please try again later.");
             Log.i("LoginActivity", "JSONException");
@@ -402,8 +548,13 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
     }
 
+    public void showSearchSuggestions(){
+
+        //searchBar.setSuggestionsAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1));
+    }
+
     /**
-     * Sets elevation of a view.
+     * Sets elevation of a view using ViewCompat
      *
      * @param view The view to set the elevation of.
      * @param elevation The height to set the elevation to.
@@ -444,22 +595,24 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
             if(convertView == null)
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.book_category, parent, false);
 
-
+            //Get Views
             TextView tvSubjectTitle = (TextView) convertView.findViewById(R.id.m_tv_title);
             LinearLayout subjectRow = (LinearLayout) convertView.findViewById(R.id.m_ll_subject_row);
+
             setElevation(subjectRow, ELEVATION_SUBJECT);
 
+            //Set text and typeface
             tvSubjectTitle.setText(subject.categoryName);
             tvSubjectTitle.setTypeface(handWriting);
 
+            //Get RecyclerView and create adapter with horizontal layout
             recyclerView = (RecyclerView) convertView.findViewById(R.id.m_rv_books);
             bookAdapter = new BookAdapter(getContext(), subject.books);
-
             categories.get(position).bookAdapter = bookAdapter;
-
             recyclerView.setAdapter(bookAdapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
+            //Return the created view
             return convertView;
         }
     }
@@ -487,6 +640,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
         @Override
         public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            //Inflate and return viewholder
             View view = inflater.inflate(R.layout.book_category_item, parent, false);
             MyViewHolder holder = new MyViewHolder(view);
             return holder;
@@ -494,17 +648,20 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
         @Override
         public void onBindViewHolder(BookAdapter.MyViewHolder holder, int position) {
+            //Get current item and set text, typeface, and image
             Book currentBook = books.get(position);
             holder.rating.setText(Float.toString(currentBook.averageRating));
             holder.rating.setTypeface(handWriting);
 
             books.get(position).imageView = holder.image;
 
+            //If a cover has been downloaded, remove loading indicator
             if(currentBook.coverSmall != null) {
                 holder.image.setImageBitmap(currentBook.coverSmall);
                 holder.progressBar.setVisibility(GONE);
             }
 
+            //Set books elevation
             setElevation(holder.book, ELEVATION_BOOK);
         }
 

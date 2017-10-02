@@ -10,7 +10,7 @@
     <string name="create_account">Create Account</string>
 
     <!-- CreateAccount Activity -->
-    <string name="name">Name</string>
+    <string name="name">Full Name</string>
     <string name="school_id">School ID</string>
 
     <!-- Transition Names -->

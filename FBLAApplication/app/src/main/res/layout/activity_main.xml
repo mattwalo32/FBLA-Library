@@ -12,8 +12,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="@dimen/margin_large"
-            android:background="@color/colorPrimary500">
+            android:background="@color/colorPrimary500"
+            android:fitsSystemWindows="true">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/m_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                android:background="@color/colorPrimary600">
+
+                <include layout="@layout/actionbar_layout"/>
+
+            </android.support.v7.widget.Toolbar>
 
             <ListView
                 android:layout_width="match_parent"
@@ -21,6 +32,7 @@
                 android:layout_gravity="start"
                 android:divider="@android:color/transparent"
                 android:dividerHeight="@dimen/margin_large"
+                android:padding="@dimen/margin_large"
                 android:id="@+id/m_lv_main_content">
 
             </ListView>
