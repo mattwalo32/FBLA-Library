@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Loader;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
@@ -13,6 +14,8 @@ import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.CursorAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.support.v7.widget.LinearLayoutManager;
@@ -196,7 +199,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
      */
     private void configActionBar(){
         Toolbar toolbar = (Toolbar) findViewById(R.id.m_toolbar);
-         setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar);
 
         //Set NavDrawer Toggle Listener
         ImageView toggleIcon = (ImageView) toolbar.findViewById(R.id.toggle_icon);
@@ -225,6 +228,12 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
                 return false;
             }
         });
+
+        //Suggestions Adapter displays how suggestions are shown
+        searchBar.setSuggestionsAdapter(new SimpleCursorAdapter(
+                getApplicationContext(), android.R.layout.simple_list_item_1, null,
+                new String[] { SearchManager.SUGGEST_COLUMN_TEXT_1 },
+                new int[] { android.R.id.text1 }));
     }
 
     /**
@@ -467,6 +476,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
      * @param json The JSON to be parsed.
      */
     private void parseBookJSON(JSONObject json){
+        //TODO move to background thread
         //Try to parse JSON
         try {
             int success = json.getInt(KEY_SUCCESS);
@@ -531,7 +541,16 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
                 searchResults.clear();
                 JSONArray jsonResponse = json.getJSONArray(KEY_JSON);
 
+                //TODO limit results
                 Log.i("LoginActivity", "SEARCH RESULTS");
+                final String[] sAutocompleteColNames = new String[] {
+                        BaseColumns._ID,
+                        SearchManager.SUGGEST_COLUMN_TEXT_1
+                };
+
+                    //Matrix that holds all results
+                    MatrixCursor cursor = new MatrixCursor(sAutocompleteColNames);
+
                     //Iterate through all books that were found
                     for(int i = 0; i < jsonResponse.length(); i++){
                         JSONObject curBook = (JSONObject) jsonResponse.get(i);
@@ -542,8 +561,12 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
                         searchResults.add(new Book(null, title, GID, thumbnail, 0f));
                         Log.i("LoginActivity", "\n" + searchResults.get(i).title);
+
+                        //Add a row to the cursor
+                        Object[] row = new Object[] {i, title};
+                        cursor.addRow(row);
                     }
-                    showSearchSuggestions();
+                    showSearchSuggestions(cursor);
             }
             //TODO case for no success
             //Exception thrown when bad JSON is recieved
@@ -555,9 +578,8 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
     }
 
-    public void showSearchSuggestions(){
-
-        //searchBar.setSuggestionsAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1));
+    public void showSearchSuggestions(Cursor result){
+        searchBar.getSuggestionsAdapter().changeCursor(result);
     }
 
     /**
