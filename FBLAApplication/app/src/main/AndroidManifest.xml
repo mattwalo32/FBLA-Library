@@ -33,6 +33,10 @@
             android:windowSoftInputMode="stateHidden|adjustPan">
 
         </activity>
+        <activity
+            android:name=".BookDetailsActivity">
+
+        </activity>
     </application>
 
 </manifest>

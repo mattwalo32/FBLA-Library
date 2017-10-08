@@ -6,6 +6,7 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
@@ -41,8 +42,13 @@ public class DownloadJSONLoader extends AsyncTaskLoader<JSONObject> {
     @Override
     public JSONObject loadInBackground() {
         Log.i("LoginActivity", url.toString());
-        InputStream is = NetworkJSONUtils.retrieveInputStream(context, url);
-        JSONObject jsonObject = NetworkJSONUtils.retrieveJSON(context, is);
-        return jsonObject;
+        try {
+            InputStream is = NetworkJSONUtils.retrieveInputStream(context, url);
+            JSONObject jsonObject = NetworkJSONUtils.retrieveJSON(context, is);
+            return jsonObject;
+        }catch(Exception e){
+            ErrorUtils.errorDialog(context, "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
+        }
+        return null;
     }
 }

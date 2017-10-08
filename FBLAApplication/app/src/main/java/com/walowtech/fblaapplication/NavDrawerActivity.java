@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,10 +18,14 @@ import com.walowtech.fblaapplication.Utils.NavbarAdapter;
 import java.util.ArrayList;
 
 /**
- * Created by mattw on 9/29/2017.
+ * Base activity for activities that contain the NavDrawer.
+ *
+ * This is the base activity for NavDrawer activities. The NavDrawer is automatically
+ * initialized, inflated, and has a listener set on it, so all activities that extend
+ * this activity will contain the NavDrawer.
  */
 
-//TODO doc
+//Created 9/29/2017
 public class NavDrawerActivity extends AppCompatActivity {
 
     public DrawerLayout drawerLayout;
@@ -64,7 +69,6 @@ public class NavDrawerActivity extends AppCompatActivity {
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //TODO when item clicked
             }
         });
     }

@@ -3,6 +3,7 @@ package com.walowtech.fblaapplication;
 import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -39,6 +40,7 @@ import com.walowtech.fblaapplication.Utils.DownloadJSONLoader;
 import com.walowtech.fblaapplication.Utils.ErrorUtils;
 import com.walowtech.fblaapplication.Utils.NetworkJSONUtils;
 import com.walowtech.fblaapplication.Utils.SlideshowAdapter;
+import com.walowtech.fblaapplication.Utils.SuggestionCursorAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -230,18 +232,26 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
         });
 
         //Suggestions Adapter displays how suggestions are shown
-        searchBar.setSuggestionsAdapter(new SimpleCursorAdapter(
-                getApplicationContext(), android.R.layout.simple_list_item_1, null,
+        searchBar.setSuggestionsAdapter(new SuggestionCursorAdapter(
+                getApplicationContext(), R.layout.suggestion, null,
                 new String[] { SearchManager.SUGGEST_COLUMN_TEXT_1 },
-                new int[] { android.R.id.text1 }));
+                new int[] { android.R.id.text1 }, 0
+        ));
+
+
     }
 
     /**
-     * TODO doc
+     * Sends request for book information about searchQuery
+     *
+     * The UID is retrieved from SharedPreferences in case the user
+     * wants to retrieve book that they checked out. Then a URI is built
+     * with their UID and search query, and an AsyncLoader is launched to fetch
+     * information from the URI.
+     *
      * @param searchQuery
      */
     public void updateSearchResults(String searchQuery){
-        Log.i("LoginActivity", searchQuery);
         //Check for internet connection
         if(!NetworkJSONUtils.checkInternetConnection(this)) {
             ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
@@ -361,28 +371,25 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
      * by notifying the book adapter of a small range changed.
      * Changing the image from any non-UI thread would crash the application.
      */
-    public static void updateUIImage(int i, int j, Bitmap bitmap){
+    public void updateUIImage(int i, int j, Bitmap bitmap){
 
-//TODO fix
+    //TODO fix the the screen is updated
         if(i <= subjectsLastVis){
             subjectAdapter.notifyDataSetChanged();
         }else {
             try {
-                //TODO fix
                 categories.get(i).bookAdapter.notifyItemRangeChanged(j-1, j+1);
             } catch (NullPointerException e) {
                 //Log.i("LoginActivity", "EXCEPTION THROWN in " + i + ", " + j);
-                //TODO catch
             }
         }
     }
 
-//TODO doc
-
     /**
      * Updates the images in the ViewPager.
      *
-     * The adapter is initialized and the adapter is set.
+     * The adapter is initialized and the adapter is set. The
+     * old adapter is replaced with the current one.
      */
     public void updateViewPagerImage(){
         slideshowAdapter = new SlideshowAdapter(this, slideshows);
@@ -541,7 +548,6 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
                 searchResults.clear();
                 JSONArray jsonResponse = json.getJSONArray(KEY_JSON);
 
-                //TODO limit results
                 Log.i("LoginActivity", "SEARCH RESULTS");
                 final String[] sAutocompleteColNames = new String[] {
                         BaseColumns._ID,
@@ -566,9 +572,10 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
                         Object[] row = new Object[] {i, title};
                         cursor.addRow(row);
                     }
-                    showSearchSuggestions(cursor);
+                searchBar.getSuggestionsAdapter().changeCursor(cursor);
+            }else {
+                ErrorUtils.errorDialog(this, "Response Error", "An unexpected response was recieved from the server. Please try again later.");
             }
-            //TODO case for no success
             //Exception thrown when bad JSON is recieved
         }catch(JSONException JSONE){
             ErrorUtils.errorDialog(this, "Server Error", "The data from the server could not be read correctly. Please try again later.");
@@ -576,10 +583,6 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
             return;
         }
 
-    }
-
-    public void showSearchSuggestions(Cursor result){
-        searchBar.getSuggestionsAdapter().changeCursor(result);
     }
 
     /**
@@ -670,10 +673,12 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
         private LayoutInflater inflater;
         ArrayList<Book> books = new ArrayList<>();
+        Context context;
 
         public BookAdapter(Context context, ArrayList<Book> books){
             inflater = LayoutInflater.from(context);
             this.books = books;
+            this.context = context;
         }
 
         @Override
@@ -704,6 +709,9 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
                     @Override
                     public void onClick(View v) {
                         Log.i("LoginActivity", "BOOK PRESSED AT " + currentBook.subject + ", " + position + ". GID: " + currentBook.GID);
+                        Intent i = new Intent(context, BookDetailsActivity.class);
+                        i.putExtra("GID", currentBook.GID);
+                        context.startActivity(i);
                     }
                 });
             }

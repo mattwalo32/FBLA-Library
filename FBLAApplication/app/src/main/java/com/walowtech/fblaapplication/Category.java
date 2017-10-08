@@ -5,11 +5,14 @@ import android.view.View;
 import java.util.ArrayList;
 
 /**
- * Created by mattw on 9/18/2017.
+ * Class that holder a category object.
+ *
+ * This object is referenced whenever a category needs to be displayed on the screen.
+ *
+ * @author Matthew Walowski
  */
 
 //Created 9/18/17
-    //TODO doc
 public class Category {
 
     public ArrayList<Book> books = new ArrayList<>();

@@ -78,10 +78,14 @@ public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
                 for (j = 0; j < categories.get(i).books.size(); j++) {
                     String url = categories.get(i).books.get(j).smallThumbnail;
                     if (url != null && !url.equals("")) {
-                        image = NetworkJSONUtils.downloadBitmap(context, url);
+                        image = null;
+                        try{
+                            image = NetworkJSONUtils.downloadBitmap(context, url);
+                        }catch(Exception e){
+                            ErrorUtils.errorDialog(context, "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
+                        }
                         categories.get(i).books.get(j).coverSmall = image;
                     } else {
-                        Log.i("LoginActivity", "NULL URL");
                         //TODO set no image image
                     }
                     //Updates on the UI thread to prevent crash
@@ -89,7 +93,7 @@ public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
                         @Override
                         public void run() {
                             if (i < categories.size()) {
-                                MainActivity.updateUIImage(i, j, image);
+                                mainActivity.updateUIImage(i, j, image);
                             }
                         }
                     });
@@ -99,9 +103,12 @@ public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
         }else if(MainActivity.downloadType == 1){
                 for(int i = 0; i < slides.size(); i++) {
                     String url = slides.get(i).imageURL;
-                    image = NetworkJSONUtils.downloadBitmap(context, url);
-
-
+                    image = null;
+                    try{
+                        image = NetworkJSONUtils.downloadBitmap(context, url);
+                    }catch(Exception e){
+                        ErrorUtils.errorDialog(context, "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
+                    }
                     slides.get(i).image = image;
                 }
 
