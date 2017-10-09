@@ -10,9 +10,12 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
@@ -597,7 +600,28 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
         ViewCompat.setElevation(view, elevation);
     }
 
+    /**
+     * Launches the Detailed Book Info Activity and
+     * passes in its GID and bitmap as an extra.
+     *
+     * This Method also creates an animation if needed.
+     *
+     * @param image the ImageView to be animated and passed as extra
+     * @param GID the GID of the book selected and to be passed as extra
+     */
+    private void launchActivityDetailedBook(ImageView image, String GID){
+        //Pair<View, String> p1 = Pair.create((View)image, getString(R.string.trans_iv_book_cover));
+        //Pair<View, String> p2 = Pair.create((View)text, getString(R.string.trans_tv_avg_rating));
 
+        //ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, p1);
+        BitmapDrawable drawable = (BitmapDrawable) image.getDrawable();
+        Bitmap bitmap = drawable.getBitmap();
+
+        Intent i = new Intent(this, BookDetailsActivity.class);
+        i.putExtra("GID", GID);
+        i.putExtra("BOOK_IMAGE", bitmap);
+        startActivity(i /*, options.toBundle()*/);
+    }
 
     //Adapters
 
@@ -690,7 +714,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
         }
 
         @Override
-        public void onBindViewHolder(BookAdapter.MyViewHolder holder, final int position) {
+        public void onBindViewHolder(final BookAdapter.MyViewHolder holder, final int position) {
             //Get current item and set text, typeface, and image
             final Book currentBook = books.get(position);
             holder.rating.setText(Float.toString(currentBook.averageRating));
@@ -709,9 +733,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
                     @Override
                     public void onClick(View v) {
                         Log.i("LoginActivity", "BOOK PRESSED AT " + currentBook.subject + ", " + position + ". GID: " + currentBook.GID);
-                        Intent i = new Intent(context, BookDetailsActivity.class);
-                        i.putExtra("GID", currentBook.GID);
-                        context.startActivity(i);
+                        launchActivityDetailedBook(currentBook.imageView, currentBook.GID);
                     }
                 });
             }

@@ -48,7 +48,7 @@
 
     <!-- Details Activity -->
     <dimen name="scroll_offset">500dp</dimen>
-    <dimen name="start_scroll_pos">400dp</dimen>
+    <dimen name="start_scroll_pos">350dp</dimen>
     <dimen name="large_book_height">190dp</dimen>
     <dimen name="large_book_width">130dp</dimen><!-- Width should be 68.75% of height -->
     <dimen name="ic_diameter">35dp</dimen>

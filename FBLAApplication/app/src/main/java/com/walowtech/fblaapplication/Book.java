@@ -3,6 +3,8 @@ package com.walowtech.fblaapplication;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
+
 /**
  * The class for a book object.
  *
@@ -18,12 +20,13 @@ import android.widget.ImageView;
 public class Book {
 
     public float averageRating;
-    public int BID, copies, UID, numRatings;
-    public long checkoutTimestamp, returnTimestamp;
+    public int numRatings, availableCopies, numCopies;
     public String GID, title, subTitle, textSnippet, subject, description, authors,
             bookDetails, thumbnail, smallThumbnail, ISBN10, ISBN13, WaitingList,
             WaitingListSize;
     public Bitmap coverSmall = null;
+    public ArrayList<Review> reviews = new ArrayList<>();
+    public ArrayList<Copy> copies = new ArrayList<>();
 
     ImageView imageView = null;
 
@@ -35,16 +38,13 @@ public class Book {
         this.averageRating = averageRating;
     }
 
-    public Book(float averageRating, int BID, int copies, int UID, int numRatings, long checkoutTimestamp, long returnTimestamp,
+    public Book(float averageRating, int numRatings, int numCopies, int availableCopies,
                 String GID, String title, String subTitle, String textSnippet, String subject, String description, String authors,
-                String bookDetails, String thumbnail, String smallThumbnail, String ISBN10, String ISBN13, String WaitingList, String WaitingListSize){
+                String thumbnail, String smallThumbnail, String ISBN10, String ISBN13){
         this.averageRating = averageRating;
-        this.BID = BID;
-        this.copies = copies;
-        this.UID = UID;
         this.numRatings = numRatings;
-        this.checkoutTimestamp = checkoutTimestamp;
-        this.returnTimestamp = returnTimestamp;
+        this.numCopies = numCopies;
+        this.availableCopies = availableCopies;
         this.GID = GID;
         this.title = title;
         this.subTitle = subTitle;
@@ -52,13 +52,10 @@ public class Book {
         this.subject = subject;
         this.description = description;
         this.authors = authors;
-        this.bookDetails = bookDetails;
         this.thumbnail = thumbnail;
         this.smallThumbnail = smallThumbnail;
         this.ISBN10 = ISBN10;
         this.ISBN13 = ISBN13;
-        this.WaitingList = WaitingList;
-        this.WaitingListSize = WaitingListSize;
     }
 
 }

@@ -3,20 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bd_sliding_up_panel"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipToPadding="false">
 
     <!-- Background Image -->
     <ImageView
+        android:id="@+id/bd_background_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/testimage"
-        android:scaleType="fitXY"/>
+        android:scaleType="fitXY" />
 
     <!-- Main Content -->
     <ScrollView
         android:id="@+id/bd_scrollview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:clipToPadding="false">
 
         <!-- Displays content in rows -->
         <LinearLayout
@@ -24,7 +26,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="@dimen/scroll_offset"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:clipToPadding="false">
 
             <!-- Top row of information -->
             <RelativeLayout
@@ -32,15 +35,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimary700"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:clipToPadding="false">
 
                 <!-- Preview Image -->
                 <ImageView
                     android:id="@+id/bd_small_image"
                     android:layout_width="@dimen/large_book_width"
                     android:layout_height="@dimen/large_book_height"
-                    android:padding="@dimen/margin"
-                    android:src="@drawable/testimage" />
+                    android:padding="@dimen/margin" />
 
                 <!-- Brief book info -->
                 <LinearLayout
@@ -57,7 +60,7 @@
                         android:id="@+id/bd_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Book Title"
+                        android:text="Loading Title"
                         android:textColor="@android:color/black"
                         android:textSize="@dimen/text_h2" />
 
@@ -65,7 +68,7 @@
                         android:id="@+id/bd_subtitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="subtitle if applicable"
+                        android:text="Loading Sub Title"
                         android:textColor="@android:color/black"
                         android:textSize="@dimen/text" />
 
@@ -73,7 +76,7 @@
                         android:id="@+id/bd_authors"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="authors"
+                        android:text="Loading Authors"
                         android:textColor="@color/colorSecondaryText"
                         android:textSize="@dimen/text" />
 
@@ -85,7 +88,8 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/bd_small_image"
                     android:layout_toEndOf="@id/bd_small_image"
-                    android:layout_alignBottom="@id/bd_small_image">
+                    android:layout_alignBottom="@id/bd_small_image"
+                    android:clipToPadding="false">
 
                     <include layout="@layout/book_details_top_row" />
 
@@ -99,7 +103,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:requiresFadingEdge="vertical"
-                android:fadingEdgeLength="100dp">
+                android:fadingEdgeLength="100dp"
+                android:paddingBottom="10dp"
+                android:clipToPadding="false"
+                android:background="@color/colorPrimary700">
 
                 <TextView
                     android:id="@+id/bd_description"
@@ -115,19 +122,18 @@
                     android:fadingEdgeLength="100dp"/>
             </LinearLayout>
 
+            <!-- Seperator needed to fill in empty space with background -->
+            <View
+                android:id="@+id/bd_separator"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@color/colorPrimary300" />
+
             <!-- Third Row - Contains Rating bar and share button -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimary300">
-
-                <!-- Seperator needed to fill in empty space with background -->
-                <View
-                    android:id="@+id/bd_separator"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:background="@color/colorPrimary300"
-                    android:layout_alignParentTop="true"/>
 
                 <TextView
                     android:id="@+id/bd_avg_rating"
@@ -137,8 +143,7 @@
                     android:textSize="@dimen/text_h1"
                     android:padding="@dimen/margin"
                     android:text="4.1"
-                    android:layout_centerVertical="true"
-                    android:layout_below="@id/bd_separator"/>
+                    android:layout_centerVertical="true" />
 
                 <com.iarcuschin.simpleratingbar.SimpleRatingBar
                     android:id="@+id/bd_ratingbar"
@@ -149,8 +154,7 @@
                     android:numStars="5"
                     app:srb_stepSize="0.5"
                     app:srb_borderColor="@color/colorAccent200"
-                    app:srb_fillColor="@color/colorAccent200"
-                    android:layout_below="@id/bd_separator"/>
+                    app:srb_fillColor="@color/colorAccent200" />
 
                 <TextView
                     android:id="@+id/bd_num_ratings"
