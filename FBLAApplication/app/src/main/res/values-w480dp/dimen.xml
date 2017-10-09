@@ -17,4 +17,7 @@
 
     <!-- Main Activity -->
     <dimen name="slide_window_height">300dp</dimen>
+
+    <!-- Book Details Activity -->
+    <dimen name="ratingbar_width">250dp</dimen>
 </resources>

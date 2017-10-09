@@ -26,4 +26,7 @@
     <!-- Main -->
     <string name="more">More</string>
 
+    <!-- Book Details Activity -->
+    <string name="checkout">Checkout</string>
+
 </resources>
