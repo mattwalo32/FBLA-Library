@@ -14,6 +14,7 @@
     <dimen name="keyline_associated_content">60dp</dimen>
 
     <dimen name="fab_diameter">50dp</dimen>
+    <dimen name="fab_radius">25dp</dimen>
 
     <!-- General dimensions for vertical spacing -->
     <dimen name="vs_status_bar">24dp</dimen>
@@ -52,5 +53,8 @@
     <dimen name="large_book_height">190dp</dimen>
     <dimen name="large_book_width">130dp</dimen><!-- Width should be 68.75% of height -->
     <dimen name="ic_diameter">35dp</dimen>
-    <dimen name="ratingbar_width">@dimen/wrap_content</dimen>
+    <dimen name="ratingbar_width">125dp</dimen>
+    <dimen name="secondary_ratingbar_width">100dp</dimen>
+    <dimen name="comment_profile_diameter">50dp</dimen>
+    <dimen name="text_rating">75dp</dimen>
 </resources>

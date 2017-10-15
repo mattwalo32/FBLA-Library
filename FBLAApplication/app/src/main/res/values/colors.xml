@@ -11,7 +11,7 @@
     <color name="colorAccent200">#69F0AE</color>
     <color name="colorAccent400">#00E676</color>
 
-    <color name="colorSecondaryText">#8A8A8A</color>
+    <color name="colorSecondaryText">#5A5A5A</color>
     <color name="colorInvalid">#FF0000</color>
 
     <color name="scrim_end">#00000000</color>

@@ -4,19 +4,17 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.LoaderManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewCompat;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,6 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.walowtech.fblaapplication.Utils.DownloadJSONLoader;
 import com.walowtech.fblaapplication.Utils.ErrorUtils;
 import com.walowtech.fblaapplication.Utils.NetworkJSONUtils;
@@ -31,10 +30,12 @@ import com.walowtech.fblaapplication.Utils.NetworkJSONUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
-import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Locale;
 
 import static android.view.View.GONE;
 
@@ -45,10 +46,16 @@ import static android.view.View.GONE;
 //Created 10/7/2017
 public class BookDetailsActivity extends Activity  implements LoaderManager.LoaderCallbacks{
 
+    private FloatingActionButton mFAB;
+    private SimpleRatingBar mBookRating;
+
     private ImageView mBackgroundImage;
     private ImageView mBookImage;
-    private LinearLayout mLinearLayout;
+    private ImageView mShareButton;
+    private RelativeLayout mBaseLayout;
+    private LinearLayout mAdditionalDetailsLayout;
     private LinearLayout mDescriptionLayout;
+    private LinearLayout mReviews;
     private RelativeLayout mTopRowLayout;
     private ScrollView mScrollView;
     private TextView mDescription;
@@ -58,8 +65,14 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     private TextView mCheckout;
     private TextView mAvgRating;
     private TextView mNumRatings;
+    private TextView mFullTitle;
+    private TextView mFullAuthors;
+    private TextView mSubject;
+    private TextView mCopies;
+    private TextView mISBN10;
+    private TextView mISBN13;
 
-    private Typeface handWriting;
+    public static Typeface handWriting;
 
     public URL requestURL;
 
@@ -99,37 +112,65 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     private final String KEY_CID = "CID";
     private final String KEY_UID = "UID";
     private final String KEY_RATING = "Rating";
+    private final String KEY_NAME = "Name";
     private final String KEY_COMMENT = "Comment";
+    private final String KEY_COMMENT_TITLE = "Title";
     private final String KEY_COMMENT_TIME = "Timestamp";
 
     private JSONObject jsonResponse;
 
     private Book currentBook;
 
+    private boolean descriptionExpanded;
+
+    ArrayList<Review> reviews = new ArrayList<>();
+
     private final int DOWNLOAD_DETAILED_JSON_LOADER = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_book_details);
 
         //Create custom font typeface
         handWriting = Typeface.createFromAsset(getAssets(), "fonts/hand_writing.ttf");
 
         //Initialize all Views
+        mFAB = (FloatingActionButton) findViewById(R.id.bd_fab_description);
+        mBookRating = (SimpleRatingBar) findViewById(R.id.bd_ratingbar);
         mBackgroundImage = (ImageView) findViewById(R.id.bd_background_image);
         mScrollView = (ScrollView) findViewById(R.id.bd_scrollview);
         mDescription = (TextView) findViewById(R.id.bd_description);
         mTitle = (TextView) findViewById(R.id.bd_title);
+        mReviews = (LinearLayout) findViewById(R.id.bd_reviews_view);
         mSubTitle = (TextView) findViewById(R.id.bd_subtitle);
         mAuthors = (TextView) findViewById(R.id.bd_authors);
         mCheckout = (TextView) findViewById(R.id.bd_checkout);
         mAvgRating = (TextView) findViewById(R.id.bd_avg_rating);
         mNumRatings = (TextView) findViewById(R.id.bd_num_ratings);
-        mLinearLayout = (LinearLayout) findViewById(R.id.bd_linear_layout);
+        mBaseLayout = (RelativeLayout) findViewById(R.id.bd_base_layout);
         mBookImage = (ImageView) findViewById(R.id.bd_small_image);
         mTopRowLayout = (RelativeLayout) findViewById(R.id.bd_top_row_layout);
+        mShareButton = (ImageView) findViewById(R.id.bd_share_button);
         mDescriptionLayout = (LinearLayout) findViewById(R.id.bd_description_layout);
+
+        mAdditionalDetailsLayout = (LinearLayout) findViewById(R.id.bd_additional_info);
+        mFullTitle = (TextView) findViewById(R.id.bd_full_title);
+        mFullAuthors = (TextView) findViewById(R.id.bd_full_authors);
+        mSubject = (TextView) findViewById(R.id.bd_subject);
+        mCopies = (TextView) findViewById(R.id.bd_copies);
+        mISBN10 = (TextView) findViewById(R.id.bd_isbn10);
+        mISBN13 = (TextView) findViewById(R.id.bd_isbn13);
+
+        //Set offset to screen height
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+
+        float height = outMetrics.heightPixels;
+
+        mBaseLayout.setPadding(0, (int)height, 0, 0);
 
         //Set typefaces
         mDescription.setTypeface(handWriting);
@@ -139,13 +180,22 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         mCheckout.setTypeface(handWriting);
         mAvgRating.setTypeface(handWriting);
         mNumRatings.setTypeface(handWriting);
+        mFullTitle.setTypeface(handWriting, Typeface.BOLD);
+        mFullAuthors.setTypeface(handWriting, Typeface.BOLD);
+        mSubject.setTypeface(handWriting, Typeface.BOLD);
+        mCopies.setTypeface(handWriting, Typeface.BOLD);
+        mISBN10.setTypeface(handWriting, Typeface.BOLD);
+        mISBN13.setTypeface(handWriting, Typeface.BOLD);
 
         //Set elevations
-        setElevation(mLinearLayout, 12);
+        setElevation(mBaseLayout, 12);
         setElevation(mTopRowLayout, 12);
         setElevation(mDescriptionLayout, 12);
         setElevation(mBookImage, 20);
         setElevation(mCheckout, 8);
+        setElevation(mReviews, 12);
+
+        descriptionExpanded = false;
 
         //Get Extras
         Intent thisIntent = getIntent();
@@ -164,6 +214,22 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         }else{
             ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
         }
+
+        //Set on click listener for sharing
+        mShareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Create an intent to share
+                Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareBody = "You should check out " + getString(R.string.app_name) + ", an app where you can easily find books at the school library!";
+                if(currentBook.title != null)
+                    shareBody = "Check out \"" + currentBook.title + "\", a book that I found with the app, " + getString(R.string.app_name);
+                sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "" + getString(R.string.app_name));
+                sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, "Share via"));
+            }
+        });
 
     }
 
@@ -291,10 +357,12 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                     int CID = currentReview.getInt(KEY_CID);
                     int rating = currentReview.getInt(KEY_RATING);
                     String timestamp = currentReview.getString(KEY_COMMENT_TIME);
+                    String commentTitle = currentReview.getString(KEY_COMMENT_TITLE);
                     String comment = currentReview.getString(KEY_COMMENT);
+                    String name = currentReview.getString(KEY_NAME);
                     int UID = currentReview.getInt(KEY_UID);
 
-                    Review curReview = new Review(CID, UID, rating, comment, timestamp);
+                    Review curReview = new Review(CID, UID, rating, comment, commentTitle, timestamp, name);
                     currentBook.reviews.add(curReview);
                 }
                 displayBookInfo();
@@ -305,16 +373,35 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     }
 
     /**
-     * Resets TextViews to display updated information
+     * Resets TextViews to display updated information TODO doc
      */
     private void displayBookInfo(){
+        //Set text of TextViews
         mTitle.setText(currentBook.title);
         mAuthors.setText(currentBook.authors);
         mDescription.setText(currentBook.description);
-        mAvgRating.setText(Float.toString(currentBook.averageRating));
+        mAvgRating.setText(String.format("%.01f", currentBook.averageRating));
+        mBookRating.setRating(currentBook.averageRating);
 
+        //Concatenate string and set text to string
         String numRatingsString = String.valueOf(currentBook.numRatings) + " Ratings";
         mNumRatings.setText(numRatingsString);
+
+        //Concatenate strings before setting them
+        String titleString = "Title: " + currentBook.title;
+        String authorsString = "Authors: " + currentBook.authors;
+        String subjectString = "Subject: " + currentBook.subject;
+        String copiesString = "Library Copies: " + currentBook.numCopies;
+        String ISBN10String = "ISBN10: " + currentBook.ISBN10;
+        String ISBN13String = "ISBN13: " + currentBook.ISBN13;
+
+        //Set text data
+        mFullTitle.setText(titleString);
+        mFullAuthors.setText(authorsString);
+        mSubject.setText(subjectString);
+        mCopies.setText(copiesString);
+        mISBN10.setText(ISBN10String);
+        mISBN13.setText(ISBN13String);
 
         //Hide subtitle if it doesn't exist
         if(currentBook.subTitle.length() < 2)
@@ -322,7 +409,131 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         else
             mSubTitle.setText(currentBook.subTitle);
 
+        //Get reviews
+        reviews = currentBook.reviews;
+        //Add first 3 reviews, unless there are less than 3 reviews - Then add all reviews
+        int upperBound = ((reviews.size() - 1) > 2)?2:(reviews.size()-1);
+        reviewAdapter(reviews, mReviews, 0, upperBound, true);
+    }
 
+    /**
+     * Adapts items to LinearLayout.
+     *
+     * From the given parameters, items are created and attached to the parent LinearLayout.
+     * For each item in the layout, a typeface and appropriate text is set. Items can be added
+     * or removed with this method.
+     *
+     * @param reviews the reviews to be adapted to the parent.
+     * @param parent the parent view to be adapted to
+     * @param lowerDataBound the lower index of data to be adapted
+     * @param upperDataBound the upper index of data to be adapted
+     * @param add specifies if views in range should be added or removed
+     */
+    public void reviewAdapter(ArrayList<Review> reviews, LinearLayout parent, int lowerDataBound, int upperDataBound, boolean add){
+        if(add) {
+            //Loop through items and inflate them
+            for (int i = lowerDataBound; i <= upperDataBound; i++) {
+                //Try to remove old view
+                try{
+                    parent.removeViewAt(i);
+                }catch(Exception e){
+
+                }
+                View view = getLayoutInflater().inflate(R.layout.review, parent, false);
+                Review currentReview = reviews.get(i);
+
+                final TextView title = (TextView) view.findViewById(R.id.comment_title);
+                final TextView body = (TextView) view.findViewById(R.id.comment_body);
+                final TextView more = (TextView) view.findViewById(R.id.comment_more);
+                final TextView name = (TextView) view.findViewById(R.id.comment_name);
+                final TextView time = (TextView) view.findViewById(R.id.comment_time);
+                final SimpleRatingBar sRatingBar = (SimpleRatingBar) view.findViewById(R.id.comment_rating);
+
+                //Set values
+                title.setText(currentReview.title);
+                body.setText(currentReview.comment + " asdf more spam to fill body completely and trigger more");
+                name.setText(currentReview.name);
+                time.setText(currentReview.formatTimestamp(currentReview.timestamp));
+                sRatingBar.setRating(currentReview.rating);
+
+                int offset = (int)(getResources().getDimension(R.dimen.comment_profile_diameter) + getResources().getDimension(R.dimen.margin));
+                title.setPadding(offset, 0, 0, 0);
+
+                //If there is no title, set title to amount of stars
+                if(title.getText() == null || title.getText() == "" || title.getText() == "null"){
+                    String titleString = (int)currentReview.rating  + " stars";
+                    title.setText(titleString);
+                }
+
+
+
+                //If they did not leave a comment, remove comment
+                if(body.getText() == null || body.getText() == "" || body.getText() == "null")
+                    body.setVisibility(GONE);
+
+                more.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(body.getLineCount() < 4){
+                            body.setMaxLines(Integer.MAX_VALUE);
+                            more.setText(R.string.minimize);
+                        }else{
+                            body.setMaxLines(3);
+                            more.setText(R.string.read_more);
+                        }
+                    }
+                });
+
+                //Check if more button needed
+                body.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        //If there are less lines than the line limit, then hide the more button.
+                        if(body.getLineCount() < 4) {
+                            Log.i("LoginActivity", "NUM LINES" + body.getLineCount());
+                            more.setVisibility(GONE);
+                        }
+                        body.setMaxLines(3);
+                    }
+                });
+
+                //Set typefaces
+                title.setTypeface(handWriting);
+                body.setTypeface(handWriting);
+                more.setTypeface(handWriting);
+                name.setTypeface(handWriting);
+                time.setTypeface(handWriting);
+
+                parent.addView(view, i);
+
+                Log.i("LoginActivity", "View added at index " + i + currentReview.title + currentReview.comment + currentReview.name);
+            }
+        }
+    }
+
+    //TODO doc
+    public void expandDescription(final View v){
+        if(!descriptionExpanded) {
+            //Set line number to unlimited
+            mDescription.setMaxLines(Integer.MAX_VALUE);
+
+            //Animate expansion
+            mAdditionalDetailsLayout.setVisibility(View.VISIBLE);
+
+            mFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_minimize_white));
+            descriptionExpanded = true;
+        }else{
+            //Set line limit
+            mDescription.setMaxLines(getApplicationContext().getResources().getInteger(R.integer.lines));
+
+            mFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_add_white));
+
+
+            //Animate collapse
+            mAdditionalDetailsLayout.setVisibility(View.GONE);
+
+            descriptionExpanded = false;
+        }
     }
 
     /**

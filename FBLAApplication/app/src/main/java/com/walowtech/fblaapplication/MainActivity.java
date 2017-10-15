@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
@@ -14,14 +13,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.util.Pair;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.CursorAdapter;
-import android.widget.SimpleCursorAdapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -49,7 +42,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -131,7 +123,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
     private ViewPager viewPager;
     public SlideshowAdapter slideshowAdapter;
-    public static ArrayList<ViewPagerItem> slideshows = new ArrayList<>();
+    public static ArrayList<ViewPagerItem> slideshows;
     public static ArrayList<Book> searchResults = new ArrayList<>();
 
     private final int DOWNLOAD_BOOK_JSON_LOADER = 0;
@@ -157,6 +149,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
         LayoutInflater inflater = getLayoutInflater();
         mainContentHeader = (ViewGroup)inflater.inflate(R.layout.main_content_header, mainContent, false);
         mainContent.addHeaderView(mainContentHeader, null, false);
+        slideshows = new ArrayList<>();
 
         //Create empty ArrayList to hold subjects and books
         categories = new ArrayList<>();
@@ -241,6 +234,18 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
                 new int[] { android.R.id.text1 }, 0
         ));
 
+        searchBar.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                return false;
+            }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
+                searchBar.setQuery(searchResults.get(position).title, true);
+                return true;
+            }
+        });
 
     }
 
@@ -717,7 +722,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
         public void onBindViewHolder(final BookAdapter.MyViewHolder holder, final int position) {
             //Get current item and set text, typeface, and image
             final Book currentBook = books.get(position);
-            holder.rating.setText(Float.toString(currentBook.averageRating));
+            holder.rating.setText(String.format("%.01f", currentBook.averageRating));
             holder.rating.setTypeface(handWriting);
 
             books.get(position).imageView = holder.image;

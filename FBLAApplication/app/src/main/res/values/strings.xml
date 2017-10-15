@@ -30,6 +30,8 @@
 
     <!-- Book Details Activity -->
     <string name="checkout">Checkout</string>
+    <string name="minimize">Minimize</string>
+    <string name="read_more">Read More</string>
 
 
 </resources>

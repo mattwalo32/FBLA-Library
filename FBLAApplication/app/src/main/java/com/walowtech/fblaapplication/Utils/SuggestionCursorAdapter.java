@@ -18,7 +18,8 @@ import com.walowtech.fblaapplication.R;
 /**
  * Created by mattw on 10/7/2017.
  */
-
+//Created 10/7/2017
+//TODO doc
 public class SuggestionCursorAdapter extends SimpleCursorAdapter {
 
     private LayoutInflater cursorInflater;
