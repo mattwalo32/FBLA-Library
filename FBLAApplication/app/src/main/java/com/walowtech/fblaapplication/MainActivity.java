@@ -41,6 +41,7 @@ import com.walowtech.fblaapplication.Utils.SuggestionCursorAdapter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -214,6 +215,10 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
         //Set SearchView listener
         searchBar = (SearchView) toolbar.findViewById(R.id.menu_search);
+        //TODO set typeface
+        int id = searchBar.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+        TextView searchText = (TextView) searchBar.findViewById(id);
+        searchText.setTypeface(handWriting);
         searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

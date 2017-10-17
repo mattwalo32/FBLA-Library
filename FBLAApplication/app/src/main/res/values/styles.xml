@@ -6,7 +6,8 @@
         <item name="colorPrimary">@color/colorPrimary500</item>
         <item name="colorPrimaryDark">@color/colorPrimary700</item>
         <item name="colorAccent">@color/colorAccent200</item>
-
+        <item name="colorButtonNormal">@color/colorPrimary500</item>
+        <item name="android:textColorHint">@color/colorSecondaryText</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
     </style>

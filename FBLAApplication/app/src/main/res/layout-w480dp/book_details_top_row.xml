@@ -24,6 +24,7 @@
             android:layout_height="@dimen/ic_diameter"
             android:scaleType="centerCrop"
             app:srcCompat="@drawable/ic_favorite_border_black"
+            android:onClick="likeBook"
             android:layout_toRightOf="@id/bd_info"
             android:layout_marginLeft="@dimen/margin"
             android:layout_marginRight="@dimen/margin"/>

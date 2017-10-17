@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/margin_large"
+    android:paddingLeft="@dimen/margin"
+    android:paddingRight="@dimen/margin"
+    android:paddingTop="@dimen/margin"
+    android:layout_marginLeft="@dimen/margin"
+    android:layout_marginStart="@dimen/margin">
+
+    <!-- Title, Image, and Rating -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/comment_h_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_h1"
+            android:textColor="@android:color/black"
+            android:text="@string/leave_review"/>
+
+        <com.iarcuschin.simpleratingbar.SimpleRatingBar
+            android:id="@+id/comment_h_rating"
+            android:layout_width="@dimen/ratingbar_width"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/comment_h_tv"
+            android:numStars="5"
+            app:srb_stepSize="1"
+            app:srb_borderColor="@color/colorAccent200"
+            app:srb_fillColor="@color/colorAccent200" />
+
+        <EditText
+            android:id="@+id/comment_h_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/comment_h_rating"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_h2"
+            android:inputType="text"
+            android:hint="Comment Title" />
+
+    </RelativeLayout>
+
+    <!-- Comment -->
+    <EditText
+        android:id="@+id/comment_h_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/text"
+        android:scrollHorizontally="false"
+        android:hint="Leave a comment"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|end"
+        android:text="@string/submit"
+        android:onClick="addComment"
+        style="@style/AppTheme"/>
+
+</LinearLayout>

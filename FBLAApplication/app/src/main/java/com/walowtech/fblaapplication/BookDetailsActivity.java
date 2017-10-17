@@ -4,25 +4,36 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.LoaderManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
+import com.walowtech.fblaapplication.Utils.DownloadDetailedImageLoader;
+import com.walowtech.fblaapplication.Utils.DownloadImageLoader;
 import com.walowtech.fblaapplication.Utils.DownloadJSONLoader;
 import com.walowtech.fblaapplication.Utils.ErrorUtils;
 import com.walowtech.fblaapplication.Utils.NetworkJSONUtils;
@@ -52,6 +63,9 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     private ImageView mBackgroundImage;
     private ImageView mBookImage;
     private ImageView mShareButton;
+    private ImageView mLikeButton;
+    private ImageView mInfoButton;
+    private View mReviewHeader;
     private RelativeLayout mBaseLayout;
     private LinearLayout mAdditionalDetailsLayout;
     private LinearLayout mDescriptionLayout;
@@ -78,9 +92,20 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
 
     private final String PARAM_ACTION = "ACTION";
     private final String PARAM_GID = "GID";
+    private final String PARAM_UID = "UID";
+    private final String PARAM_PASSWORD = "PASSWORD";
+    private final String PARAM_RATING = "RATING";
+    private final String PARAM_COMMENT = "COMMENT";
+    private final String PARAM_TITLE = "TITLE";
 
     private String VALUE_ACTION_RETRIEVE_DETAILED_DATA = "ACTION_RETRIEVE_DETAILED_BOOK_DATA";
+    private String VALUE_ACTION_ADD_REVIEW = "ACTION_ADD_REVIEW";
     private String VALUE_GID;
+    private int VALUE_UID;
+    private String VALUE_PASSWORD;
+    private int VALUE_RATING;
+    private String VALUE_COMMENT;
+    private String VALUE_TITLE;
 
     private final String BASE_URL = "walowtech.com";
     private final String PATH0 = "apis";
@@ -122,10 +147,12 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     private Book currentBook;
 
     private boolean descriptionExpanded;
+    private boolean liked;
 
     ArrayList<Review> reviews = new ArrayList<>();
 
     private final int DOWNLOAD_DETAILED_JSON_LOADER = 0;
+    private final int DOWNLOAD_DETAILED_IMAGE_LOADER = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -153,6 +180,8 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         mBookImage = (ImageView) findViewById(R.id.bd_small_image);
         mTopRowLayout = (RelativeLayout) findViewById(R.id.bd_top_row_layout);
         mShareButton = (ImageView) findViewById(R.id.bd_share_button);
+        mLikeButton = (ImageView) findViewById(R.id.bd_favorite);
+        mInfoButton = (ImageView) findViewById(R.id.bd_info);
         mDescriptionLayout = (LinearLayout) findViewById(R.id.bd_description_layout);
 
         mAdditionalDetailsLayout = (LinearLayout) findViewById(R.id.bd_additional_info);
@@ -162,6 +191,16 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         mCopies = (TextView) findViewById(R.id.bd_copies);
         mISBN10 = (TextView) findViewById(R.id.bd_isbn10);
         mISBN13 = (TextView) findViewById(R.id.bd_isbn13);
+
+        //Inflate and set leave comment view
+        mReviewHeader = (ViewGroup)getLayoutInflater().inflate(R.layout.review_header, mReviews, false);
+        TextView mHeaderTitle = (TextView) mReviewHeader.findViewById(R.id.comment_h_title);
+        TextView mHeaderBody = (TextView) mReviewHeader.findViewById(R.id.comment_h_body);
+        TextView mHeaderString = (TextView) mReviewHeader.findViewById(R.id.comment_h_tv);
+        mHeaderString.setTypeface(handWriting);
+        mHeaderBody.setTypeface(handWriting);
+        mHeaderTitle.setTypeface(handWriting);
+        mReviews.addView(mReviewHeader);
 
         //Set offset to screen height
         Display display = getWindowManager().getDefaultDisplay();
@@ -207,6 +246,16 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
             mBackgroundImage.setImageBitmap(bookCover);
         }
 
+        //Set like button state
+        liked = false;
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        for(int i = 0; i < sharedPref.getInt("NUM_LIKED", 0); i++) {
+            if (sharedPref.getString("LIKED" + i, null).equals(VALUE_GID)) {
+                mLikeButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_red));
+                liked = true;
+            }
+        }
+
         //Check for network connection
         if(NetworkJSONUtils.checkInternetConnection(this)) {
             //Retrieve JSON for Book Info
@@ -249,7 +298,12 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
         jsonResponse = null;
-        return new DownloadJSONLoader(this, requestURL);
+        if(id == DOWNLOAD_DETAILED_JSON_LOADER) {
+            return new DownloadJSONLoader(this, requestURL);
+        } else if(id == DOWNLOAD_DETAILED_IMAGE_LOADER) {
+            return new DownloadDetailedImageLoader(this, currentBook.thumbnail);
+        }
+        return null;
     }
 
     @Override
@@ -262,6 +316,9 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                 } catch (JSONException JSONE) {
                     ErrorUtils.errorDialog(this, "Data Error", "There was an error with the data format. Please try again later.");
                 }
+            }else if(loader.getId() == DOWNLOAD_DETAILED_IMAGE_LOADER){
+                Bitmap image = (Bitmap) data;
+                mBackgroundImage.setImageBitmap(image);
             }
         }else{
             ErrorUtils.errorDialog(this, "Could not connect to server", "No information was retrieved from the server. Please try again later.");
@@ -308,7 +365,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         }
 
         //Restart loader is used instead of init loader so that if screen is rotated, loader is guarenteed to restart
-        getLoaderManager().restartLoader(DOWNLOAD_DETAILED_JSON_LOADER, null, this);
+        getLoaderManager().initLoader(DOWNLOAD_DETAILED_JSON_LOADER, null, this);
     }
 
     public void parseJSON(JSONObject json){
@@ -365,6 +422,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                     Review curReview = new Review(CID, UID, rating, comment, commentTitle, timestamp, name);
                     currentBook.reviews.add(curReview);
                 }
+                getLoaderManager().initLoader(DOWNLOAD_DETAILED_IMAGE_LOADER, null, this);
                 displayBookInfo();
             }
         }catch(JSONException JSONE){
@@ -435,7 +493,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
             for (int i = lowerDataBound; i <= upperDataBound; i++) {
                 //Try to remove old view
                 try{
-                    parent.removeViewAt(i);
+                    parent.removeViewAt(i + 1);
                 }catch(Exception e){
 
                 }
@@ -451,7 +509,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
 
                 //Set values
                 title.setText(currentReview.title);
-                body.setText(currentReview.comment + " asdf more spam to fill body completely and trigger more");
+                body.setText(currentReview.comment);
                 name.setText(currentReview.name);
                 time.setText(currentReview.formatTimestamp(currentReview.timestamp));
                 sRatingBar.setRating(currentReview.rating);
@@ -490,7 +548,6 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                     public void run() {
                         //If there are less lines than the line limit, then hide the more button.
                         if(body.getLineCount() < 4) {
-                            Log.i("LoginActivity", "NUM LINES" + body.getLineCount());
                             more.setVisibility(GONE);
                         }
                         body.setMaxLines(3);
@@ -504,9 +561,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                 name.setTypeface(handWriting);
                 time.setTypeface(handWriting);
 
-                parent.addView(view, i);
-
-                Log.i("LoginActivity", "View added at index " + i + currentReview.title + currentReview.comment + currentReview.name);
+                parent.addView(view, i + 1);
             }
         }
     }
@@ -534,6 +589,90 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
 
             descriptionExpanded = false;
         }
+    }
+
+    /**
+     * Adds book to liked and changes icon.
+     *
+     * @param v The caller view
+     */
+    public void likeBook(View v) {
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor prefEditor = sharedPreferences.edit();
+
+        //If not already liked
+        if (!liked) {
+            //Get current amount of liked books and put like info
+            int numLiked = sharedPreferences.getInt("NUM_LIKED", 0);
+            prefEditor.putInt("NUM_LIKED", numLiked + 1);
+            prefEditor.putString("LIKED" + numLiked, currentBook.GID);
+            prefEditor.commit();
+            mLikeButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_red));
+            liked = true;
+        }
+    }
+
+    /**
+     * Submits comment
+     *
+     * Creates URI and URL to request to add the comment. Then starts loader
+     * and clears EditTexts.
+     *
+     * @param v The caller view
+     */
+    public void addComment(View v){
+        //Get review views
+        SimpleRatingBar rating = (SimpleRatingBar) mReviewHeader.findViewById(R.id.comment_h_rating);
+        EditText title = (EditText) mReviewHeader.findViewById(R.id.comment_h_title);
+        EditText comment = (EditText) mReviewHeader.findViewById(R.id.comment_h_body);
+
+        //Set params
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        VALUE_GID = currentBook.GID;
+        VALUE_UID = sharedPref.getInt("UID", -1);
+        VALUE_PASSWORD = sharedPref.getString("PASSWORD", null);
+        VALUE_RATING = Integer.getInteger(Float.toString(rating.getRating()));
+        VALUE_TITLE = title.getText().toString();
+        VALUE_COMMENT = comment.getText().toString();
+
+        //Verify info
+        if(VALUE_GID == null || VALUE_UID == -1){
+            ErrorUtils.errorDialog(this, "Error", "Information could not be retrieved from memory. Try logging out and logging back in.");
+            return;
+        }else if(VALUE_PASSWORD == null){
+            Toast.makeText(this, "No saved password was found. Please manually enter password.", Toast.LENGTH_LONG).show();
+            //TODO ask for password
+        }else if(VALUE_RATING <= 0 || VALUE_RATING > 5){
+            Toast.makeText(this, "Please select a rating", Toast.LENGTH_SHORT);
+        }
+
+        //Build URI
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme(SCHEME)
+                .authority(BASE_URL)
+                .appendPath(PATH0)
+                .appendPath(PATH1)
+                .appendPath(PATH2) //TODO finish
+                .appendQueryParameter(PARAM_ACTION, VALUE_ACTION_ADD_REVIEW)
+                .appendQueryParameter(PARAM_GID, VALUE_GID)
+                .appendQueryParameter(PARAM_UID, Integer.toString(VALUE_UID))
+                .appendQueryParameter(PARAM_PASSWORD, VALUE_PASSWORD)
+                .appendQueryParameter(PARAM_RATING, Integer.toString(VALUE_RATING))
+                .appendQueryParameter(PARAM_TITLE, VALUE_TITLE)
+                .appendQueryParameter(PARAM_COMMENT, VALUE_COMMENT)
+                .build();
+        String urlString = builder.toString();
+
+        //Try to create URL from Uri
+        try{
+            requestURL = new URL(urlString);
+        }catch(MalformedURLException MURLE){
+            ErrorUtils.errorDialog(this, "There was an error with the url", "Currently the server can not be reached. Make sure your username and password are entered correctly");
+            return;
+        }
+
+        //Start Loader
+        getLoaderManager().initLoader(DOWNLOAD_DETAILED_JSON_LOADER, null, this);
     }
 
     /**
