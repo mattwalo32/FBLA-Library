@@ -127,11 +127,11 @@ public class NetworkJSONUtils {
     public static JSONObject retrieveJSON(Context context, InputStream is){
         JSONObject json = null;
         StringBuilder response = new StringBuilder();
-        InputStreamReader streamReader;
-        BufferedReader bufferedReader;
+        InputStreamReader streamReader = null;
+        BufferedReader bufferedReader = null;
 
         if(is == null) {
-            ErrorUtils.errorDialog(context, "Server Error", "It seems no data could be downloaded from the server. Please try again later.");
+            ErrorUtils.errorDialog(context, "Server Error", "It seems no data could be downloaded from the server. Please try again later."); //TODO may need to fix all errors
             return null;
         }
 
@@ -139,15 +139,13 @@ public class NetworkJSONUtils {
             streamReader = new InputStreamReader(is);
             bufferedReader = new BufferedReader(streamReader);
 
-
             String line = bufferedReader.readLine();
             while(line != null){
                 response.append(line);
                 line = bufferedReader.readLine();
             }
+
             json = new JSONObject(response.toString());
-
-
         }catch (IOException IOE){
             ErrorUtils.errorDialog(context, "Connection Error", "There was an error with your network connection. Check your connection and retry.");
             return null;

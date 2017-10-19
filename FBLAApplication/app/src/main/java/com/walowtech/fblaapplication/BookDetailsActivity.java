@@ -141,6 +141,8 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     private final String KEY_COMMENT = "Comment";
     private final String KEY_COMMENT_TITLE = "Title";
     private final String KEY_COMMENT_TIME = "Timestamp";
+    private final String KEY_AUTH_SUCCESS = "validationSuccess";
+    private final String KEY_MESSAGE = "message";
 
     private JSONObject jsonResponse;
 
@@ -148,11 +150,14 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
 
     private boolean descriptionExpanded;
     private boolean liked;
+    private boolean hasReview;
+    private int userReviewRating = 0;
 
     ArrayList<Review> reviews = new ArrayList<>();
 
     private final int DOWNLOAD_DETAILED_JSON_LOADER = 0;
     private final int DOWNLOAD_DETAILED_IMAGE_LOADER = 1;
+    private final int UPLOAD_COMMENT_LOADER = 2;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -234,6 +239,8 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         setElevation(mCheckout, 8);
         setElevation(mReviews, 12);
 
+        mFAB.bringToFront();
+
         descriptionExpanded = false;
 
         //Get Extras
@@ -298,7 +305,11 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
         jsonResponse = null;
-        if(id == DOWNLOAD_DETAILED_JSON_LOADER) {
+        //If downloading detailed JSON or uploading comment
+        if(id == DOWNLOAD_DETAILED_JSON_LOADER || id == UPLOAD_COMMENT_LOADER) {
+            /*This can be used for uploading, because the data to be uploaded is coming from
+            * the URL arguments and then JSON needs to be downloaded to figure the response
+            * and success that was given*/
             return new DownloadJSONLoader(this, requestURL);
         } else if(id == DOWNLOAD_DETAILED_IMAGE_LOADER) {
             return new DownloadDetailedImageLoader(this, currentBook.thumbnail);
@@ -309,12 +320,13 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader loader, Object data) {
         if(!(data == null || data == " ")) {
-            if (loader.getId() == DOWNLOAD_DETAILED_JSON_LOADER) {
+            if (loader.getId() == DOWNLOAD_DETAILED_JSON_LOADER || loader.getId() == UPLOAD_COMMENT_LOADER) {
                 try {
                     jsonResponse = new JSONObject(data.toString());
                     parseJSON(jsonResponse);
                 } catch (JSONException JSONE) {
                     ErrorUtils.errorDialog(this, "Data Error", "There was an error with the data format. Please try again later.");
+                    return;
                 }
             }else if(loader.getId() == DOWNLOAD_DETAILED_IMAGE_LOADER){
                 Bitmap image = (Bitmap) data;
@@ -395,7 +407,6 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                 //Create book object
                 currentBook = new Book(Float.valueOf(averageRating), numberRatings, copies, availableCopies, VALUE_GID, title, subTitle, null, subject, description, authors, thumbnail, null, ISBN10, ISBN13);
 
-
                 //Loop through copy details
                 for(int i = 0; i < copyDetails.length(); i++){
                     JSONObject currentCopy = (JSONObject)copyDetails.get(i);
@@ -408,6 +419,12 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                     Copy curCopy = new Copy(BID, waitingListSize, checkoutTime, returnTime);
                     currentBook.copies.add(curCopy);
                 }
+
+                //Get UID to check if there are comments by current user. Also assume that there are no reviews initially
+                SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                VALUE_UID = sharedPref.getInt("UID", -1);
+                hasReview = false;
+
                 //Loop through Reviews
                 for(int i = 0; i < reviews.length(); i++){
                     JSONObject currentReview = (JSONObject)reviews.get(i);
@@ -420,10 +437,28 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                     int UID = currentReview.getInt(KEY_UID);
 
                     Review curReview = new Review(CID, UID, rating, comment, commentTitle, timestamp, name);
-                    currentBook.reviews.add(curReview);
+
+                    //If the current user already added a review, display it at the top.
+                    if(UID == VALUE_UID) {
+                        currentBook.reviews.add(0, curReview);
+                        hasReview = true;
+                        userReviewRating = rating;
+                    }else {
+                        currentBook.reviews.add(curReview);
+                    }
                 }
                 getLoaderManager().initLoader(DOWNLOAD_DETAILED_IMAGE_LOADER, null, this);
                 displayBookInfo();
+            }else if(success == 11){ //TODO change success to success codes
+                boolean authSuccess = json.getBoolean(KEY_AUTH_SUCCESS);
+                if(authSuccess){
+                    String message = json.getString(KEY_MESSAGE);
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                    //Updates new info
+                    //retrieveDetailedBookInfo(); //TODO update info
+                }else{
+                    ErrorUtils.errorDialog(this, "Authentication Error", "The user's credentials could not be authenticated, so the review was not uploaded. Please try logging out and baack in.");
+                }
             }
         }catch(JSONException JSONE){
             ErrorUtils.errorDialog(this, "Malformed JSON Error", "A malformed response was recieved from the server. Please try again later.");
@@ -469,8 +504,13 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
 
         //Get reviews
         reviews = currentBook.reviews;
+
+        //Set rating bar if rating exists
+        SimpleRatingBar srb = (SimpleRatingBar)mReviewHeader.findViewById(R.id.comment_h_rating);
+        srb.setRating(userReviewRating);
+
         //Add first 3 reviews, unless there are less than 3 reviews - Then add all reviews
-        int upperBound = ((reviews.size() - 1) > 2)?2:(reviews.size()-1);
+        int upperBound = ((reviews.size() - 1) > 10)?10:(reviews.size()-1);
         reviewAdapter(reviews, mReviews, 0, upperBound, true);
     }
 
@@ -518,7 +558,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                 title.setPadding(offset, 0, 0, 0);
 
                 //If there is no title, set title to amount of stars
-                if(title.getText() == null || title.getText() == "" || title.getText() == "null"){
+                if(title.getText() == null || title.getText() == "" || title.getText() == "null" || title.getText() == " "){
                     String titleString = (int)currentReview.rating  + " stars";
                     title.setText(titleString);
                 }
@@ -609,6 +649,13 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
             prefEditor.commit();
             mLikeButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_red));
             liked = true;
+        }else{
+            int numLiked = sharedPreferences.getInt("NUM_LIKED", 0);
+            prefEditor.putInt("NUM_LIKED", numLiked - 1);
+            prefEditor.remove("LIKED" + numLiked);
+            prefEditor.commit();
+            mLikeButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_border_black));
+            liked = false;
         }
     }
 
@@ -626,12 +673,14 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         EditText title = (EditText) mReviewHeader.findViewById(R.id.comment_h_title);
         EditText comment = (EditText) mReviewHeader.findViewById(R.id.comment_h_body);
 
+
+
         //Set params
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         VALUE_GID = currentBook.GID;
         VALUE_UID = sharedPref.getInt("UID", -1);
         VALUE_PASSWORD = sharedPref.getString("PASSWORD", null);
-        VALUE_RATING = Integer.getInteger(Float.toString(rating.getRating()));
+        VALUE_RATING = ((int)rating.getRating());
         VALUE_TITLE = title.getText().toString();
         VALUE_COMMENT = comment.getText().toString();
 
@@ -643,8 +692,11 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
             Toast.makeText(this, "No saved password was found. Please manually enter password.", Toast.LENGTH_LONG).show();
             //TODO ask for password
         }else if(VALUE_RATING <= 0 || VALUE_RATING > 5){
-            Toast.makeText(this, "Please select a rating", Toast.LENGTH_SHORT);
+            Toast.makeText(this, "Please select a rating", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+
 
         //Build URI
         Uri.Builder builder = new Uri.Builder();
@@ -652,16 +704,24 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                 .authority(BASE_URL)
                 .appendPath(PATH0)
                 .appendPath(PATH1)
-                .appendPath(PATH2) //TODO finish
+                .appendPath(PATH2)
                 .appendQueryParameter(PARAM_ACTION, VALUE_ACTION_ADD_REVIEW)
                 .appendQueryParameter(PARAM_GID, VALUE_GID)
                 .appendQueryParameter(PARAM_UID, Integer.toString(VALUE_UID))
                 .appendQueryParameter(PARAM_PASSWORD, VALUE_PASSWORD)
-                .appendQueryParameter(PARAM_RATING, Integer.toString(VALUE_RATING))
-                .appendQueryParameter(PARAM_TITLE, VALUE_TITLE)
-                .appendQueryParameter(PARAM_COMMENT, VALUE_COMMENT)
-                .build();
+                .appendQueryParameter(PARAM_RATING, Integer.toString(VALUE_RATING));
+
+        if(!(VALUE_TITLE.trim().length() == 0)){
+            builder.appendQueryParameter(PARAM_TITLE, VALUE_TITLE);
+        }
+
+        if(!(VALUE_COMMENT.trim().length() == 0)){
+            builder.appendQueryParameter(PARAM_COMMENT, VALUE_COMMENT);
+        }
+
+        builder.build();
         String urlString = builder.toString();
+
 
         //Try to create URL from Uri
         try{
@@ -671,8 +731,9 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
             return;
         }
 
+
         //Start Loader
-        getLoaderManager().initLoader(DOWNLOAD_DETAILED_JSON_LOADER, null, this);
+        getLoaderManager().initLoader(UPLOAD_COMMENT_LOADER, null, this);
     }
 
     /**

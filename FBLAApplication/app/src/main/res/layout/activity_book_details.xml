@@ -25,18 +25,9 @@
             android:id="@+id/bd_base_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/scroll_offset"
+            android:clipToPadding="false"
             android:orientation="vertical"
-            android:clipToPadding="false">
-
-            <!--<FrameLayout
-                android:foregroundGravity="bottom"
-                android:layout_width="match_parent"
-                android:layout_height="500dp"
-                android:background="@color/colorPrimary300"
-                android:layout_alignParentTop="true">
-
-            </FrameLayout>-->
+            android:paddingTop="@dimen/scroll_offset">
 
             <!-- Top row of information -->
             <RelativeLayout
@@ -44,8 +35,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimary700"
-                android:orientation="horizontal"
-                android:clipToPadding="false">
+                android:clipToPadding="false"
+                android:orientation="horizontal">
 
                 <!-- Preview Image -->
                 <ImageView
@@ -56,43 +47,45 @@
 
                 <!-- Brief book info -->
                 <LinearLayout
+                    android:id="@+id/linearLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="@dimen/margin"
                     android:layout_alignParentTop="true"
-                    android:layout_toRightOf="@+id/bd_small_image"
+                    android:layout_marginLeft="18dp"
+                    android:layout_marginStart="18dp"
                     android:layout_toEndOf="@+id/bd_small_image"
-                    android:id="@+id/linearLayout">
+                    android:layout_toRightOf="@+id/bd_small_image"
+                    android:orientation="vertical"
+                    android:padding="@dimen/margin">
 
                     <TextView
                         android:id="@+id/bd_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="2"
                         android:text="Loading Title"
                         android:textColor="@android:color/black"
-                        android:maxLines="2"
-                        android:ellipsize="end"
                         android:textSize="@dimen/text_h2" />
 
                     <TextView
                         android:id="@+id/bd_subtitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
                         android:text="Loading Sub Title"
                         android:textColor="@android:color/black"
-                        android:maxLines="1"
-                        android:ellipsize="end"
                         android:textSize="@dimen/text" />
 
                     <TextView
                         android:id="@+id/bd_authors"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
                         android:text="Loading Authors"
                         android:textColor="@color/colorSecondaryText"
-                        android:maxLines="1"
-                        android:ellipsize="end"
                         android:textSize="@dimen/text" />
 
                 </LinearLayout>
@@ -101,9 +94,9 @@
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/bd_small_image"
-                    android:layout_toEndOf="@id/bd_small_image"
                     android:layout_alignBottom="@id/bd_small_image"
+                    android:layout_toEndOf="@id/bd_small_image"
+                    android:layout_toRightOf="@id/bd_small_image"
                     android:clipToPadding="false">
 
                     <include layout="@layout/book_details_top_row" />
@@ -114,40 +107,41 @@
             <!-- Second Row - Description - Must be nested in LinearLayout for fading edge to work -->
             <LinearLayout
                 android:id="@+id/bd_description_layout"
-                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:requiresFadingEdge="vertical"
-                android:fadingEdgeLength="100dp"
-                android:paddingBottom="10dp"
-                android:clipToPadding="false"
-                android:background="@color/colorPrimary700"
                 android:layout_below="@id/bd_top_row_layout"
-                android:animateLayoutChanges="true">
+                android:animateLayoutChanges="true"
+                android:background="@color/colorPrimary700"
+                android:clipToPadding="false"
+                android:fadingEdgeLength="100dp"
+                android:orientation="vertical"
+                android:paddingBottom="10dp"
+                android:requiresFadingEdge="vertical">
 
                 <TextView
                     android:id="@+id/bd_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/colorPrimary700"
-                    android:textSize="@dimen/text"
-                    android:padding="@dimen/margin"
-                    android:maxLines="@integer/lines"
                     android:ellipsize="none"
-                    tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam vehicula venenatis urna, quis gravida felis ornare quis. Maecenas sodales at sapien nec dignissim. Vivamus lacus arcu, euismod in lorem ut, sollicitudin congue orci. Praesent at ipsum et quam aliquet consectetur. Nulla pellentesque tristique ultricies. Morbi lacinia est lorem, non accumsan."
-                    android:textColor="@android:color/white"
+                    android:fadingEdgeLength="100dp"
+                    android:maxLines="@integer/lines"
+                    android:padding="@dimen/margin"
                     android:requiresFadingEdge="vertical"
-                    android:fadingEdgeLength="100dp"/>
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/text"
+                    tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam vehicula venenatis urna, quis gravida felis ornare quis. Maecenas sodales at sapien nec dignissim. Vivamus lacus arcu, euismod in lorem ut, sollicitudin congue orci. Praesent at ipsum et quam aliquet consectetur. Nulla pellentesque tristique ultricies. Morbi lacinia est lorem, non accumsan." />
 
                 <!-- Additional book details - Can be hidden -->
                 <LinearLayout
                     android:id="@+id/bd_additional_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true"
                     android:orientation="vertical"
                     android:padding="@dimen/margin"
-                    android:visibility="gone"
-                    android:animateLayoutChanges="true">
+                    android:visibility="gone">
+
                     <TextView
                         android:id="@+id/bd_full_title"
                         android:layout_width="wrap_content"
@@ -155,6 +149,7 @@
                         android:textColor="@android:color/white"
                         android:textSize="@dimen/text"
                         tools:text="Title: title" />
+
                     <TextView
                         android:id="@+id/bd_full_authors"
                         android:layout_width="wrap_content"
@@ -162,6 +157,7 @@
                         android:textColor="@android:color/white"
                         android:textSize="@dimen/text"
                         tools:text="Authors: authors, authors" />
+
                     <TextView
                         android:id="@+id/bd_subject"
                         android:layout_width="wrap_content"
@@ -169,103 +165,91 @@
                         android:textColor="@android:color/white"
                         android:textSize="@dimen/text"
                         tools:text="Subject: subject" />
+
                     <TextView
                         android:id="@+id/bd_copies"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@android:color/white"
                         android:textSize="@dimen/text"
-                        tools:text="School Copies: 3"/>
+                        tools:text="School Copies: 3" />
+
                     <TextView
                         android:id="@+id/bd_isbn10"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@android:color/white"
                         android:textSize="@dimen/text"
-                        tools:text="ISBN 10: 1234567890"/>
+                        tools:text="ISBN 10: 1234567890" />
+
                     <TextView
                         android:id="@+id/bd_isbn13"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@android:color/white"
                         android:textSize="@dimen/text"
-                        tools:text="ISBN13: 1234567890123"/>
-                    
-                </LinearLayout>
-                
-            </LinearLayout>
+                        tools:text="ISBN13: 1234567890123" />
 
-            <!-- Description FAB -->
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/bd_fab_description"
-                android:layout_width="@dimen/fab_diameter"
-                android:layout_height="@dimen/fab_diameter"
-                app:fabSize="normal"
-                app:layout_anchor="@id/bd_description_layout"
-                app:layout_anchorGravity="bottom|center_horizontal"
-                app:srcCompat="@drawable/ic_add_white"
-                android:scaleType="centerCrop"
-                android:layout_above="@+id/bd_social_layout"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="@dimen/fab_radius"
-                android:onClick="expandDescription" />
+                </LinearLayout>
+
+            </LinearLayout>
 
             <!-- Seperator needed to fill in empty space with background -->
             <View
                 android:id="@+id/bd_separator"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:background="@color/colorPrimary300"
-                android:layout_below="@id/bd_description_layout" />
+                android:layout_below="@id/bd_description_layout"
+                android:background="@color/colorPrimary300" />
 
             <!-- Third Row - Contains Rating bar and share button -->
             <RelativeLayout
                 android:id="@+id/bd_social_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorPrimary300"
                 android:layout_below="@id/bd_separator"
-                android:animateLayoutChanges="true">
+                android:animateLayoutChanges="true"
+                android:background="@color/colorPrimary300">
 
                 <TextView
                     android:id="@+id/bd_avg_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:padding="@dimen/margin"
                     android:textColor="@android:color/black"
                     android:textSize="@dimen/text_rating"
-                    android:padding="@dimen/margin"
-                    tools:text="4.1"
-                    android:layout_centerVertical="true" />
+                    tools:text="4.1" />
 
 
                 <!-- Rating Bar and number of ratings -->
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@id/bd_avg_rating"
                     android:orientation="vertical"
                     android:paddingLeft="@dimen/margin"
-                    android:paddingStart="@dimen/margin"
-                    android:layout_toRightOf="@id/bd_avg_rating"
-                    android:layout_centerVertical="true">
+                    android:paddingStart="@dimen/margin">
 
                     <com.iarcuschin.simpleratingbar.SimpleRatingBar
                         android:id="@+id/bd_ratingbar"
                         android:layout_width="@dimen/ratingbar_width"
                         android:layout_height="wrap_content"
-                        app:srb_isIndicator="true"
                         android:numStars="5"
-                        app:srb_stepSize="1"
                         app:srb_borderColor="@color/colorAccent200"
-                        app:srb_fillColor="@color/colorAccent200" />
+                        app:srb_fillColor="@color/colorAccent200"
+                        app:srb_isIndicator="true"
+                        app:srb_stepSize="1" />
 
                     <TextView
                         android:id="@+id/bd_num_ratings"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:paddingTop="5dp"
                         android:textColor="@android:color/black"
                         android:textSize="@dimen/text"
-                        tools:text="15 Ratings"
-                        android:paddingTop="5dp" />
+                        tools:text="15 Ratings" />
 
                 </LinearLayout>
 
@@ -273,31 +257,49 @@
                     android:id="@+id/bd_share_button"
                     android:layout_width="@dimen/ic_diameter"
                     android:layout_height="@dimen/ic_diameter"
-                    app:srcCompat="@drawable/ic_share_black"
                     android:layout_alignParentRight="true"
                     android:layout_centerInParent="true"
                     android:layout_margin="@dimen/margin"
-                    android:scaleType="centerCrop" />
+                    android:scaleType="centerCrop"
+                    app:srcCompat="@drawable/ic_share_black" />
             </RelativeLayout>
 
+            <!-- Description FAB -->
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/bd_fab_description"
+                android:layout_width="@dimen/fab_diameter"
+                android:layout_height="@dimen/fab_diameter"
+                android:layout_above="@id/bd_social_layout"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="@dimen/fab_radius"
+                android:onClick="expandDescription"
+                android:scaleType="centerCrop"
+                app:fabSize="normal"
+                app:srcCompat="@drawable/ic_add_white" />
+
             <FrameLayout
+                android:id="@+id/bd_reviews_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/bd_social_layout"
                 android:background="@color/colorPrimary300"
-                android:layout_below="@id/bd_social_layout">
+                android:paddingBottom="@dimen/fab_diameter"
+                android:clipToPadding="false">
 
                 <LinearLayout
                     android:id="@+id/bd_reviews_view"
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/margin"
-                    android:background="@color/colorPrimary100">
+                    android:background="@color/colorPrimary100"
+                    android:orientation="vertical">
 
                 </LinearLayout>
             </FrameLayout>
 
         </RelativeLayout>
+
+
     </ScrollView>
 
 </android.support.design.widget.CoordinatorLayout>

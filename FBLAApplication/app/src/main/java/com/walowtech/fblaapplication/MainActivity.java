@@ -386,7 +386,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
      */
     public void updateUIImage(int i, int j, Bitmap bitmap){
 
-    //TODO fix the the screen is updated
+        //TODO fix the the screen is updated
         if(i <= subjectsLastVis){
             subjectAdapter.notifyDataSetChanged();
         }else {
@@ -505,7 +505,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
                 JSONObject jsonResponse = json.getJSONObject(KEY_JSON);
                 int numSubjects = jsonResponse.getInt(KEY_NUM_SUBJECTS);
 
-               categories.clear();
+                categories.clear();
 
                 //iterate through subjects
                 for(int i = 0; i < numSubjects + 1; i++){
@@ -567,24 +567,24 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
                         SearchManager.SUGGEST_COLUMN_TEXT_1
                 };
 
-                    //Matrix that holds all results
-                    MatrixCursor cursor = new MatrixCursor(sAutocompleteColNames);
+                //Matrix that holds all results
+                MatrixCursor cursor = new MatrixCursor(sAutocompleteColNames);
 
-                    //Iterate through all books that were found
-                    for(int i = 0; i < jsonResponse.length(); i++){
-                        JSONObject curBook = (JSONObject) jsonResponse.get(i);
+                //Iterate through all books that were found
+                for(int i = 0; i < jsonResponse.length(); i++){
+                    JSONObject curBook = (JSONObject) jsonResponse.get(i);
 
-                        String GID = curBook.getString(KEY_GID);
-                        String title = curBook.getString(KEY_TITLE);
-                        String thumbnail = curBook.getString(KEY_SMALL_THUMBNAIL);
+                    String GID = curBook.getString(KEY_GID);
+                    String title = curBook.getString(KEY_TITLE);
+                    String thumbnail = curBook.getString(KEY_SMALL_THUMBNAIL);
 
-                        searchResults.add(new Book(null, title, GID, thumbnail, 0f));
-                        Log.i("LoginActivity", "\n" + searchResults.get(i).title);
+                    searchResults.add(new Book(null, title, GID, thumbnail, 0f));
+                    Log.i("LoginActivity", "\n" + searchResults.get(i).title);
 
-                        //Add a row to the cursor
-                        Object[] row = new Object[] {i, title};
-                        cursor.addRow(row);
-                    }
+                    //Add a row to the cursor
+                    Object[] row = new Object[] {i, title};
+                    cursor.addRow(row);
+                }
                 searchBar.getSuggestionsAdapter().changeCursor(cursor);
             }else {
                 ErrorUtils.errorDialog(this, "Response Error", "An unexpected response was recieved from the server. Please try again later.");
@@ -625,7 +625,12 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
         //ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, p1);
         BitmapDrawable drawable = (BitmapDrawable) image.getDrawable();
-        Bitmap bitmap = drawable.getBitmap();
+        Bitmap bitmap;
+        try {
+            bitmap = drawable.getBitmap();
+        }catch(NullPointerException NPE){
+            bitmap = null;
+        }
 
         Intent i = new Intent(this, BookDetailsActivity.class);
         i.putExtra("GID", GID);

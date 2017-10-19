@@ -47,7 +47,9 @@ public class DownloadJSONLoader extends AsyncTaskLoader<JSONObject> {
             JSONObject jsonObject = NetworkJSONUtils.retrieveJSON(context, is);
             return jsonObject;
         }catch(Exception e){
-            ErrorUtils.errorDialog(context, "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
+            e.printStackTrace();
+            //TODO fix this because it is calling UID from background https://stackoverflow.com/questions/17379002/java-lang-runtimeexception-cant-create-handler-inside-thread-that-has-not-call
+            //ErrorUtils.errorDialog(context, "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
         }
         return null;
     }

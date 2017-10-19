@@ -109,7 +109,7 @@ public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
                     }catch(Exception e){
                         ErrorUtils.errorDialog(context, "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
                     }
-                    slides.get(i).image = image;
+                    slides.get(i).image = image; //TODO Crash from null object reference java.lang.NullPointerException: Attempt to invoke virtual method 'int java.util.ArrayList.size()' on a null object reference
                 }
 
             activity.runOnUiThread(new Runnable() {

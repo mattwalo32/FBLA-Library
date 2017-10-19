@@ -29,18 +29,18 @@
             android:layout_marginLeft="@dimen/margin"
             android:layout_marginRight="@dimen/margin"/>
 
-    <TextView
-        android:id="@+id/bd_checkout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorAccent200"
-        android:padding="@dimen/margin"
-        android:layout_marginRight="@dimen/margin"
-        android:text="@string/checkout"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/text_h2"
-        android:layout_toRightOf="@id/bd_favorite"/>
+        <TextView
+            android:id="@+id/bd_checkout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorAccent200"
+            android:padding="@dimen/margin"
+            android:layout_marginRight="@dimen/margin"
+            android:text="@string/checkout"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_h2"
+            android:layout_toRightOf="@id/bd_favorite"/>
 
     </RelativeLayout>
 </LinearLayout>

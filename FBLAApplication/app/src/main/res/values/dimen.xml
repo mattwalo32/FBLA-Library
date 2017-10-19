@@ -57,4 +57,5 @@
     <dimen name="secondary_ratingbar_width">100dp</dimen>
     <dimen name="comment_profile_diameter">50dp</dimen>
     <dimen name="text_rating">75dp</dimen>
+    <dimen name="btn_get_width">100dp</dimen>
 </resources>
