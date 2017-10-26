@@ -1,0 +1,38 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- General Settings -->
+    <PreferenceCategory
+        android:title="@string/general" >
+
+        <SwitchPreference
+            android:key="pref_key_notify_overdue"
+            android:title="@string/notify_overdue"
+            android:defaultValue="true" />
+
+        <SwitchPreference
+            android:key="pref_key_notify_fee"
+            android:title="@string/notify_fee"
+            android:defaultValue="true" />
+
+        <Preference
+            android:key="pref_key_clear_liked"
+            android:title="@string/clear_liked_books" />
+
+    </PreferenceCategory>
+
+
+
+    <!-- About App -->
+    <PreferenceCategory
+        android:title="@string/about" >
+
+        <Preference
+            android:title="@string/version" />
+
+        <Preference
+            android:title="@string/release_date" />
+
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

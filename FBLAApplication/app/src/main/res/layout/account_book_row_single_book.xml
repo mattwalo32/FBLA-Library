@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="@dimen/margin"
+    android:padding="@dimen/margin"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white">
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/book_row_single_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:textSize="@dimen/text_h2"
+        android:textColor="@android:color/black"
+        android:text="Loading . . ."/>
+
+    <!-- Book Image -->
+    <ImageView
+        android:id="@+id/account_book_row_book_image"
+        android:layout_width="@dimen/book_width"
+        android:layout_height="@dimen/book_height"
+        android:layout_marginTop="@dimen/margin"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/book_row_single_header"/>
+
+    <TextView
+        android:id="@+id/book_row_single_due"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/account_book_row_book_image"
+        android:textSize="@dimen/text_h2"
+        android:textColor="@android:color/black"
+        android:maxLines="1"
+        android:ellipsize="end"
+        tools:text="Due: 5 days"/>
+
+    <!-- Book info -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignTop="@id/account_book_row_book_image"
+        android:layout_toLeftOf="@id/book_row_single_due"
+        android:layout_toRightOf="@id/account_book_row_book_image"
+        android:paddingLeft="@dimen/margin">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_h2"
+            android:textColor="@android:color/black"
+            android:maxLines="1"
+            android:ellipsize="end"
+            tools:text="Book Title"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text"
+            android:textColor="@android:color/black"
+            android:maxLines="1"
+            android:ellipsize="end"
+            tools:text="Subtitle if applicable"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text"
+            android:textColor="@color/colorSecondaryText"
+            android:maxLines="1"
+            android:ellipsize="end"
+            tools:text="Authors"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

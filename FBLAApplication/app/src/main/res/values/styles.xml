@@ -2,7 +2,6 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary500</item>
         <item name="colorPrimaryDark">@color/colorPrimary700</item>
         <item name="colorAccent">@color/colorAccent200</item>
@@ -10,7 +9,26 @@
         <item name="android:textColorHint">@color/colorSecondaryText</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
+        <item name="android:clipToPadding">false</item>
     </style>
 
+    <!-- Theme of Settings Activity/Fragment. -->
+    <style name="SettingsTheme" parent="Theme.AppCompat.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorAccent">@color/colorPrimary500</item>
+        <item name="colorButtonNormal">@color/colorPrimary500</item>
+        <item name="colorPrimary">@color/colorPrimary500</item>
+        <item name="colorPrimaryDark">@color/colorPrimary700</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="actionBarStyle">@style/SettingsTheme.ActionBarStyle</item>
+    </style>
+
+    <style name="SettingsTheme.ActionBarStyle" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:titleTextStyle">@style/SettingsTheme.ActionBar.TitleTextStyle</item>
+    </style>
+
+    <style name="SettingsTheme.ActionBar.TitleTextStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
 
 </resources>

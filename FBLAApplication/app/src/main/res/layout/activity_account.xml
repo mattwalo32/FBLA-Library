@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- Top Row - Contains user info and edit icon -->
+                <RelativeLayout
+                    android:id="@+id/aa_layout_top_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/top_frame_height"
+                    android:padding="@dimen/margin"
+                    android:background="@color/colorPrimary700">
+
+                    <TextView
+                        android:id="@+id/aa_username"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/black"
+                        android:textSize="@dimen/text_h2"
+                        tools:text="Firstname Lastname"/>
+
+                    <TextView
+                        android:id="@+id/aa_email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/aa_username"
+                        android:textAlignment="center"
+                        android:textColor="@color/colorSecondaryText"
+                        android:textSize="@dimen/text"
+                        tools:text="FLastname@gmail.com"/>
+
+
+
+                </RelativeLayout>
+
+                <!-- Bottom Row - Contains all books -->
+                <RelativeLayout
+                    android:id="@+id/aa_layout_bottom_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/aa_layout_top_row"
+                    android:background="@color/colorPrimary500">
+
+
+                    <ListView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:divider="@android:color/transparent"
+                        android:dividerHeight="@dimen/margin_large"
+                        android:padding="@dimen/margin_large"
+                        android:id="@+id/m_lv_main_content" />
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+
+            <!-- Images that go between layers -->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="@dimen/large_profile_diameter"
+                android:layout_height="@dimen/large_profile_diameter"
+                android:src="@drawable/ic_circle_white"
+                app:layout_anchor="@id/aa_layout_top_row"
+                app:layout_anchorGravity="bottom|center_horizontal"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="@dimen/large_profile_diameter"
+                android:layout_height="@dimen/large_profile_diameter"
+                android:src="@drawable/ic_account_circle_100dp"
+                app:layout_anchor="@id/aa_layout_top_row"
+                app:layout_anchorGravity="bottom|center_horizontal"/>
+
+
+
+        </android.support.design.widget.CoordinatorLayout>
+
+
+
+</ScrollView>

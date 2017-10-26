@@ -3,10 +3,16 @@ package com.walowtech.fblaapplication;
 import android.graphics.Bitmap;
 
 /**
- * Created by mattw on 9/30/2017.
+ * Class holds an instance of an item in the view pager. It
+ * contains information about the image's description, URL, and
+ * linked item action.
+ *
+ * @author Matthew Walowski
+ * @version 1.0
+ * @since 1.0
  */
 
-//TODO doc
+//Created 9/30/17
 public class ViewPagerItem {
 
     public String shortDescription;

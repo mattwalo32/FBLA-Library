@@ -16,10 +16,11 @@ import org.w3c.dom.Text;
 //Created 9/24/2017
 public class NavbarItem {
 
-    public int image;
+    public int image, index;
     public String text;
 
-    public NavbarItem(int image, String text){
+    public NavbarItem(int index, int image, String text){
+        this.index = index;
         this.image = image;
         this.text = text;
     }

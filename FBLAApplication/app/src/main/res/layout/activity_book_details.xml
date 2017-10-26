@@ -12,7 +12,8 @@
         android:id="@+id/bd_background_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitXY" />
+        android:scaleType="fitXY"
+        android:transitionName="@string/trans_iv_book_cover"/>
 
     <!-- Main Content -->
     <ScrollView
@@ -51,8 +52,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
-                    android:layout_marginLeft="18dp"
-                    android:layout_marginStart="18dp"
                     android:layout_toEndOf="@+id/bd_small_image"
                     android:layout_toRightOf="@+id/bd_small_image"
                     android:orientation="vertical"
@@ -106,6 +105,7 @@
 
             <!-- Second Row - Description - Must be nested in LinearLayout for fading edge to work -->
             <LinearLayout
+                android:clipChildren="false"
                 android:id="@+id/bd_description_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -126,7 +126,10 @@
                     android:ellipsize="none"
                     android:fadingEdgeLength="100dp"
                     android:maxLines="@integer/lines"
-                    android:padding="@dimen/margin"
+                    android:paddingLeft="@dimen/margin"
+                    android:paddingRight="@dimen/margin"
+                    android:paddingTop="@dimen/margin"
+                    android:paddingBottom="@dimen/margin_large"
                     android:requiresFadingEdge="vertical"
                     android:textColor="@android:color/white"
                     android:textSize="@dimen/text"
@@ -275,15 +278,27 @@
                 android:onClick="expandDescription"
                 android:scaleType="centerCrop"
                 app:fabSize="normal"
-                app:srcCompat="@drawable/ic_add_white" />
+                app:srcCompat="@drawable/ic_add_white"
+                app:borderWidth="0dp"
+                app:elevation="@dimen/elev_fab"/>
 
             <FrameLayout
-                android:id="@+id/bd_reviews_layout"
+                android:id="@+id/bd_review_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/bd_social_layout"
-                android:background="@color/colorPrimary300"
-                android:paddingBottom="@dimen/fab_diameter"
+                android:padding="10dp"
+                android:background="@color/colorPrimary300">
+                <include layout="@layout/review_header" />
+            </FrameLayout>
+
+            <RelativeLayout
+                android:id="@+id/bd_reviews_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/bd_review_header"
+                android:background="@color/colorPrimary100"
+                android:paddingBottom="@dimen/margin"
                 android:clipToPadding="false">
 
                 <LinearLayout
@@ -291,11 +306,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/margin"
-                    android:background="@color/colorPrimary100"
                     android:orientation="vertical">
 
                 </LinearLayout>
-            </FrameLayout>
+
+                <TextView
+                    android:id="@+id/bd_view_all_reviews"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/bd_reviews_view"
+                    android:textColor="@color/colorAccent400"
+                    android:textSize="@dimen/text_h2"
+                    android:textAlignment="center"
+                    android:text="@string/view_all"
+                    android:padding="@dimen/margin"
+                    android:onClick="viewAllReviews"/>
+
+            </RelativeLayout>
 
         </RelativeLayout>
 

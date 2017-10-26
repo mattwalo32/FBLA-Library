@@ -13,12 +13,15 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Slide;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +33,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.walowtech.fblaapplication.Utils.DownloadImageLoader;
 import com.walowtech.fblaapplication.Utils.DownloadJSONLoader;
@@ -140,10 +144,12 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.i("LoginActivity", "CREATED");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        configActionBar();
         super.onCreateDrawer();
+
+        handWriting = Typeface.createFromAsset(getAssets(), "fonts/hand_writing.ttf");
 
         //Initialize main content
         mainContent = (ListView) findViewById(R.id.m_lv_main_content);
@@ -168,8 +174,6 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
         //Set adapter
         mainContent.setAdapter(subjectAdapter);
 
-        handWriting = Typeface.createFromAsset(getAssets(), "fonts/hand_writing.ttf");
-
         //Initialize ViewPager
         viewPager = (ViewPager)mainContentHeader.findViewById(R.id.m_view_pager);
         ArrayList<ViewPagerItem> initSlide = new ArrayList<>();
@@ -188,6 +192,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
         //TODO show image for no image
 
         setNames();
+        configActionBar();
     }
 
     /**
@@ -198,7 +203,6 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
      */
     private void configActionBar(){
         Toolbar toolbar = (Toolbar) findViewById(R.id.m_toolbar);
-        setSupportActionBar(toolbar);
 
         //Set NavDrawer Toggle Listener
         ImageView toggleIcon = (ImageView) toolbar.findViewById(R.id.toggle_icon);
@@ -252,6 +256,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
             }
         });
 
+        setSupportActionBar(toolbar);
     }
 
     /**
@@ -313,9 +318,10 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
             return new DownloadJSONLoader(this, requestURL);
         }else if(id == DOWNLOAD_BOOK_IMAGE_LOADER || id == DOWNLOAD_SLIDE_IMAGE_LOADER) {
             if (downloadType == 0)
-                return new DownloadImageLoader(this, this, categories, null, this);
+                //TODO create one image loader
+                return new DownloadImageLoader(this, this, categories, new ArrayList<ViewPagerItem>(), this);
             else if(downloadType == 1)
-                return new DownloadImageLoader(this, this, null, slideshows, this);
+                return new DownloadImageLoader(this, this, new ArrayList<Category>(), slideshows, this);
         }
         return null;
     }
@@ -391,9 +397,11 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
             subjectAdapter.notifyDataSetChanged();
         }else {
             try {
-                categories.get(i).bookAdapter.notifyItemRangeChanged(j-1, j+1);
+                categories.get(i).bookAdapter.notifyItemRangeChanged(j-1, j+1); //TODO can be index out of bounds
             } catch (NullPointerException e) {
                 //Log.i("LoginActivity", "EXCEPTION THROWN in " + i + ", " + j);
+            } catch (Exception e){
+                Toast.makeText(this, "An unexpected error occurred while. Some books may display wrong.", Toast.LENGTH_SHORT);
             }
         }
     }
@@ -620,10 +628,10 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
      * @param GID the GID of the book selected and to be passed as extra
      */
     private void launchActivityDetailedBook(ImageView image, String GID){
-        //Pair<View, String> p1 = Pair.create((View)image, getString(R.string.trans_iv_book_cover));
+        android.support.v4.util.Pair<View, String> p1 = android.support.v4.util.Pair.create((View)image, getString(R.string.trans_iv_book_cover));
         //Pair<View, String> p2 = Pair.create((View)text, getString(R.string.trans_tv_avg_rating));
 
-        //ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, p1);
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, p1);
         BitmapDrawable drawable = (BitmapDrawable) image.getDrawable();
         Bitmap bitmap;
         try {
@@ -635,7 +643,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
         Intent i = new Intent(this, BookDetailsActivity.class);
         i.putExtra("GID", GID);
         i.putExtra("BOOK_IMAGE", bitmap);
-        startActivity(i /*, options.toBundle()*/);
+        startActivity(i , options.toBundle());
     }
 
     //Adapters

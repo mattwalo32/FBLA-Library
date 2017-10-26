@@ -58,4 +58,19 @@
     <dimen name="comment_profile_diameter">50dp</dimen>
     <dimen name="text_rating">75dp</dimen>
     <dimen name="btn_get_width">100dp</dimen>
+
+    <!-- Account Activity -->
+    <dimen name="top_frame_height">200dp</dimen>
+    <dimen name="large_profile_diameter">175dp</dimen>
+
+    <!-- Elevations -->
+    <dimen name="elev_base_layout">15dp</dimen>
+    <dimen name="elev_top_row_layout">12dp</dimen>
+    <dimen name="elev_book_image">20dp</dimen>
+    <dimen name="elev_checkout">4dp</dimen>
+    <dimen name="elev_description_layout">12dp</dimen>
+    <dimen name="elev_social">8dp</dimen>
+    <dimen name="elev_leave_review">8dp</dimen>
+    <dimen name="elev_reviews">4dp</dimen>
+    <dimen name="elev_fab">16dp</dimen>
 </resources>

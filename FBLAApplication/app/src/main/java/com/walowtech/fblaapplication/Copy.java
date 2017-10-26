@@ -12,8 +12,9 @@ package com.walowtech.fblaapplication;
 public class Copy {
 
     public int BID, waitingListAmount;
-    public String checkoutTime, returnTime;
+    public String checkoutTime, returnTime, copyInfo;
 
+    //TODO get book info
     public Copy(int BID, int waitingListAmount, String checkoutTime, String returnTime){
         this.BID = BID;
         this.waitingListAmount = waitingListAmount;

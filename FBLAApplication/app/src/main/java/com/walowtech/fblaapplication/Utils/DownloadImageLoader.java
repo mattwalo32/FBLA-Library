@@ -31,10 +31,10 @@ import static com.walowtech.fblaapplication.MainActivity.subjectsLastVis;
 //Created 9/21/17
 public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
 
-    ArrayList<Category> categories;
-    ArrayList<ViewPagerItem> slides;
+    ArrayList<Category> categories = new ArrayList<>();
+    ArrayList<ViewPagerItem> slides = new ArrayList<>();
     Context context;
-    ArrayList<Bitmap> response;
+    ArrayList<Bitmap> response = new ArrayList<>();
     Activity activity;
     Bitmap image;
 
@@ -82,6 +82,7 @@ public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
                         try{
                             image = NetworkJSONUtils.downloadBitmap(context, url);
                         }catch(Exception e){
+                            //TODO this causes an error
                             ErrorUtils.errorDialog(context, "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
                         }
                         categories.get(i).books.get(j).coverSmall = image;
@@ -93,7 +94,7 @@ public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
                         @Override
                         public void run() {
                             if (i < categories.size()) {
-                                mainActivity.updateUIImage(i, j, image);
+                                mainActivity.updateUIImage(i, j, image); //TODO out of bounds exception 8 was 8
                             }
                         }
                     });

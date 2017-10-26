@@ -52,11 +52,11 @@ public class NavDrawerActivity extends AppCompatActivity {
         toggle.setDrawerIndicatorEnabled(true);
         drawerLayout.addDrawerListener(toggle);
 
-        navbarItems.add(new NavbarItem(R.drawable.ic_account_black, "Account"));
-        navbarItems.add(new NavbarItem(R.drawable.ic_settings_black, "Settings"));
-        navbarItems.add(new NavbarItem(R.drawable.ic_info_black, "Information"));
-        navbarItems.add(new NavbarItem(R.drawable.ic_fees_black, "Fees"));
-        navbarItems.add(new NavbarItem(R.drawable.ic_logout_black, "Logout"));
+        navbarItems.add(new NavbarItem(0, R.drawable.ic_account_black, "Account"));
+        navbarItems.add(new NavbarItem(1, R.drawable.ic_settings_black, "Settings"));
+        navbarItems.add(new NavbarItem(2, R.drawable.ic_info_black, "Information"));
+        navbarItems.add(new NavbarItem(3, R.drawable.ic_fees_black, "Fees"));
+        navbarItems.add(new NavbarItem(4, R.drawable.ic_logout_black, "Logout"));
 
         navbarAdapter = new NavbarAdapter(this, navbarItems);
 
