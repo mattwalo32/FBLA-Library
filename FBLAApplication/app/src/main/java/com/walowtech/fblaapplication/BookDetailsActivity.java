@@ -111,6 +111,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     private final String VALUE_ACTION_ADD_REVIEW = "ACTION_ADD_REVIEW";
     private final String VALUE_ACTION_CHECKOUT = "ACTION_CHECKOUT_BOOK";
     private final String VALUE_ACTION_WAITLIST = "ACTION_ADD_TO_WAIT_LIST";
+    private final String VALUE_ACTION_RETURN = "ACTION_RETURN_BOOK";
     private String VALUE_GID;
     private static int VALUE_UID;
     private static String VALUE_PASSWORD;
@@ -158,11 +159,13 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     private JSONObject jsonResponse;
 
     private Book currentBook;
+    private Copy mCopy;
 
     private boolean descriptionExpanded;
     private boolean liked;
     private boolean hasReview;
     private boolean updating;
+    private boolean checkedOut = true;
     private int userReviewRating = 0;
     private int likeIndex;
 
@@ -172,6 +175,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     private final int DOWNLOAD_DETAILED_IMAGE_LOADER = 1;
     private final int UPLOAD_COMMENT_LOADER = 2;
     private final int CHECKOUT_BOOK_LOADER = 3;
+    private final int RETURN_BOOK_LOADER = 4;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -286,11 +290,20 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         mCheckout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(currentBook.copies != null) {
-                    DialogFragment bookFragment = SelectBookFragment.newInstance(BookDetailsActivity.this, currentBook.copies, currentBook.availableCopies);
-                    bookFragment.show(getFragmentManager(), "TestDialog");
-                }else{
-                    Toast.makeText(BookDetailsActivity.this, "Cannot checkout book. Info is still loading.", Toast.LENGTH_SHORT).show();
+                try {
+                    if (currentBook.copies != null) {
+                        if (!checkedOut) {
+                            DialogFragment bookFragment = SelectBookFragment.newInstance(BookDetailsActivity.this, currentBook.copies, currentBook.availableCopies);
+                            bookFragment.show(getFragmentManager(), "TestDialog");
+                        } else if (mCopy != null) {
+                            Log.i("LoginActivity", "RETURNED");
+                            returnBook(mCopy);
+                        }
+                    } else {
+                        Toast.makeText(BookDetailsActivity.this, "Book is still loading.", Toast.LENGTH_SHORT).show();
+                    }
+                }catch(Exception E){
+                    Toast.makeText(BookDetailsActivity.this, "Book is still loading.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -340,7 +353,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         jsonResponse = null;
         Log.i("LoginActivity", "Creating");
         //If downloading detailed JSON or uploading comment
-        if(id == DOWNLOAD_DETAILED_JSON_LOADER || id == UPLOAD_COMMENT_LOADER || id == CHECKOUT_BOOK_LOADER) {
+        if(id == DOWNLOAD_DETAILED_JSON_LOADER || id == UPLOAD_COMMENT_LOADER || id == CHECKOUT_BOOK_LOADER || id == RETURN_BOOK_LOADER) {
             /*This can be used for uploading, because the data to be uploaded is coming from
             * the URL arguments and then JSON needs to be downloaded to figure the response
             * and success that was given*/
@@ -355,7 +368,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader loader, Object data) {
         if(!(data == null || data == " ")) {
-            if (loader.getId() == DOWNLOAD_DETAILED_JSON_LOADER || loader.getId() == UPLOAD_COMMENT_LOADER || loader.getId() == CHECKOUT_BOOK_LOADER) {
+            if (loader.getId() == DOWNLOAD_DETAILED_JSON_LOADER || loader.getId() == UPLOAD_COMMENT_LOADER || loader.getId() == CHECKOUT_BOOK_LOADER || loader.getId() == RETURN_BOOK_LOADER) {
                 try {
                     jsonResponse = new JSONObject(data.toString());
                     parseJSON(jsonResponse);
@@ -469,6 +482,10 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                 //Create book object
                 currentBook = new Book(Float.valueOf(averageRating), numberRatings, copies, availableCopies, VALUE_GID, title, subTitle, null, subject, description, authors, thumbnail, null, ISBN10, ISBN13);
 
+                //Get UID to check if there are comments by current user. Also assume that there are no reviews initially
+                SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                VALUE_UID = sharedPref.getInt("UID", -2);
+
                 //Loop through copy details
                 for(int i = 0; i < copyDetails.length(); i++){
                     JSONObject currentCopy = (JSONObject)copyDetails.get(i);
@@ -477,14 +494,23 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                     String checkoutTime = currentCopy.getString(KEY_CHECKOUT_TIME);
                     String returnTime = currentCopy.getString(KEY_RETURN_TIME);
                     int waitingListSize = currentCopy.getInt(KEY_WAITLIST_SIZE);
+                    int UID = currentCopy.getInt(KEY_UID);
 
                     Copy curCopy = new Copy(BID, waitingListSize, checkoutTime, returnTime);
                     currentBook.copies.add(curCopy);
-                }
+                    if (VALUE_UID == UID) {
+                        mCheckout.setText("Return");
+                        checkedOut = true;
+                        mCopy = curCopy;
+                        break;
+                    }else{
+                        checkedOut = false;
+                        mCheckout.setText("Checkout");
+                    }
 
-                //Get UID to check if there are comments by current user. Also assume that there are no reviews initially
-                SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-                VALUE_UID = sharedPref.getInt("UID", -1);
+
+
+                }
                 hasReview = false;
 
                 //Loop through Reviews
@@ -529,12 +555,37 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                 }
             }else if(success == 14){
                 //Book successfully checked out
+                int BID = json.getInt(KEY_BID);
+                SharedPreferences.Editor prefEditor = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE).edit();
+                prefEditor.putInt("BOOK" + BID, BID);
+                prefEditor.commit();
+
                 String message = json.getString(KEY_MESSAGE);
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+
+                checkedOut = true;
+                mCheckout.setText("Return");
             }else if(success == 15){
                 //Successfully added to wait list
+                int BID = json.getInt(KEY_BID);
+                SharedPreferences.Editor prefEditor = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE).edit();
+                prefEditor.putInt("WAITLIST" + BID, BID);
+                prefEditor.commit();
+
                 String message = json.getString(KEY_MESSAGE);
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }else if(success == 16){
+                //Successfully returned
+                int BID = json.getInt(KEY_BID);
+                SharedPreferences.Editor prefEditor = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE).edit();
+                prefEditor.remove("BOOK" + BID);
+                prefEditor.commit();
+
+                String message = json.getString(KEY_MESSAGE);
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                checkedOut = false;
+                mCheckout.setText("Checkout");
+                Log.i("LoginActivity", "SUCCESS RETURNED");
             }
         }catch(JSONException JSONE){
             ErrorUtils.errorDialog(this, "Malformed JSON Error", "A malformed response was recieved from the server. Please try again later.");
@@ -762,6 +813,46 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
 
         //Start Loader
         getLoaderManager().initLoader(CHECKOUT_BOOK_LOADER, null, this);
+    }
+
+    /**
+     * Method is called when return button is pressed. A URI is
+     * constructed with URL arguments detailing the UID, password, BID,
+     * and the action to return the book. The URI is converted to a URL and a loader to send the
+     * request and parse the response is created.
+     *
+     * @param copy The copy of the book to be returned
+     */
+    public void returnBook(Copy copy){
+        int BID = copy.BID;
+
+        //Build URI
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme(SCHEME)
+                .authority(BASE_URL)
+                .appendPath(PATH0)
+                .appendPath(PATH1)
+                .appendPath(PATH2)
+                .appendQueryParameter(PARAM_ACTION, VALUE_ACTION_RETURN)
+                .appendQueryParameter(PARAM_BID, Integer.toString(BID))
+                .appendQueryParameter(PARAM_UID, Integer.toString(VALUE_UID))
+                .appendQueryParameter(PARAM_PASSWORD, VALUE_PASSWORD)
+                .build();
+
+        String urlString = builder.toString();
+
+
+        //Try to create URL from Uri
+        try{
+            requestURL = new URL(urlString);
+        }catch(MalformedURLException MURLE){
+            ErrorUtils.errorDialog(this, "There was an error with the url", "Currently the server can not be reached. Make sure your username and password are entered correctly");
+            return;
+        }
+
+
+        //Start Loader
+        getLoaderManager().initLoader(RETURN_BOOK_LOADER, null, this);
     }
 
     /**

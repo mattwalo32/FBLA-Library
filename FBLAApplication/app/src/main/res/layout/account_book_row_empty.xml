@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/large_book_height"
+    android:layout_margin="@dimen/margin"
+    android:background="@android:color/white">
+
+    <TextView
+        android:id="@+id/book_row_title"
+        android:padding="@dimen/margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="Title"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/text_h2"
+        android:layout_centerInParent="true"/>
+
+    <TextView
+        android:id="@+id/book_row_header"
+        android:padding="@dimen/margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No items in this category"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/text_h2"
+        android:layout_centerInParent="true"/>
+
+</RelativeLayout>

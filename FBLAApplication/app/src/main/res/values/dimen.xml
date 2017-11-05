@@ -60,7 +60,7 @@
     <dimen name="btn_get_width">100dp</dimen>
 
     <!-- Account Activity -->
-    <dimen name="top_frame_height">200dp</dimen>
+    <dimen name="top_frame_height">150dp</dimen>
     <dimen name="large_profile_diameter">175dp</dimen>
 
     <!-- Elevations -->

@@ -41,6 +41,9 @@
     <string name="view_all">View All</string>
     <string name="title_activity_settings">Settings</string>
 
+    <!-- Account Details Activity -->
+    <string name="favorites">Favorites</string>
+
     <!-- Strings related to Settings -->
     <string name="general">General</string>
     <string name="notify_overdue">Notify if books are overdue</string>

@@ -3,7 +3,9 @@ package com.walowtech.fblaapplication;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * The class for a book object.
@@ -17,7 +19,7 @@ import java.util.ArrayList;
  */
 
 //Created 9/17/17
-public class Book {
+public class Book{
 
     public float averageRating;
     public int numRatings, availableCopies, numCopies;
@@ -29,6 +31,10 @@ public class Book {
     public ArrayList<Copy> copies = new ArrayList<>();
 
     ImageView imageView = null;
+
+    public Book(String GID){
+        this.GID = GID;
+    }
 
     public Book(String subject, String title, String GID, String smallThumbnail, float averageRating){
         this.subject = subject;
@@ -56,6 +62,15 @@ public class Book {
         this.smallThumbnail = smallThumbnail;
         this.ISBN10 = ISBN10;
         this.ISBN13 = ISBN13;
+    }
+
+    public String formatTimestamp(String timeString){
+        long time = Long.decode(timeString);
+        Date date = new Date(time * 1000L);
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        //sdf.setTimeZone(TimeZone.getTimeZone("GMT-4"));
+        String formattedDate = sdf.format(date);
+        return formattedDate;
     }
 
 }

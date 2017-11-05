@@ -37,11 +37,14 @@ import com.walowtech.fblaapplication.Utils.DownloadJSONLoader;
 import com.walowtech.fblaapplication.Utils.ErrorUtils;
 import com.walowtech.fblaapplication.Utils.NetworkJSONUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 /**
  * Activity for logging in
@@ -96,6 +99,8 @@ public class LoginActivity extends Activity implements LoaderManager.LoaderCallb
     private final String SCHEME = "https";
     private final String VALUE_ACTION = "ACTION_RETRIEVE_ACCOUNT_DATA";
 
+    private final String KEY_BOOKS = "Books";
+    private final String KEY_WAIT_LIST = "WaitingList";
     private final String KEY_MESSAGE = "Message";
     private final String KEY_NAME = "Name";
     private final String KEY_SUCCESS = "SuccessCode";
@@ -255,7 +260,24 @@ public class LoginActivity extends Activity implements LoaderManager.LoaderCallb
                 sharedPrefEditor.putString("NAME", name);
                 sharedPrefEditor.putString("EMAIL", email);
                 sharedPrefEditor.putString("PASSWORD", password);
-                sharedPrefEditor.apply();
+
+                Map<String, ?> prefEntries = sharedPref.getAll();
+                for(Map.Entry<String, ?> entry : prefEntries.entrySet()){
+                    if(entry.getKey().contains("BOOK") || entry.getKey().contains("WAITLIST"))
+                        sharedPrefEditor.remove(entry.getKey());
+                }
+
+                JSONArray books = jsonObject.getJSONArray(KEY_BOOKS);
+                for(int i = 0; i < books.length(); i++){
+                    sharedPrefEditor.putInt("BOOK" + books.getInt(i), books.getInt(i));
+                }
+
+                JSONArray waitList = jsonObject.getJSONArray(KEY_WAIT_LIST);
+                for(int i = 0; i < waitList.length(); i++) {
+                    sharedPrefEditor.putInt("WAITLIST" + waitList.getInt(i), waitList.getInt(i));
+                }
+
+                sharedPrefEditor.commit();
 
                 Toast.makeText(this, "Welcome Back!", Toast.LENGTH_SHORT).show();
 

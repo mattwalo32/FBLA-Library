@@ -1,6 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="@dimen/margin"
+    android:padding="@dimen/margin"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white">
 
-</LinearLayout>
+    <!-- Title -->
+    <TextView
+        android:id="@+id/book_row_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:textSize="@dimen/text_h2"
+        android:textColor="@android:color/black"
+        android:text="Loading . . ."/>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/cl_multi_book_row"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/book_row_header"
+        android:layout_alignParentLeft="true">
+
+        <!-- Book images -->
+        <LinearLayout
+            android:id="@+id/aa_layout_books"
+            android:clipToPadding="false"
+            android:clipChildren="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+        </LinearLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="@dimen/fab_diameter"
+            android:layout_height="@dimen/fab_diameter"
+            app:layout_anchor="@id/aa_layout_books"
+            app:layout_anchorGravity="right|center_vertical"
+            android:paddingRight="@dimen/fab_radius"
+            android:scaleType="centerCrop"
+            app:fabSize="normal"
+            app:borderWidth="0dp"
+            app:srcCompat="@drawable/ic_add_white"/>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+    <TextView
+        android:id="@+id/tv_expand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/cl_multi_book_row"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/margin"
+        android:textSize="@dimen/text"
+        android:textColor="@color/colorSecondaryText"
+        android:textAlignment="center"
+        android:text="Expand to view more details"/>
+
+
+
+</RelativeLayout>

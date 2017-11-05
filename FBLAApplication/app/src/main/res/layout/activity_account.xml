@@ -3,6 +3,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -19,7 +21,7 @@
                     android:id="@+id/aa_layout_top_row"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/top_frame_height"
-                    android:padding="@dimen/margin"
+                    android:padding="@dimen/margin_large"
                     android:background="@color/colorPrimary700">
 
                     <TextView
@@ -54,14 +56,76 @@
                     android:background="@color/colorPrimary500">
 
 
-                    <ListView
+                    <LinearLayout
+                        android:id="@+id/aa_ll_rows"
+                        android:orientation="vertical"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
                         android:divider="@android:color/transparent"
                         android:dividerHeight="@dimen/margin_large"
-                        android:padding="@dimen/margin_large"
-                        android:id="@+id/m_lv_main_content" />
+                        android:paddingTop="@dimen/profile_diameter"
+                        android:paddingBottom="@dimen/margin">
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        xmlns:android="http://schemas.android.com/apk/res/android"
+                        xmlns:tools="http://schemas.android.com/tools"
+                        android:layout_marginLeft="@dimen/margin"
+                        android:layout_marginRight="@dimen/margin"
+                        android:layout_marginBottom="@dimen/margin_large"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/aa_ll_rows"
+                        android:orientation="vertical"
+                        android:background="@android:color/white"
+                        android:clipToPadding="false"
+                        android:clipChildren="false"
+                        android:id="@+id/aa_favorites">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:paddingLeft="@dimen/margin"
+                            android:paddingTop="@dimen/margin"
+                            android:textSize="@dimen/text_h2"
+                            android:textColor="@android:color/black"
+                            android:text="@string/favorites"
+                            android:id="@+id/aa_tv_title"/>
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/aa_rv_books"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clipToPadding="false"
+                            android:clipChildren="false">
+
+                        </android.support.v7.widget.RecyclerView>
+
+                        <!-- View only visible if there are items in recycler view -->
+                        <RelativeLayout
+                            android:id="@+id/book_row_no_liked_items"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/book_height"
+                            android:layout_margin="@dimen/margin"
+                            android:background="@android:color/white">
+
+                            <TextView
+                                android:id="@+id/book_row_none_liked"
+                                android:padding="@dimen/margin"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="You haven't liked any books yet."
+                                android:textAlignment="center"
+                                android:textColor="@android:color/black"
+                                android:textSize="@dimen/text_h2"
+                                android:layout_centerInParent="true"/>
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
 
                 </RelativeLayout>
 
@@ -77,16 +141,16 @@
                 app:layout_anchorGravity="bottom|center_horizontal"/>
 
             <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/aa_profile"
                 android:layout_width="@dimen/large_profile_diameter"
                 android:layout_height="@dimen/large_profile_diameter"
                 android:src="@drawable/ic_account_circle_100dp"
                 app:layout_anchor="@id/aa_layout_top_row"
-                app:layout_anchorGravity="bottom|center_horizontal"/>
+                app:layout_anchorGravity="bottom|center_horizontal" />
+
 
 
 
         </android.support.design.widget.CoordinatorLayout>
-
-
 
 </ScrollView>
