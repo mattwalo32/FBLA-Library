@@ -11,11 +11,14 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +28,7 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -203,9 +207,14 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
      */
     private void configActionBar(){
         Toolbar toolbar = (Toolbar) findViewById(R.id.m_toolbar);
+        setSupportActionBar(toolbar);
 
-        //Set NavDrawer Toggle Listener
-        ImageView toggleIcon = (ImageView) toolbar.findViewById(R.id.toggle_icon);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_drawable));
+        actionBar.setDisplayHomeAsUpEnabled(false);
+
+
+        final ImageView toggleIcon = (ImageView) toolbar.findViewById(R.id.toggle_icon);
         toggleIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -219,7 +228,7 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
 
         //Set SearchView listener
         searchBar = (SearchView) toolbar.findViewById(R.id.menu_search);
-        //TODO set typeface
+        searchBar.setPadding(0, 0, 0, 0);
         int id = searchBar.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
         TextView searchText = (TextView) searchBar.findViewById(id);
         searchText.setTypeface(handWriting);
@@ -256,7 +265,22 @@ public class MainActivity extends NavDrawerActivity implements LoaderManager.Loa
             }
         });
 
-        setSupportActionBar(toolbar);
+        //TODO verify
+        if(Build.VERSION.SDK_INT >= 24) {
+            toolbar.post(new Runnable() {
+                @Override
+                public void run() {
+                    int searchBarLeft = (int) searchBar.getX();
+                    int buttonRight = (int) toggleIcon.getX() + toggleIcon.getWidth();
+
+                    int difference = buttonRight - searchBarLeft;
+                    searchBar.setPadding(difference, 0, 0, 0);
+
+                    Log.i("LoginActivity", difference + " " + searchBarLeft + " " + buttonRight);
+                }
+            });
+        }
+
     }
 
     /**

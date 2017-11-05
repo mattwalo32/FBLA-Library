@@ -84,6 +84,8 @@ public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
                         }catch(Exception e){
                             //TODO this causes an error
                             ErrorUtils.errorDialog(context, "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
+                           // ErrorUtils.errorDialog(activity.getApplicationContext(), "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
+                            e.printStackTrace();
                         }
                         categories.get(i).books.get(j).coverSmall = image;
                     } else {
