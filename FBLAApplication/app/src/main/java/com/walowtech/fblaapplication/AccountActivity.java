@@ -417,7 +417,7 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
         likedAdapter.notifyDataSetChanged();
     }
 
-            //TODO doc
+    //TODO doc
     public void parseJSON(ArrayList<ArrayList<JSONObject>> JSONArray){
         for(int i = 0; i < JSONArray.size(); i++) {
             imageURLs.add(new ArrayList<String>());
@@ -598,13 +598,13 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
 
                     /*android.support.v4.util.Pair<View, String> p1 = android.support.v4.util.Pair.create((View)image, getString(R.string.trans_iv_book_cover));
                     ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, p1);*/
-                    BitmapDrawable drawable = (BitmapDrawable) currentBook.imageView.getDrawable();
-                    Bitmap bitmap;
-                    try {
-                        bitmap = drawable.getBitmap();
-                    }catch(NullPointerException NPE){
-                        bitmap = null;
-                    }
+                        BitmapDrawable drawable = (BitmapDrawable) currentBook.imageView.getDrawable();
+                        Bitmap bitmap;
+                        try {
+                            bitmap = drawable.getBitmap();
+                        }catch(NullPointerException NPE){
+                            bitmap = null;
+                        }
 
                         bookDetailsIntent.putExtra("GID", GID);
                         bookDetailsIntent.putExtra("BOOK_IMAGE", bitmap);

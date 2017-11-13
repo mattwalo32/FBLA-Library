@@ -59,5 +59,18 @@ public class SettingsFragment extends PreferenceFragment {
                 return true;
             }
         });
+
+        Preference crashApp = (Preference) findPreference("pref_key_crash_app");
+        crashApp.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() { //Crash button listener
+            @Override
+            //THIS WILL CRASH THE APP
+            public boolean onPreferenceClick(Preference preference) {
+                int[] list = new int[2];
+                for(int i = 0; i < 5; i++){
+                    list[i] = 1;
+                }
+                return true;
+            }
+        });
     }
 }

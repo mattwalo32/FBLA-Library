@@ -64,7 +64,7 @@ public class Book{
         this.ISBN13 = ISBN13;
     }
 
-    public String formatTimestamp(String timeString){
+    public static String formatTimestamp(String timeString){
         long time = Long.decode(timeString);
         Date date = new Date(time * 1000L);
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");

@@ -303,6 +303,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                         Toast.makeText(BookDetailsActivity.this, "Book is still loading.", Toast.LENGTH_SHORT).show();
                     }
                 }catch(Exception E){
+                    E.printStackTrace();
                     Toast.makeText(BookDetailsActivity.this, "Book is still loading.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -373,6 +374,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                     jsonResponse = new JSONObject(data.toString());
                     parseJSON(jsonResponse);
                 } catch (JSONException JSONE) {
+                    JSONE.printStackTrace();
                     ErrorUtils.errorDialog(this, "Data Error", "There was an error with the data format. Please try again later.");
                     return;
                 }
@@ -420,6 +422,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         try{
             requestURL = new URL(urlString);
         }catch(MalformedURLException MURLE){
+            MURLE.printStackTrace();
             ErrorUtils.errorDialog(this, "There was an error with the url", "Currently the server can not be reached. Make sure your username and password are entered correctly");
             return;
         }
@@ -588,6 +591,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                 Log.i("LoginActivity", "SUCCESS RETURNED");
             }
         }catch(JSONException JSONE){
+            JSONE.printStackTrace();
             ErrorUtils.errorDialog(this, "Malformed JSON Error", "A malformed response was recieved from the server. Please try again later.");
         }
     }
@@ -664,7 +668,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                 try{
                     parent.removeViewAt(i);
                 }catch(Exception e){
-
+                    e.printStackTrace();
                 }
                 View view = getLayoutInflater().inflate(R.layout.review, parent, false);
                 Review currentReview = reviews.get(i);
@@ -806,6 +810,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         try{
             requestURL = new URL(urlString);
         }catch(MalformedURLException MURLE){
+            MURLE.printStackTrace();
             ErrorUtils.errorDialog(this, "There was an error with the url", "Currently the server can not be reached. Make sure your username and password are entered correctly");
             return;
         }
@@ -846,6 +851,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         try{
             requestURL = new URL(urlString);
         }catch(MalformedURLException MURLE){
+            MURLE.printStackTrace();
             ErrorUtils.errorDialog(this, "There was an error with the url", "Currently the server can not be reached. Make sure your username and password are entered correctly");
             return;
         }
@@ -903,6 +909,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                 liked = false;
             }
         }catch(Exception e){
+            e.printStackTrace();
             Toast.makeText(this, "Book is still loading", Toast.LENGTH_SHORT).show();
         }
     }
@@ -973,6 +980,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         try {
             requestURL = new URL(urlString);
         } catch (MalformedURLException MURLE) {
+            MURLE.printStackTrace();
             ErrorUtils.errorDialog(this, "There was an error with the url", "Currently the server can not be reached. Make sure your username and password are entered correctly");
             return;
         }

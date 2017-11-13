@@ -20,7 +20,14 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="Development">
 
+        <Preference
+            android:key="pref_key_crash_app"
+            android:title="Crash App to Send Report" />
+
+    </PreferenceCategory>
 
     <!-- About App -->
     <PreferenceCategory

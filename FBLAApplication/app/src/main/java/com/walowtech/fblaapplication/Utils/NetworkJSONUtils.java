@@ -104,6 +104,7 @@ public class NetworkJSONUtils {
                     return null;
             }
         }catch(IOException IOE){
+            IOE.printStackTrace();
             ErrorUtils.errorDialog(context, "Connection Error", "There was an error with your network connection. Check your connection and retry.");
             return null;
         }
@@ -147,9 +148,11 @@ public class NetworkJSONUtils {
 
             json = new JSONObject(response.toString());
         }catch (IOException IOE){
+            IOE.printStackTrace();
             ErrorUtils.errorDialog(context, "Connection Error", "There was an error with your network connection. Check your connection and retry.");
             return null;
         }catch (JSONException JE){
+            JE.printStackTrace();
             ErrorUtils.errorDialog(context, "Data Format Error", "There was an error with the data format. Please try again later.");
             return null;
         }
@@ -163,8 +166,10 @@ public class NetworkJSONUtils {
             InputStream is = new java.net.URL(url).openStream();
             bitmap = BitmapFactory.decodeStream(is);
         }catch(MalformedURLException MURLE){
+            MURLE.printStackTrace();
             ErrorUtils.errorDialog(context, "URL Error", "There was an error with the URL request. Please try again later.");
         }catch(IOException IOE){
+            IOE.printStackTrace();
             ErrorUtils.errorDialog(context, "Connection Error", "There was an error with your network connection. Check your connection and retry.");
         }
 

@@ -33,10 +33,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.walowtech.fblaapplication.Utils.DownloadJSONLoader;
 import com.walowtech.fblaapplication.Utils.ErrorUtils;
 import com.walowtech.fblaapplication.Utils.NetworkJSONUtils;
 
+import org.acra.ACRA;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,6 +52,8 @@ import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+
+
 
 /**
  * Activity for logging in
@@ -59,24 +68,17 @@ import java.util.Map;
  */
 
 //Created 9/10/2017
-public class LoginActivity extends Activity implements LoaderManager.LoaderCallbacks{
+public class LoginActivity extends BaseActivity{
 
 
     //TODO check app version
-    private final String LOG_TAG = "LoginActivity";
-
     private boolean bypassInputs = false;
-
-    private ConnectivityManager conn;
 
     private FrameLayout topPanel;
     private LinearLayout bottomPanel;
-
     private EditText editEmail;
     private EditText editPassword;
-
     private FloatingActionButton fab;
-
     private ProgressBar progressBar;
 
     private String email;
@@ -87,35 +89,20 @@ public class LoginActivity extends Activity implements LoaderManager.LoaderCallb
     private TextView textPassword;
     private TextView createAccount;
 
-    private Typeface handWriting;
-
-    private final String BASE_URL = "walowtech.com";
-    private final String PARAM_ACTION = "ACTION";
-    private final String PARAM_EMAIL = "EMAIL";
-    private final String PARAM_PASSWORD = "PASSWORD";
-    private final String PATH0 = "apis";
-    private final String PATH1 = "FBLALibrary";
-    private final String PATH2 = "api.php";
-    private final String SCHEME = "https";
     private final String VALUE_ACTION = "ACTION_RETRIEVE_ACCOUNT_DATA";
-
-    private final String KEY_BOOKS = "Books";
-    private final String KEY_WAIT_LIST = "WaitingList";
-    private final String KEY_MESSAGE = "Message";
-    private final String KEY_NAME = "Name";
-    private final String KEY_SUCCESS = "SuccessCode";
-    private final String KEY_UID = "UID";
 
     private JSONObject jsonResponse;
     private URL requestURL;
 
     private int UID, success;
-    private String name, status, message;
+    private String name, message;
+
+    RequestQueue queue;
 
     private final int DOWNLOAD_JSON_LOADER = 0;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -147,6 +134,8 @@ public class LoginActivity extends Activity implements LoaderManager.LoaderCallb
         email = sharedPref.getString("EMAIL", null);
         password = sharedPref.getString("PASSWORD", null);
 
+        queue = Volley.newRequestQueue(this);
+
         if(NetworkJSONUtils.checkInternetConnection(this)) {
             if (email != null && password != null) {
                 bypassInputs = true;
@@ -156,36 +145,6 @@ public class LoginActivity extends Activity implements LoaderManager.LoaderCallb
         }else{
             ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
         }
-    }
-
-    @Override
-    public Loader<JSONObject> onCreateLoader(int id, Bundle args) {
-        jsonResponse = null;
-        return new DownloadJSONLoader(LoginActivity.this, requestURL);
-    }
-
-    @Override
-    public void onLoadFinished(Loader loader, Object data) {
-        if(data != null && data != " ") {
-            try {
-                jsonResponse = new JSONObject(data.toString());
-                parseJSON(jsonResponse);
-            } catch (JSONException JSONE) {
-                ErrorUtils.errorDialog(this, "Data Error", "There was an error with the data format. Please try again later.");
-            }
-        }else{
-            ErrorUtils.errorDialog(this, "Could not connect to server", "No information was retrieved from the server. Please try again later.");
-        }
-
-        fab.animate().scaleX(1f).scaleY(1f).alpha(250f).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(250);
-        progressBar.setVisibility(View.GONE);
-
-        getLoaderManager().destroyLoader(loader.getId());
-    }
-
-    @Override
-    public void onLoaderReset(Loader loader) {
-
     }
 
     /**
@@ -199,7 +158,7 @@ public class LoginActivity extends Activity implements LoaderManager.LoaderCallb
      *
      * @param v The view that calls the method. This parameter is unused, but
      *          necessary for the onClick attribute to be implemented
-     */
+     */ //TODO new doc
     public void login(View v){
         if(!NetworkJSONUtils.checkInternetConnection(this)) {
             ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
@@ -227,15 +186,25 @@ public class LoginActivity extends Activity implements LoaderManager.LoaderCallb
                 .build();
         String urlString = builder.toString();
 
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, urlString,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonResponse = new JSONObject(response);
+                            parseJSON(jsonResponse);
+                        }catch(JSONException JSONE){
+                            ErrorUtils.errorDialog(getApplicationContext(), "Data Error", "There was an error with the data format. Please try again later.");
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                ErrorUtils.errorDialog(LoginActivity.this, "Could not connect to server", "No information was retrieved from the server. Please try again later.");
+            }
+        });
 
-        try{
-            requestURL = new URL(urlString);
-        }catch(MalformedURLException MURLE){
-            ErrorUtils.errorDialog(this, "There was an error connecting to the server", "Currently the server can not be reached. Make sure your username and password are entered correctly");
-            return;
-        }
-
-        getLoaderManager().initLoader(DOWNLOAD_JSON_LOADER, null, this);
+        queue.add(stringRequest);
     }
 
     /**
@@ -250,7 +219,8 @@ public class LoginActivity extends Activity implements LoaderManager.LoaderCallb
     private void parseJSON(JSONObject jsonObject){
         try {
             success = jsonObject.getInt(KEY_SUCCESS);
-            if(success == 1){
+            if(success == getResources().getInteger(R.integer.CODE_user_validated)){
+
                 UID = jsonObject.getInt(KEY_UID);
                 name = jsonObject.getString(KEY_NAME);
 
@@ -293,6 +263,7 @@ public class LoginActivity extends Activity implements LoaderManager.LoaderCallb
                 setEditTextColors(new EditText[] {editPassword}, R.color.colorInvalid);
             }
         }catch(JSONException JSONE){
+            JSONE.printStackTrace();
             ErrorUtils.errorDialog(this, "Data Format Error", "There seems to be an error with the data format. Please try again later.");
         }
     }

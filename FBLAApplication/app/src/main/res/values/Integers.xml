@@ -3,4 +3,7 @@
     <integer name="lines">7</integer>
     <integer name="max_comment_lines">3</integer>
 
+    <integer name="CODE_user_validated">2001</integer>
+    <integer name="CODE_user_invalid">1001</integer>
+
 </resources>

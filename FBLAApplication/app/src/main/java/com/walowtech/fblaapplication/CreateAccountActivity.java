@@ -156,6 +156,7 @@ public class CreateAccountActivity extends Activity implements LoaderManager.Loa
                 jsonResponse = new JSONObject(data.toString());
                 parseJSON(jsonResponse);
             } catch (JSONException JSONE) {
+                JSONE.printStackTrace();
                 ErrorUtils.errorDialog(this, "Data Error", "There was an error with the data format. Please try again later.");
             }
         }else{
@@ -234,6 +235,7 @@ public class CreateAccountActivity extends Activity implements LoaderManager.Loa
         try{
             requestURL = new URL(urlString);
         }catch(MalformedURLException MURLE){
+            MURLE.printStackTrace();
             ErrorUtils.errorDialog(this, "There was an error with the url", "Currently the server can not be reached. Make sure your username and password are entered correctly");
             return;
         }
@@ -284,6 +286,7 @@ public class CreateAccountActivity extends Activity implements LoaderManager.Loa
                 }
             }
         }catch(JSONException JSONE){
+            JSONE.printStackTrace();
             ErrorUtils.errorDialog(this, "Data Format Error", "There seems to be an error with the data format. Please try again later.");
         }
     }
