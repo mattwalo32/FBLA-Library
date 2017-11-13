@@ -82,10 +82,9 @@ public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
                         try{
                             image = NetworkJSONUtils.downloadBitmap(context, url);
                         }catch(Exception e){
-                            //TODO this causes an error
-                            ErrorUtils.errorDialog(context, "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
-                           // ErrorUtils.errorDialog(activity.getApplicationContext(), "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
                             e.printStackTrace();
+                            //TODO this causes an error
+                           // ErrorUtils.errorDialog(activity.getApplicationContext(), "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
                         }
                         categories.get(i).books.get(j).coverSmall = image;
                     } else {
@@ -110,17 +109,11 @@ public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
                     try{
                         image = NetworkJSONUtils.downloadBitmap(context, url);
                     }catch(Exception e){
+                        e.printStackTrace();
                         ErrorUtils.errorDialog(context, "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
                     }
                     slides.get(i).image = image; //TODO Crash from null object reference java.lang.NullPointerException: Attempt to invoke virtual method 'int java.util.ArrayList.size()' on a null object reference
                 }
-
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mainActivity.updateViewPagerImage();
-                }
-            });
 
         }
         return null;
