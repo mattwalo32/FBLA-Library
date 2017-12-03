@@ -35,10 +35,16 @@ public class SlideshowAdapter extends PagerAdapter {
     private ArrayList<ViewPagerItem> slides;
     private Context context;
     private LayoutInflater layoutInflater;
+    boolean showText;
 
     public SlideshowAdapter(Context context, ArrayList<ViewPagerItem> slides){
+        this(context, slides, true); //Assume that words are wanted
+    }
+
+    public SlideshowAdapter(Context context, ArrayList<ViewPagerItem> slides, boolean showText){
         this.context = context;
         this.slides = slides;
+        this.showText = showText;
     }
 
     @Override
@@ -64,6 +70,11 @@ public class SlideshowAdapter extends PagerAdapter {
 
         textView.setText(curSlide.description);
         textView.setTypeface(MainActivity.handWriting);
+
+        if(!showText){
+            textView.setVisibility(View.INVISIBLE);
+        }
+
         if(curSlide.image != null) {
             progressBar.setVisibility(GONE);
             imageView.setImageBitmap(curSlide.image);

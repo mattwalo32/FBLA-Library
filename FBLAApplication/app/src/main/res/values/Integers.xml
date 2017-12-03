@@ -6,4 +6,11 @@
     <integer name="CODE_user_validated">2001</integer>
     <integer name="CODE_user_invalid">1001</integer>
 
+    <integer name="ALARM_NULL">-1</integer>
+    <integer name="ALARM_5_DAY_WARNING">0</integer>
+    <integer name="ALARM_1_DAY_WARNING">1</integer>
+    <integer name="ALARM_0_DAY_WARNING">2</integer>
+    <integer name="ALARM_OVERDUE_NOTIFICATION">3</integer>
+    <integer name="ALARM_FEE">4</integer>
+
 </resources>

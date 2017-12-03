@@ -251,7 +251,7 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
             title = (TextView) curView.findViewById(R.id.book_row_header);
             setElevation(curView, 8); //Set elevation of row
 
-            if (curList.size() > 1) { //If there is more than one item
+            if (curList.size() >= 1) { //If there is one item or more
                 if (i == 0) { //First item always checked out books
                     curTitle = amountCheckedOut + " book" + ((amountCheckedOut > 1) ? "s" : "") + " checked out"; //Set title
                     inflateBooks(parent, true, amountCheckedOut); //Inflate books in row
@@ -287,7 +287,7 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
     public void inflateBooks(ViewGroup parentView, boolean checkedOut, int numViews){
         LayoutInflater inflater = getLayoutInflater();
 
-        if(numViews > 1) { //If there are views to inflate
+        if(numViews >= 1) { //If there are views to inflate
             for (int i = 0; i < numViews; i++) {
                 View row = inflater.inflate(R.layout.book_row_item, parentView, false);
                 if(checkedOut) {

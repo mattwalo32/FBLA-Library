@@ -3,8 +3,10 @@ package com.walowtech.fblaapplication;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.DialogFragment;
 import android.app.LoaderManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
@@ -35,12 +37,15 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.walowtech.fblaapplication.Utils.DownloadDetailedImageLoader;
 import com.walowtech.fblaapplication.Utils.DownloadImageLoader;
 import com.walowtech.fblaapplication.Utils.DownloadJSONLoader;
 import com.walowtech.fblaapplication.Utils.ErrorUtils;
+import com.walowtech.fblaapplication.Utils.FirebaseIDService;
 import com.walowtech.fblaapplication.Utils.NetworkJSONUtils;
+import com.walowtech.fblaapplication.Utils.RequestPushService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -176,6 +181,8 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     private final int UPLOAD_COMMENT_LOADER = 2;
     private final int CHECKOUT_BOOK_LOADER = 3;
     private final int RETURN_BOOK_LOADER = 4;
+
+    private AlarmManager alarmManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -568,6 +575,8 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
 
                 checkedOut = true;
                 mCheckout.setText("Return");
+
+                configureReturnAlarm(BID);
             }else if(success == 15){
                 //Successfully added to wait list
                 int BID = json.getInt(KEY_BID);
@@ -580,7 +589,8 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
             }else if(success == 16){
                 //Successfully returned
                 int BID = json.getInt(KEY_BID);
-                SharedPreferences.Editor prefEditor = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE).edit();
+                SharedPreferences pref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                SharedPreferences.Editor prefEditor = pref.edit();
                 prefEditor.remove("BOOK" + BID);
                 prefEditor.commit();
 
@@ -588,12 +598,37 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
                 checkedOut = false;
                 mCheckout.setText("Checkout");
+
                 Log.i("LoginActivity", "SUCCESS RETURNED");
             }
         }catch(JSONException JSONE){
             JSONE.printStackTrace();
             ErrorUtils.errorDialog(this, "Malformed JSON Error", "A malformed response was recieved from the server. Please try again later.");
         }
+    }
+
+    //TODO doc
+    public void configureReturnAlarm(int BID){
+        alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+
+        Intent intent = new Intent(this, RequestPushService.class);
+
+        intent.putExtra("TO", FirebaseInstanceId.getInstance().getToken());
+        intent.putExtra("BODY", "This is just a reminder that a book you have checked out is due in 5 days.");
+        intent.putExtra("TITLE", "Don't forget to return your book!");
+        intent.putExtra("BID", BID);
+        intent.putExtra("ALARM_TYPE", getResources().getInteger(R.integer.ALARM_5_DAY_WARNING));
+        PendingIntent serviceIntent = PendingIntent.getService(this, getResources().getInteger(R.integer.ALARM_5_DAY_WARNING) + BID, intent, 0);
+
+        long currentTime = System.currentTimeMillis();
+        long oneDay = 60 * 60 * 24 * 1000;
+        long nineDays = oneDay * 9;
+
+        alarmManager.set(
+                AlarmManager.RTC,
+                currentTime + nineDays,
+                serviceIntent
+        );
     }
 
     /**

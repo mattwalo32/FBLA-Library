@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">FBLA Application</string>
+    <string name="app_name">Preface</string>
+    <string name="school_name">WT High School</string>
     <string name="preference_file_key">FBLAApplicationUserData</string>
     <string name="string_empty"></string>
     <string name="crash_toast_text">Please press send in the email to send a crash report.</string>
@@ -55,6 +56,13 @@
     <string name="version">1.0</string>
     <string name="release_date">January 1, 2018</string> <!-- TODO set info -->
 
+    <string name="about_school">Since its founding, WT High School has been committed to advancing the education of its community by providing limitless free
+    resources to its student body and teachers. We are proud that our library contains a vast wealth of utilities for all to benefit from. With our app, Preface, we
+    are achieving our mission of providing educational resources to those eager to learn. See a map of our prestigious school and library above.</string>
 
+    <string name="about_app">With this app, "By the Cover", students and faculty alike can find, preview, checkout, and return books.
+        If the desired book is currently checked out, then the user can add themselves to the waitinglist with the touch of a button. After a user checks
+        out a book on the app, it will be ready for pick up, and as the due date approches, they will receive notifications, reminding them that a book is due soon.\n\n This app was
+        created by Matthew Walowski for the 2017 FBLA Mobile Application Development Competition. WT Highschool and any books checked out on this app are factitious. </string>
 
 </resources>

@@ -62,12 +62,14 @@ public class GridViewActivity extends NavDrawerActivity {
     SearchView searchBar;
     RequestQueue requestQueue;
     TextView mNoneFound;
+    TextView mLoadingText;
 
     String extraURL;
+    String extraQuery;
 
     ArrayList<Book> books = new ArrayList<>();
+    ArrayList<Book> searchResults = new ArrayList<>();
 
-    private final int DOWNLOAD_SEARCH_JSON_LOADER = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -78,10 +80,12 @@ public class GridViewActivity extends NavDrawerActivity {
 
         Intent thisIntent = getIntent();
         extraURL = thisIntent.getStringExtra("URL");
+        extraQuery = thisIntent.getStringExtra("QUERY");
 
         requestQueue = Volley.newRequestQueue(this);
 
         mNoneFound = (TextView) findViewById(R.id.ga_none_found);
+        mLoadingText = (TextView) findViewById(R.id.ga_loading);
         gridLayout = (RecyclerView) findViewById(R.id.gv_grid_layout);
         gridLayout.setLayoutManager(new GridLayoutManager(this, calculateNoOfColumns(getApplicationContext())));
 
@@ -89,6 +93,7 @@ public class GridViewActivity extends NavDrawerActivity {
         gridLayout.setAdapter(gridViewAdapter);
 
         mNoneFound.setTypeface(handWriting);
+        mLoadingText.setTypeface(handWriting);
 
         configActionBar();
         if(NetworkJSONUtils.checkInternetConnection(this)) {
@@ -96,12 +101,6 @@ public class GridViewActivity extends NavDrawerActivity {
         }else{
             ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
         }
-        /*gridLayout.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-        });*/
     }
 
     //TODO doc
@@ -112,6 +111,7 @@ public class GridViewActivity extends NavDrawerActivity {
                 try {
                     JSONObject json = new JSONObject(response);
                     parseBookJSON(json);
+                    mLoadingText.setVisibility(View.GONE);
                 }catch(JSONException JSONE){
                     ErrorUtils.errorDialog(getApplicationContext(), "Data Error", "There was an error with the data format. Please try again later.");
                 }
@@ -119,10 +119,11 @@ public class GridViewActivity extends NavDrawerActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                ErrorUtils.errorDialog(getApplicationContext(), "Could not connect to server", "No information was retrieved from the server. Please try again later.");
+                //ErrorUtils.errorDialog(getApplicationContext(), "Could not connect to server", "No information was retrieved from the server. Please try again later.");//TODO crash
             }
         });
 
+        stringRequest.addMarker(CustomTags.BOOK_REQUESTS);
         requestQueue.add(stringRequest);
     }
 
@@ -159,10 +160,41 @@ public class GridViewActivity extends NavDrawerActivity {
         int id = searchBar.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
         TextView searchText = (TextView) searchBar.findViewById(id);
         searchText.setTypeface(handWriting);
+        if(extraQuery == null) {
+            searchBar.setQueryHint("Search");
+        }else{
+            searchBar.setQuery(extraQuery, false);
+        }
         searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchURL(GridViewActivity.this, query);
+                searchBar.setQuery(query, false);
+
+                Uri.Builder builder = new Uri.Builder();
+                VALUE_SEARCH_ITEM = "ALL";
+                VALUE_SEARCH_QUERY = query;
+                String maxResults = "1000";
+
+                builder.scheme(SCHEME)
+                        .authority(BASE_URL)
+                        .appendPath(PATH0)
+                        .appendPath(PATH1)
+                        .appendPath(PATH2)
+                        .appendQueryParameter(PARAM_ACTION, VALUE_ACTION_SEARCH)
+                        .appendQueryParameter(PARAM_SEARCH_ITEM, VALUE_SEARCH_ITEM)
+                        .appendQueryParameter(PARAM_SEARCH_QUERY, VALUE_SEARCH_QUERY)
+                        .appendQueryParameter(PARAM_NUM_RESULTS, maxResults)
+                        .build();
+
+                //Cancel all current requests
+                requestQueue.cancelAll(CustomTags.SEARCH_REQUESTS);
+                requestQueue.cancelAll(CustomTags.IMAGE_REQUESTS);
+                requestQueue.cancelAll(CustomTags.BOOK_REQUESTS);
+
+                books.clear();
+
+                getJSON(builder.toString());
+
                 return true;
             }
 
@@ -275,6 +307,7 @@ public class GridViewActivity extends NavDrawerActivity {
             }
         });
 
+        stringRequest.addMarker(CustomTags.SEARCH_REQUESTS);
         requestQueue.add(stringRequest);
     }
 
@@ -283,7 +316,7 @@ public class GridViewActivity extends NavDrawerActivity {
         try {
             int success = json.getInt(KEY_SUCCESS);
             if (success == 4) {
-                searchBar.getSuggestionsAdapter().changeCursor(super.updateSearchResults(json));
+                searchBar.getSuggestionsAdapter().changeCursor(super.updateSearchResults(json, searchResults));
             }
         }catch(JSONException JSONE){
             //TODO catch
@@ -313,8 +346,13 @@ public class GridViewActivity extends NavDrawerActivity {
                     ImageRequest imageRequest = new ImageRequest(smallThumbnail, new Response.Listener<Bitmap>() {
                         @Override
                         public void onResponse(Bitmap response) {
-                            books.get(currentSize).coverSmall = response;
-                            gridViewAdapter.notifyDataSetChanged();
+                            try {
+                                books.get(currentSize).coverSmall = response;
+                                gridViewAdapter.notifyDataSetChanged();
+                            }catch(IndexOutOfBoundsException IOBE){
+                                //This will be called if the user searches for a new image but images from the old search are still loading
+                                //TODO catch
+                            }
                         }
                     }, 0, 0, null, new Response.ErrorListener() {
                         @Override
@@ -323,6 +361,7 @@ public class GridViewActivity extends NavDrawerActivity {
                         }
                     });
 
+                    imageRequest.addMarker(CustomTags.IMAGE_REQUESTS);
                     requestQueue.add(imageRequest);
                 }
 

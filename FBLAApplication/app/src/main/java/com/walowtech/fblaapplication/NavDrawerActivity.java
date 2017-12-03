@@ -74,7 +74,6 @@ public class NavDrawerActivity extends BaseActivity {
     public String VALUE_SEARCH_ITEM = "TITLE";
 
     public URL requestURL;
-    public static ArrayList<Book> searchResults = new ArrayList<>();
 
     protected void onCreateDrawer(){
         drawerLayout = (DrawerLayout) findViewById(R.id.m_nav_drawer);
@@ -96,7 +95,7 @@ public class NavDrawerActivity extends BaseActivity {
         navbarItems.add(new NavbarItem(0, R.drawable.ic_account_black, "Account"));
         navbarItems.add(new NavbarItem(1, R.drawable.ic_settings_black, "Settings"));
         navbarItems.add(new NavbarItem(2, R.drawable.ic_info_black, "Information"));
-        navbarItems.add(new NavbarItem(3, R.drawable.ic_fees_black, "Fees"));
+        //navbarItems.add(new NavbarItem(3, R.drawable.ic_fees_black, "Fees"));
         navbarItems.add(new NavbarItem(4, R.drawable.ic_logout_black, "Logout"));
 
         navbarAdapter = new NavbarAdapter(this, navbarItems);
@@ -160,7 +159,7 @@ public class NavDrawerActivity extends BaseActivity {
     }
 
     //TODO doc
-    public MatrixCursor updateSearchResults(JSONObject json) throws JSONException {
+    public MatrixCursor updateSearchResults(JSONObject json, ArrayList<Book> searchResults) throws JSONException {
         //Clear previous search results
         searchResults.clear();
         JSONArray jsonResponse = json.getJSONArray(KEY_JSON);
@@ -213,6 +212,7 @@ public class NavDrawerActivity extends BaseActivity {
         Intent gridActivity = new Intent(context, GridViewActivity.class);
 
         gridActivity.putExtra("URL", builder.toString());
+        gridActivity.putExtra("QUERY", searchString);
         Log.i("LoginActivity", builder.toString());
 
         context.startActivity(gridActivity);

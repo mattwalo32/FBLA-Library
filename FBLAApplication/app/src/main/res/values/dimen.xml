@@ -73,4 +73,9 @@
     <dimen name="elev_leave_review">8dp</dimen>
     <dimen name="elev_reviews">4dp</dimen>
     <dimen name="elev_fab">16dp</dimen>
+
+    <!-- About Activity -->
+    <dimen name="map_height_default">250dp</dimen>
+    <dimen name="logo_width">200dp</dimen>
+    <dimen name="logo_height_default">150dp</dimen>
 </resources>

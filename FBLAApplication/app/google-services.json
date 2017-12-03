@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1054512647571",
+    "firebase_url": "https://fbla-app-8d4ac.firebaseio.com",
+    "project_id": "fbla-app-8d4ac",
+    "storage_bucket": "fbla-app-8d4ac.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1054512647571:android:7c18cefada83aa96",
+        "android_client_info": {
+          "package_name": "com.walowtech.fblaapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1054512647571-8n2qn4ten2rkg5kpn27itgaatm687eb9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjDR48QmuEud5lwOVhfbwFjuSAVGOin40"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

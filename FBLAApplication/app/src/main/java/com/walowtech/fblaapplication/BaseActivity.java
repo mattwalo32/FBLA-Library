@@ -5,7 +5,9 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 
 /**
  * Created by mattw on 11/10/2017.
@@ -67,5 +69,15 @@ public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         handWriting = Typeface.createFromAsset(getAssets(), "fonts/hand_writing.ttf"); // Standard typeface throughout app
+    }
+
+    /**
+     * Sets elevation of a view using ViewCompat
+     *
+     * @param view The view to set the elevation of.
+     * @param elevation The height to set the elevation to.
+     */
+    public void setElevation(View view, int elevation){
+        ViewCompat.setElevation(view, elevation);
     }
 }

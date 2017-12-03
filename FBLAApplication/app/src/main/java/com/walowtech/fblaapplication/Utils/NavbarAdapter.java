@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.walowtech.fblaapplication.AboutActivity;
 import com.walowtech.fblaapplication.AccountActivity;
 import com.walowtech.fblaapplication.LoginActivity;
 import com.walowtech.fblaapplication.MainActivity;
@@ -65,7 +66,8 @@ public class NavbarAdapter extends ArrayAdapter<NavbarItem>{
                         getContext().startActivity(settingIntent);
                         break;
                     case 2: //Information
-
+                        Intent aboutIntent = new Intent(getContext(), AboutActivity.class);
+                        getContext().startActivity(aboutIntent);
                         break;
                     case 3: //Fees
 

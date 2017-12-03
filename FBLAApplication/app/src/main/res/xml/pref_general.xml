@@ -21,11 +21,19 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Development">
+        android:title="For Judges and Development">
 
         <Preference
             android:key="pref_key_crash_app"
-            android:title="Crash App to Send Report" />
+            android:title="Crash App to Send Report"
+            android:summary="This will simulate a crash should it ever occur. This is used for judging purposes to demonstrate the bug reporting process."/>
+
+        <Preference
+            android:key="pref_key_notification_seq"
+            android:title="Force Notification"
+            android:summary="This will force send a notification that a user may recieve if that had a book due soon.
+This is used for judging purposes to demonstrate that notifications are implemented. After pressing this
+button you will have 5 seconds to exit the app to view the notification."/>
 
     </PreferenceCategory>
 

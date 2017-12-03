@@ -241,6 +241,7 @@ public class MainActivity extends NavDrawerActivity{
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchURL(MainActivity.this, query);
+                searchBar.setQuery(query, false);
                 return true;
             }
 
@@ -548,7 +549,7 @@ public class MainActivity extends NavDrawerActivity{
 
                 downloadSlideImages();
             }else if(success == 4){
-                searchBar.getSuggestionsAdapter().changeCursor(super.updateSearchResults(json));
+                searchBar.getSuggestionsAdapter().changeCursor(super.updateSearchResults(json, searchResults));
             }else {
                 ErrorUtils.errorDialog(this, "Response Error", "An unexpected response was recieved from the server. Please try again later.");
             }
@@ -619,18 +620,6 @@ public class MainActivity extends NavDrawerActivity{
     }
 
     /**
-     * Sets elevation of a view using ViewCompat
-     *
-     * @param view The view to set the elevation of.
-     * @param elevation The height to set the elevation to.
-     */
-    private void setElevation(View view, int elevation){
-        //TODO fix shadow problem
-        //TODO fix scrollbar problem
-        ViewCompat.setElevation(view, elevation);
-    }
-
-    /**
      * Launches the Detailed Book Info Activity and
      * passes in its GID and bitmap as an extra.
      *
@@ -694,32 +683,37 @@ public class MainActivity extends NavDrawerActivity{
 
             setElevation(subjectRow, ELEVATION_SUBJECT);
 
-            tvMore.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Uri.Builder builder = new Uri.Builder();
+            if(subject.categoryName.equals("Popular")){ //If category is popular books
+                tvMore.setVisibility(GONE); //Get rid of more button
+            }else {
+                tvMore.setVisibility(View.VISIBLE);
+                tvMore.setOnClickListener(new View.OnClickListener() { //Else set an on click listener
+                    @Override
+                    public void onClick(View v) {
+                        Uri.Builder builder = new Uri.Builder();
 
-                    VALUE_SEARCH_ITEM = "SUBJECT";
-                    VALUE_SEARCH_QUERY = subject.categoryName;
-                    String maxResults = "1000";
+                        VALUE_SEARCH_ITEM = "SUBJECT";
+                        VALUE_SEARCH_QUERY = subject.categoryName;
+                        String maxResults = "1000";
 
-                    builder.scheme(SCHEME)
-                            .authority(BASE_URL)
-                            .appendPath(PATH0)
-                            .appendPath(PATH1)
-                            .appendPath(PATH2)
-                            .appendQueryParameter(PARAM_ACTION, VALUE_ACTION_SEARCH)
-                            .appendQueryParameter(PARAM_SEARCH_ITEM, VALUE_SEARCH_ITEM)
-                            .appendQueryParameter(PARAM_SEARCH_QUERY, VALUE_SEARCH_QUERY)
-                            .appendQueryParameter(PARAM_NUM_RESULTS, maxResults)
-                            .build();
-                    Intent gridActivity = new Intent(getContext(), GridViewActivity.class);
+                        builder.scheme(SCHEME)
+                                .authority(BASE_URL)
+                                .appendPath(PATH0)
+                                .appendPath(PATH1)
+                                .appendPath(PATH2)
+                                .appendQueryParameter(PARAM_ACTION, VALUE_ACTION_SEARCH)
+                                .appendQueryParameter(PARAM_SEARCH_ITEM, VALUE_SEARCH_ITEM)
+                                .appendQueryParameter(PARAM_SEARCH_QUERY, VALUE_SEARCH_QUERY)
+                                .appendQueryParameter(PARAM_NUM_RESULTS, maxResults)
+                                .build();
+                        Intent gridActivity = new Intent(getContext(), GridViewActivity.class);
 
-                    gridActivity.putExtra("URL", builder.toString());
+                        gridActivity.putExtra("URL", builder.toString());
 
-                    getContext().startActivity(gridActivity);
-                }
-            });
+                        getContext().startActivity(gridActivity);
+                    }
+                });
+            }
 
             //Set text and typeface
             tvSubjectTitle.setText(subject.categoryName);

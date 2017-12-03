@@ -25,6 +25,15 @@
                 android:text="No Books Found"
                 android:layout_centerInParent="true"/>
 
+            <TextView
+                android:id="@+id/ga_loading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_h1"
+                android:textColor="@android:color/black"
+                android:text="Loading..."
+                android:layout_centerInParent="true"/>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -39,6 +39,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.walowtech.fblaapplication.Utils.DownloadJSONLoader;
 import com.walowtech.fblaapplication.Utils.ErrorUtils;
 import com.walowtech.fblaapplication.Utils.NetworkJSONUtils;
@@ -145,6 +146,8 @@ public class LoginActivity extends BaseActivity{
         }else{
             ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
         }
+
+        Log.i("LoginActivity", "FIREBASE TOKEN: " + FirebaseInstanceId.getInstance().getToken());
     }
 
     /**
