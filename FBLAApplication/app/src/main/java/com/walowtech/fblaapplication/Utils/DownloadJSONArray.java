@@ -11,14 +11,22 @@ import java.net.URL;
 import java.util.ArrayList;
 
 /**
- * Created by mattw on 10/30/2017.
+ * Downloads ListArrays of JSONObjects from a stream.
+ *
+ * A 2D array of URLs is passed into the constructor. Then the URLs are used
+ * to created a 2D array of JSONObjects from the resultant stream.
+ *
+ * @author Matthew Walowski
+ * @version 1.0
+ * @since 1.0
  */
-//TODO doc
+//Created 10/30/2017
 public class DownloadJSONArray extends AsyncTaskLoader {
 
     ArrayList<ArrayList<URL>> urls;
     Context context;
 
+    //Constructor
     public DownloadJSONArray(Context context, ArrayList<ArrayList<URL>> urls){
         super(context);
         this.urls = urls;
@@ -27,7 +35,7 @@ public class DownloadJSONArray extends AsyncTaskLoader {
 
     @Override
     protected void onStartLoading() {
-        forceLoad();
+        forceLoad(); //Forces loadInBackground to be acalled automatically
     }
 
     @Override

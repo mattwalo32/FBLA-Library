@@ -60,7 +60,16 @@ import java.util.Locale;
 import static android.view.View.GONE;
 
 /**
- * Created by mattw on 10/7/2017.
+ * This Activity shows detailed information about a book.
+ *
+ * The book's GID is expected as an extra, and upon retrieving it, detailed information
+ * about the book is requested from the server. The response is then parsed and the information
+ * is displayed on screen. The functionality to checkout, return, waitlist, and review books is
+ * included.
+ *
+ * @author Matthew Walowski
+ * @version 1.0
+ * @since 1.0
  */
 
 //Created 10/7/2017
@@ -388,6 +397,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
             }else if(loader.getId() == DOWNLOAD_DETAILED_IMAGE_LOADER){
                 Bitmap image = (Bitmap) data;
                 mBackgroundImage.setImageBitmap(image);
+                mBookImage.setImageBitmap(image); // Sets cover in case book was called from context where no cover provided
             }
         }else{
             ErrorUtils.errorDialog(this, "Could not connect to server", "No information was retrieved from the server. Please try again later.");
@@ -607,7 +617,11 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         }
     }
 
-    //TODO doc
+    /**
+     * Creates an alarm 9 days from current time that will send a push notification.
+     *
+     * @param BID The BID the the alarm is regarding.
+     */
     public void configureReturnAlarm(int BID){
         alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
 
@@ -978,8 +992,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
             ErrorUtils.errorDialog(this, "Error", "Information could not be retrieved from memory. Try logging out and logging back in.");
             return;
         } else if (VALUE_PASSWORD == null) {
-            Toast.makeText(this, "No saved password was found. Please manually enter password.", Toast.LENGTH_LONG).show();
-            //TODO ask for password
+            Toast.makeText(this, "No saved password was found. Please log out then log back in.", Toast.LENGTH_LONG).show();
         } else if (VALUE_RATING <= 0 || VALUE_RATING > 5) {
             Toast.makeText(this, "Please select a rating", Toast.LENGTH_SHORT).show();
             return;

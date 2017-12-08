@@ -28,11 +28,16 @@ import com.walowtech.fblaapplication.R;
 import java.util.ArrayList;
 
 /**
- * Created by mattw on 11/6/2017.
+ * Inflates each book object to the RecyclerGridView.
+ *
+ * Touch listeners and typefaces are applied.
+ *
+ * @author Matthew Walowski
+ * @version 1.0
+ * @since 1.0
  */
 
-//TODO doc
-
+//Created 11/6/2017
 public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>{
 
     private ArrayList<Book> books;
@@ -99,7 +104,7 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>{
         return books.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         TextView rating;
         ProgressBar progressBar;
         ImageView bookCover;
@@ -109,13 +114,6 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>{
             rating = (TextView)itemView.findViewById(R.id.m_tv_rating);
             progressBar = (ProgressBar)itemView.findViewById(R.id.m_pb_book_progress);
             bookCover = (ImageView)itemView.findViewById(R.id.m_iv_book_cover);
-            itemView.setOnClickListener(this);
-        }
-
-
-        @Override
-        public void onClick(View v) {
-            //TODO click listener
         }
 
         //gets data at click position

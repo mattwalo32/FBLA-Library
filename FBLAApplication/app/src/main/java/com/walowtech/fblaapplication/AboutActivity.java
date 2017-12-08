@@ -1,16 +1,35 @@
 package com.walowtech.fblaapplication;
 
+import android.app.SearchManager;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.walowtech.fblaapplication.Utils.SlideshowAdapter;
+import com.walowtech.fblaapplication.Utils.SuggestionCursorAdapter;
 
 import java.util.ArrayList;
 
-public class AboutActivity extends NavDrawerActivity {
+/**
+ * Activity contains information about the school.
+ *
+ * A map of the school, school information, app information, and the app logo are
+ * all displayed here.
+ *
+ * @author Matthew Walowski
+ * @version 1.0
+ * @since 1.0
+ */
+public class AboutActivity extends BaseActivity {
 
     private LinearLayout mMainLayout;
     private LinearLayout mSecondLayer;
@@ -18,6 +37,8 @@ public class AboutActivity extends NavDrawerActivity {
     private TextView mAboutSchool;
     private TextView mAboutApp;
     private ViewPager mPager;
+
+    private SearchView searchBar;
 
     private SlideshowAdapter pagerAdapter;
     private ArrayList<ViewPagerItem> slides = new ArrayList<>();
@@ -42,14 +63,33 @@ public class AboutActivity extends NavDrawerActivity {
         setElevation(mSecondLayer, 12);
 
         ViewPagerItem libMap = new ViewPagerItem(null, null, null, null);
-        libMap.image = BitmapFactory.decodeResource(getResources(), R.drawable.library_map_resized);
+        libMap.image = BitmapFactory.decodeResource(getResources(), R.drawable.library_transparent);
 
         slides.add(libMap);
 
         pagerAdapter = new SlideshowAdapter(this, slides, false);
         mPager.setAdapter(pagerAdapter);
 
+        //configActionBar();
+    }
 
-        //TODO app bar
+
+        /**
+         * Configures the actionbar
+         *
+         * The layout of the actionbar is inflated and listeners
+         * are set on the toggle button and SearchView
+         */
+    private void configActionBar(){
+        /*Toolbar toolbar = (Toolbar) findViewById(R.id.aba_toolbar);//Find toolbar in layout
+        setSupportActionBar(toolbar);//Set the toolbar as the actionbar
+
+        //Set background to a drawable blue background
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_drawable));
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setTitle(""); //TODO make better*/
+
     }
 }

@@ -71,8 +71,6 @@ import java.util.Map;
 //Created 9/10/2017
 public class LoginActivity extends BaseActivity{
 
-
-    //TODO check app version
     private boolean bypassInputs = false;
 
     private FrameLayout topPanel;
@@ -90,22 +88,19 @@ public class LoginActivity extends BaseActivity{
     private TextView textPassword;
     private TextView createAccount;
 
-    private final String VALUE_ACTION = "ACTION_RETRIEVE_ACCOUNT_DATA";
-
-    private JSONObject jsonResponse;
-    private URL requestURL;
-
     private int UID, success;
     private String name, message;
 
     RequestQueue queue;
 
-    private final int DOWNLOAD_JSON_LOADER = 0;
+    private static String APP_VERSION;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        APP_VERSION = getResources().getString(R.string.app_version);
 
         topPanel = (FrameLayout) findViewById(R.id.l_fl_top_panel);
         bottomPanel = (LinearLayout) findViewById(R.id.l_ll_bottom_panel);
@@ -144,27 +139,20 @@ public class LoginActivity extends BaseActivity{
                 bypassInputs = false;
             }
         }else{
-            ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
+            ErrorUtils.errorDialog(LoginActivity.this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
         }
-
-        Log.i("LoginActivity", "FIREBASE TOKEN: " + FirebaseInstanceId.getInstance().getToken());
     }
 
     /**
-     * Starts Loader that authenticates user data
-     *
-     * First the URL to request is built with Uri.Builder
-     * Then, the user's email and password are sent to the database
-     * via URL in the form of a URL query, and the resulting
-     * JSONObject from the input stream is returned and assigned
-     * to the variable jsonResponse, which gets parsed.
+     * User data is put into a URL is created that will send appropriate data to the server. The request
+     * is sent using Volley, on the response, the JSON is parsed
      *
      * @param v The view that calls the method. This parameter is unused, but
      *          necessary for the onClick attribute to be implemented
-     */ //TODO new doc
+     */
     public void login(View v){
         if(!NetworkJSONUtils.checkInternetConnection(this)) {
-            ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
+            ErrorUtils.errorDialog(LoginActivity.this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
             return;
         }
         fab.animate().scaleX(.1f).scaleY(.1f).alpha(0f).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(250);
@@ -183,9 +171,10 @@ public class LoginActivity extends BaseActivity{
                 .appendPath(PATH0)
                 .appendPath(PATH1)
                 .appendPath(PATH2)
-                .appendQueryParameter(PARAM_ACTION, VALUE_ACTION)
+                .appendQueryParameter(PARAM_ACTION, VALUE_ACTION_RETRIEVE_ACCOUNT_DATA)
                 .appendQueryParameter(PARAM_EMAIL, email)
                 .appendQueryParameter(PARAM_PASSWORD, password)
+                .appendQueryParameter(PARAM_VERSION, APP_VERSION)
                 .build();
         String urlString = builder.toString();
 
@@ -197,7 +186,7 @@ public class LoginActivity extends BaseActivity{
                             JSONObject jsonResponse = new JSONObject(response);
                             parseJSON(jsonResponse);
                         }catch(JSONException JSONE){
-                            ErrorUtils.errorDialog(getApplicationContext(), "Data Error", "There was an error with the data format. Please try again later.");
+                            ErrorUtils.errorDialog(LoginActivity.this, "Data Error", "There was an error with the data format. Please try again later.");
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -220,6 +209,7 @@ public class LoginActivity extends BaseActivity{
      * @param jsonObject The JSONObject to parse
      */
     private void parseJSON(JSONObject jsonObject){
+        stopLoadingAnimation();
         try {
             success = jsonObject.getInt(KEY_SUCCESS);
             if(success == getResources().getInteger(R.integer.CODE_user_validated)){
@@ -255,10 +245,14 @@ public class LoginActivity extends BaseActivity{
                 Toast.makeText(this, "Welcome Back!", Toast.LENGTH_SHORT).show();
 
                 launchMainActivity();
+            }else if(success == 5001) {
+                message = jsonObject.getString(KEY_MESSAGE);
+
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }else{
                 message = jsonObject.getString(KEY_MESSAGE);
 
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 
                 Animation shake = AnimationUtils.loadAnimation(this, R.anim.shake);
                 editPassword.setText("");
@@ -267,7 +261,7 @@ public class LoginActivity extends BaseActivity{
             }
         }catch(JSONException JSONE){
             JSONE.printStackTrace();
-            ErrorUtils.errorDialog(this, "Data Format Error", "There seems to be an error with the data format. Please try again later.");
+            ErrorUtils.errorDialog(LoginActivity.this, "Data Format Error", "There seems to be an error with the data format. Please try again later.");
         }
     }
 
@@ -293,6 +287,14 @@ public class LoginActivity extends BaseActivity{
 
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, p1, p2, p3, p4, p5, p6, p7);
         startActivity(i, options.toBundle());
+    }
+
+    /**
+     * Stops the loading animation so that the user can press the button again
+     */
+    public void stopLoadingAnimation(){
+        fab.animate().scaleX(1f).scaleY(1f).alpha(1f).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(250);
+        progressBar.setVisibility(View.INVISIBLE);
     }
 
     /**

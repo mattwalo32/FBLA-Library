@@ -8,12 +8,19 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 
 /**
- * Created by mattw on 11/10/2017.
+ * The class that contains all basic functions and variables of any activities for this app.
+ *
+ * All classes in this application should extend from this class or a variant of this class.
+ *
+ * @author Matthew Walowski
+ * @version 1.0
+ * @since 1.0
  */
-//TODO doc
 
+//Created 11/10/2017
 public class BaseActivity extends AppCompatActivity {
 
     public static Typeface handWriting;
@@ -54,11 +61,16 @@ public class BaseActivity extends AppCompatActivity {
     protected final String PARAM_SEARCH_ITEM = "SEARCHITEM";
     protected final String PARAM_EMAIL = "EMAIL";
     protected final String PARAM_PASSWORD = "PASSWORD";
+    protected final String PARAM_VERSION = "VERSION";
+    protected final String PARAM_SEARCH_BID = "BID";
+    protected final String PARAM_GID = "GID";
 
     //VALUES are the values of URL arguments;
     protected final String VALUE_ACTION_BOOKS = "ACTION_RETRIEVE_TOP_BOOKS_BY_CATEGORY";
     protected final String VALUE_ACTION_MESSAGE = "ACTION_RETRIEVE_DAILY_MESSAGE";
     protected final String VALUE_ACTION_SEARCH = "ACTION_RETRIEVE_BOOK_DATA";
+    protected final String VALUE_ACTION_RETRIEVE_ACCOUNT_DATA = "ACTION_RETRIEVE_ACCOUNT_DATA";
+    protected final String VALUE_ACTION_RETRIEVE_DETAILED_DATA = "ACTION_RETRIEVE_DETAILED_BOOK_DATA";
     protected final String VALUE_NUM_RESULTS = "15";
     protected int VALUE_UID;
     protected String VALUE_SEARCH_QUERY;
@@ -67,7 +79,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN); //Stops keyboard from popping up
         handWriting = Typeface.createFromAsset(getAssets(), "fonts/hand_writing.ttf"); // Standard typeface throughout app
     }
 
@@ -79,5 +91,17 @@ public class BaseActivity extends AppCompatActivity {
      */
     public void setElevation(View view, int elevation){
         ViewCompat.setElevation(view, elevation);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN); //Stops keyboard from popping up
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

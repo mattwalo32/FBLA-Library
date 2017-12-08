@@ -25,6 +25,7 @@ import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -51,8 +52,17 @@ import java.net.URL;
 import java.util.ArrayList;
 
 /**
- * Created by mattw on 11/6/2017.
- *///TODO doc
+ * This activity displays books in a grid pattern.
+ *
+ * This activity is launched whenever an item is searched for or a large/unknown
+ * amount of items need to be displayed simplistically. The activity consists of
+ * a grid view that contains many book cover, each of which will launch a seperate
+ * activity onClick.
+ *
+ * @author Matthew Walowski
+ * @version 1.0
+ * @since 1.0
+ */
 
 //Created 11/6/2017
 public class GridViewActivity extends NavDrawerActivity {
@@ -87,7 +97,7 @@ public class GridViewActivity extends NavDrawerActivity {
         mNoneFound = (TextView) findViewById(R.id.ga_none_found);
         mLoadingText = (TextView) findViewById(R.id.ga_loading);
         gridLayout = (RecyclerView) findViewById(R.id.gv_grid_layout);
-        gridLayout.setLayoutManager(new GridLayoutManager(this, calculateNoOfColumns(getApplicationContext())));
+        gridLayout.setLayoutManager(new GridLayoutManager(this, calculateNoOfColumns()));
 
         gridViewAdapter = new GridAdapter(this, this, books);
         gridLayout.setAdapter(gridViewAdapter);
@@ -103,7 +113,12 @@ public class GridViewActivity extends NavDrawerActivity {
         }
     }
 
-    //TODO doc
+    /**
+     * Downloads a stream from a url and converts it into a JSONObject that gets parsed from a
+     * different method.
+     *
+     * @param url The URL to download the JSON from.
+     */
     public void getJSON(final String url){
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
@@ -113,13 +128,13 @@ public class GridViewActivity extends NavDrawerActivity {
                     parseBookJSON(json);
                     mLoadingText.setVisibility(View.GONE);
                 }catch(JSONException JSONE){
-                    ErrorUtils.errorDialog(getApplicationContext(), "Data Error", "There was an error with the data format. Please try again later.");
+                    ErrorUtils.errorDialog(GridViewActivity.this, "Data Error", "There was an error with the data format. Please try again later.");
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //ErrorUtils.errorDialog(getApplicationContext(), "Could not connect to server", "No information was retrieved from the server. Please try again later.");//TODO crash
+                ErrorUtils.errorDialog(GridViewActivity.this, "Could not connect to server", "No information was retrieved from the server. Please try again later.");
             }
         });
 
@@ -222,12 +237,12 @@ public class GridViewActivity extends NavDrawerActivity {
             public boolean onSuggestionClick(int position) {
                 searchBar.setQuery(searchResults.get(position).title, true);
                 String GID = searchResults.get(position).GID;
-                onSuggestionSelected(GridViewActivity.this, GID); //TODO dont create new
+                onSuggestionSelected(GridViewActivity.this, GID);
                 return true;
             }
         });
 
-        //TODO verify
+        //App bar displays differently on different device versions. Padding needs to be changed based on those versions
         if(Build.VERSION.SDK_INT >= 24) {
             toolbar.post(new Runnable() {
                 @Override
@@ -236,7 +251,9 @@ public class GridViewActivity extends NavDrawerActivity {
                     int buttonRight = (int) toggleIcon.getX() + toggleIcon.getWidth();
 
                     int difference = buttonRight - searchBarLeft;
-                    searchBar.setPadding(difference, 0, 0, 0);
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)searchBar.getLayoutParams();
+                    params.setMargins(difference, 0, 0, 0);
+                    searchBar.setLayoutParams(params);
 
                     Log.i("LoginActivity", difference + " " + searchBarLeft + " " + buttonRight);
                 }
@@ -311,19 +328,29 @@ public class GridViewActivity extends NavDrawerActivity {
         requestQueue.add(stringRequest);
     }
 
-    //TODO doc
+    /**
+     * Checks success code of JSON and passes to super class to parse results.
+     *
+     * @param json The JSON to parse.
+     */
     public void parseSearchJSON(JSONObject json){
         try {
             int success = json.getInt(KEY_SUCCESS);
             if (success == 4) {
-                searchBar.getSuggestionsAdapter().changeCursor(super.updateSearchResults(json, searchResults));
+                searchBar.getSuggestionsAdapter().changeCursor(super.updateSearchResults(json, searchResults)); //Superclass parses JSON
             }
         }catch(JSONException JSONE){
-            //TODO catch
+            ErrorUtils.errorDialog(this, "A JSON Error Occurred", "The response from the server was incorrectly formatted. Please try again later.");
         }
     }
 
-    //TODO doc
+    /**
+     * Checks success code of JSON and parses it based on expected object
+     * If success code is:
+     *      4 - An Array of books is expected and parsed to populate grid.
+     *
+     * @param json The JSONObject to parse.
+     */
     public void parseBookJSON(JSONObject json){
         try {
             int success = json.getInt(KEY_SUCCESS);
@@ -350,14 +377,14 @@ public class GridViewActivity extends NavDrawerActivity {
                                 books.get(currentSize).coverSmall = response;
                                 gridViewAdapter.notifyDataSetChanged();
                             }catch(IndexOutOfBoundsException IOBE){
-                                //This will be called if the user searches for a new image but images from the old search are still loading
-                                //TODO catch
+                                //FIXED? - This will be called if the user searches for a new image but images from the old search are still loading
+                                ErrorUtils.errorDialog(GridViewActivity.this, "An Error Occurred", "An error occurred while updating the images. Please try again.");
                             }
                         }
                     }, 0, 0, null, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            //TODO error response
+                            ErrorUtils.errorDialog(GridViewActivity.this, "An Error Occurred", "This search could not be executed right now. Please try again later.");
                         }
                     });
 
@@ -370,11 +397,17 @@ public class GridViewActivity extends NavDrawerActivity {
                 mNoneFound.setVisibility(View.VISIBLE);
             }
         }catch(JSONException JSONE){
-            //TODO catch
+            ErrorUtils.errorDialog(this, "JSON Error", "There was an error in the format of the data received from the server. Please try again later.");
         }
     }
 
-    public int calculateNoOfColumns(Context context) {
+    /**
+     * Calculates the number of columns needed to fit books of a certain width
+     * in as many rows as possible.
+     *
+     * @return The max number of columns.
+     */
+    public int calculateNoOfColumns() {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         float pxWidth = displayMetrics.widthPixels - getResources().getDimension(R.dimen.margin) * 2;
         float pxColumnWidth = getResources().getDimension(R.dimen.book_width);

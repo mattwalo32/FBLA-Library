@@ -78,7 +78,6 @@ import static android.view.View.GONE;
  * @since 1.0
  */
 
-//TODO clean up loaders
 //TODO if internet changes app crashes
 
 //Created 9/15/2017
@@ -122,11 +121,6 @@ public class MainActivity extends NavDrawerActivity{
     private final String PARAM_UID = "UID";
     private final String PARAM_SEARCH_QUERY = "SEARCHSTRING";
     private final String PARAM_SEARCH_ITEM = "SEARCHITEM";
-
-    private final String PATH0 = "apis";
-    private final String PATH1 = "FBLALibrary";
-    private final String PATH2 = "api.php";
-    private final String SCHEME = "https";
 
     private final String VALUE_ACTION_BOOKS = "ACTION_RETRIEVE_TOP_BOOKS_BY_CATEGORY";
     private final String VALUE_ACTION_MESSAGE = "ACTION_RETRIEVE_DAILY_MESSAGE";
@@ -211,14 +205,15 @@ public class MainActivity extends NavDrawerActivity{
      * are set on the toggle button and SearchView
      */
     private void configActionBar(){
-        Toolbar toolbar = (Toolbar) findViewById(R.id.m_toolbar);
-        setSupportActionBar(toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.m_toolbar);//Find toolbar in layout
+        setSupportActionBar(toolbar);//Set the toolbar as the actionbar
 
+        //Set background to a drawable blue background
         ActionBar actionBar = getSupportActionBar();
         actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_drawable));
         actionBar.setDisplayHomeAsUpEnabled(false);
 
-
+        //Set on click listener for the toggle nav button
         final ImageView toggleIcon = (ImageView) toolbar.findViewById(R.id.toggle_icon);
         toggleIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -240,7 +235,7 @@ public class MainActivity extends NavDrawerActivity{
         searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchURL(MainActivity.this, query);
+                searchURL(MainActivity.this, query); //Gets searched items
                 searchBar.setQuery(query, false);
                 return true;
             }
@@ -274,7 +269,7 @@ public class MainActivity extends NavDrawerActivity{
             }
         });
 
-        //TODO verify
+        //App bar displays differently on different device versions. Padding needs to be changed based on those versions
         if(Build.VERSION.SDK_INT >= 24) {
             toolbar.post(new Runnable() {
                 @Override
@@ -283,7 +278,9 @@ public class MainActivity extends NavDrawerActivity{
                     int buttonRight = (int) toggleIcon.getX() + toggleIcon.getWidth();
 
                     int difference = buttonRight - searchBarLeft;
-                    searchBar.setPadding(difference, 0, 0, 0);
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)searchBar.getLayoutParams();
+                    params.setMargins(difference, 0, 0, 0);
+                    searchBar.setLayoutParams(params);
 
                     Log.i("LoginActivity", difference + " " + searchBarLeft + " " + buttonRight);
                 }
@@ -424,14 +421,13 @@ public class MainActivity extends NavDrawerActivity{
                             JSONObject jsonResponse = new JSONObject(response);
                             parseBookJSON(jsonResponse);
                         }catch(JSONException JSONE){
-                            ErrorUtils.errorDialog(getApplicationContext(), "Data Error", "There was an error with the data format. Please try again later.");
+                            ErrorUtils.errorDialog(MainActivity.this, "Data Error", "There was an error with the data format. Please try again later.");
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //ErrorUtils.errorDialog(getApplicationContext(), "Could not connect to server", "No information was retrieved from the server. Please try again later.");
-            //TODO throws error
+                ErrorUtils.errorDialog(MainActivity.this, "Could not connect to server", "No information was retrieved from the server. Please try again later.");
             }
         });
 
@@ -613,7 +609,7 @@ public class MainActivity extends NavDrawerActivity{
                     requestQueue.add(imageRequest);
 
                 } else {
-                    //TODO set no image image
+                    Toast.makeText(this, "One or more books is missing a cover image.", Toast.LENGTH_SHORT).show();
                 }
             }
         }

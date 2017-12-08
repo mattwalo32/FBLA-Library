@@ -56,6 +56,10 @@ import static com.walowtech.fblaapplication.MainActivity.handWriting;
  * This is the base activity for NavDrawer activities. The NavDrawer is automatically
  * initialized, inflated, and has a listener set on it, so all activities that extend
  * this activity will contain the NavDrawer.
+ *
+ * @author Matthew Walowski
+ * @version 1.0
+ * @since 1.0
  */
 
 //Created 9/29/2017
@@ -93,8 +97,8 @@ public class NavDrawerActivity extends BaseActivity {
         drawerLayout.addDrawerListener(toggle);
 
         navbarItems.add(new NavbarItem(0, R.drawable.ic_account_black, "Account"));
-        navbarItems.add(new NavbarItem(1, R.drawable.ic_settings_black, "Settings"));
-        navbarItems.add(new NavbarItem(2, R.drawable.ic_info_black, "Information"));
+        navbarItems.add(new NavbarItem(1, R.drawable.ic_info_black, "About"));
+        navbarItems.add(new NavbarItem(2, R.drawable.ic_settings_black, "Settings"));
         //navbarItems.add(new NavbarItem(3, R.drawable.ic_fees_black, "Fees"));
         navbarItems.add(new NavbarItem(4, R.drawable.ic_logout_black, "Logout"));
 
@@ -158,7 +162,15 @@ public class NavDrawerActivity extends BaseActivity {
         email.setTypeface(handWriting);
     }
 
-    //TODO doc
+    /**
+     * Creates an empty matrix cursor. Then the cursor is populated with all of the results from
+     * the search and returned.
+     *
+     * @param json The JSON of the search.
+     * @param searchResults An arrayList of the books of the search results.
+     * @return The newly created MatrixCursor.
+     * @throws JSONException Thrown if unexpected JSON is provided.
+     */
     public MatrixCursor updateSearchResults(JSONObject json, ArrayList<Book> searchResults) throws JSONException {
         //Clear previous search results
         searchResults.clear();
@@ -191,7 +203,13 @@ public class NavDrawerActivity extends BaseActivity {
         return cursor;
     }
 
-    //TODO doc
+    /**
+     * Builds the search URL. The search item, query, and max results are included
+     * as URL arguments. Then launches the GridActivity with the search url as an extra.
+     *
+     * @param context The context to launch the activity from.
+     * @param searchString The query to search.
+     */
     public void searchURL(Context context, String searchString){
         VALUE_SEARCH_ITEM = "ALL";
         VALUE_SEARCH_QUERY = searchString;
@@ -218,11 +236,16 @@ public class NavDrawerActivity extends BaseActivity {
         context.startActivity(gridActivity);
     }
 
-    //TODO doc
+    /**
+     * Called when a suggestion from the searchbar is selected. A new BookDetails
+     * activity is launched.
+     *
+     * @param context The context to launch the activity from.
+     * @param GID The Google ID of the book to view.
+     */
     public void onSuggestionSelected(Context context, String GID){
         Intent i = new Intent(this, BookDetailsActivity.class);
         i.putExtra("GID", GID);
-        //i.putExtra("BOOK_IMAGE", bitmap);
         startActivity(i);
     }
 

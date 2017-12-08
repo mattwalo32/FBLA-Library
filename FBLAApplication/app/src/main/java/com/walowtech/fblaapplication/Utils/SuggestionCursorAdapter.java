@@ -16,10 +16,13 @@ import com.walowtech.fblaapplication.MainActivity;
 import com.walowtech.fblaapplication.R;
 
 /**
- * Created by mattw on 10/7/2017.
+ * Adapts the book information into the suggestions bar.
+ *
+ * @author Matthew Walowski
+ * @version 1.0
+ * @since 1.0
  */
 //Created 10/7/2017
-//TODO doc
 public class SuggestionCursorAdapter extends SimpleCursorAdapter {
 
     private LayoutInflater cursorInflater;

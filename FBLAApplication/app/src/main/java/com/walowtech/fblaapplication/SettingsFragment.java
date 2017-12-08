@@ -28,10 +28,17 @@ import java.util.Map;
 import static android.content.Context.ALARM_SERVICE;
 
 /**
- * Created by mattw on 10/22/2017.
+ * Fragment holds display for settings.
+ *
+ * The settings XML file is inflated to show all settings. Touch listeners
+ * are also set on all preferences.
+ *
+ * @author Matthew Walowski
+ * @version 1.0
+ * @since 1.0
  */
 
-//TODO doc
+//Created 10/22/2017
 public class SettingsFragment extends PreferenceFragment {
 
     @Override

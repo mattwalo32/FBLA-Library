@@ -61,11 +61,11 @@ public class NavbarAdapter extends ArrayAdapter<NavbarItem>{
                         Intent accountIntent = new Intent(getContext(), AccountActivity.class);
                         getContext().startActivity(accountIntent);
                         break;
-                    case 1: //Settings
+                    case 2: //Settings
                         Intent settingIntent = new Intent(getContext(), SettingsActivity.class);
                         getContext().startActivity(settingIntent);
                         break;
-                    case 2: //Information
+                    case 1: //Information
                         Intent aboutIntent = new Intent(getContext(), AboutActivity.class);
                         getContext().startActivity(aboutIntent);
                         break;

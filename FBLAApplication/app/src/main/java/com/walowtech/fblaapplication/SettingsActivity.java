@@ -17,16 +17,21 @@ import android.view.View;
 import android.widget.TextView;
 
 /**
- * Created by mattw on 10/22/2017.
+ * Holds the SettingFragment and sets the action bar.
+ *
+ * @author Matthew Walowski
+ * @version 1.0
+ * @since 1.0
  */
 
-//TODO doc
+//Created 10/22/2017
 public class SettingsActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //Start content fragment
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();

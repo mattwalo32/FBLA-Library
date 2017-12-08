@@ -13,6 +13,19 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!--<android.support.v7.widget.Toolbar
+            android:id="@+id/aba_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            android:background="@color/colorPrimary600"
+            app:contentInsetLeft="0dp"
+            app:contentInsetStart="0dp"
+            app:contentInsetRight="0dp"
+            app:contentInsetEnd="0dp">
+
+        </android.support.v7.widget.Toolbar> -->
+
         <TextView
             android:id="@+id/aba_school_name"
             android:layout_width="match_parent"
@@ -36,6 +49,7 @@
                 android:id="@+id/aa_pager"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/map_height_default"
+                android:padding="@dimen/margin"
                 android:layout_gravity="center_horizontal" />
 
             <TextView

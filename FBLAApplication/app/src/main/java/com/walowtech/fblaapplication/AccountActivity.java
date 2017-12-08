@@ -52,8 +52,18 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import static android.view.View.GONE;
 import static com.walowtech.fblaapplication.MainActivity.handWriting;
 
+/**
+ * Contains information about the user's account.
+ *
+ * This activity shows all books that are currently checked out, their due dates, any books that they are
+ * on the waiting list for, and any books that they've liked.
+ *
+ * @author Matthew Walowski
+ * @version 1.0
+ * @since 1.0
+ */
 public class AccountActivity extends Activity implements LoaderManager.LoaderCallbacks {
-
+//TODO change profile
     CircleImageView mProfile;
     LinearLayout mRowsLayout;
     LinearLayout mFavoritesLayout;
@@ -402,13 +412,13 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
                         ArrayList<Copy> currentList = i == 0 ? checkedOut : waitListed;
                         currentList.get(j).bitmap = images.get(i).get(j);
                     }catch(Exception e){
-                        //TODO catch
+                        ErrorUtils.errorDialog(this, "An Error Occurred", "An error occurred while displaying data. Some images may be missing.");
                     }
                 }else{
                     try {
                         liked.get(j).coverSmall = images.get(i).get(j);
                     }catch(Exception e){
-                        //TODO catch
+                        ErrorUtils.errorDialog(this, "An Error Occurred", "An error occurred while displaying data. Some images may be missing.");
                     }
                 }
             }
@@ -417,7 +427,15 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
         likedAdapter.notifyDataSetChanged();
     }
 
-    //TODO doc
+    /**
+     * Parses JSON based on the success code which is included in all JSON responses
+     * If success is equal to:
+     *      0 - An error occurred: show message
+     *      1 - Liked info retrieved: parse liked info and notify adapter
+     *      21 - Book info retrieved: parse book info and update data
+     * @param JSONArray A 2D ArrayList of JSONObjects. The first dimension is imageURLs, while the
+     *                  second is book objects.
+     */
     public void parseJSON(ArrayList<ArrayList<JSONObject>> JSONArray){
         for(int i = 0; i < JSONArray.size(); i++) {
             imageURLs.add(new ArrayList<String>());
@@ -461,7 +479,7 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
                         updateData(i, j, currentList);
                     }
                 } catch (JSONException JSONE) {
-                    Log.i("LoginActivity", "EXCEPTION"); //TODO catch
+                   ErrorUtils.errorDialog(this, "Data Format Error", "There was an error with the response received from the server. Please try again later.");
                 }
             }
         }

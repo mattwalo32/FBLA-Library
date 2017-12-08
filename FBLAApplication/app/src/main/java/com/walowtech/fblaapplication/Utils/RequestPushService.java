@@ -34,10 +34,17 @@ import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 
 /**
- * Created by mattw on 11/18/2017.
+ * Requests a push notification to be sent to the device.
+ *
+ * This service should be deployed by an alarm days after being sent. This is to
+ * create the effect of scheduled notifications.
+ *
+ * @author Matthew Walowski
+ * @version 1.0
+ * @since 1.0
  */
 
-//TODO doc
+//Created 11/18/2017
 public class RequestPushService extends Service {
 
     String PARAM_TO = "\"to\"";
@@ -192,6 +199,7 @@ public class RequestPushService extends Service {
     private void createJSONObject(){
         jsonRequest = null;
         try {
+            //Create JSON POST object
             String jsonString = "{" +
                     PARAM_TO + " : " + VALUE_TO + ", " +
                     PARAM_PRIORITY + " : " + VALUE_PRIORITY + ", " +
@@ -213,7 +221,14 @@ public class RequestPushService extends Service {
         super.onDestroy();
     }
 
-    //TODO doc
+    /**
+     * Configures the next alarm to send.
+     *
+     * @param ringTime The time from now in ms that the alarm should ring.
+     * @param body The text body of the notification.
+     * @param title The text title of the notification.
+     * @param alarmType The type of alarm. This is provided to determine if another alarm should be sent after.
+     */
     public void configureAlarm(long ringTime, String body, String title, int alarmType){
         AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
 

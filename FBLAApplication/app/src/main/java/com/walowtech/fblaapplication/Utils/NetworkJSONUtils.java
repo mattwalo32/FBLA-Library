@@ -132,7 +132,7 @@ public class NetworkJSONUtils {
         BufferedReader bufferedReader = null;
 
         if(is == null) {
-            ErrorUtils.errorDialog(context, "Server Error", "It seems no data could be downloaded from the server. Please try again later."); //TODO may need to fix all errors
+            //ErrorUtils.errorDialog(context, "Server Error", "It seems no data could be downloaded from the server. Please try again later."); //TODO may need to fix all errors
             return null;
         }
 
