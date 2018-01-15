@@ -1,5 +1,6 @@
 package com.walowtech.fblaapplication.Utils;
 
+import android.app.Activity;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -21,10 +22,12 @@ import java.util.ArrayList;
 public class DownloadImageArray extends AsyncTaskLoader{
 
     Context context;
+    Activity activity;
     ArrayList<ArrayList<String>> urls;
 
-    public DownloadImageArray(Context context, ArrayList<ArrayList<String>> urls){
+    public DownloadImageArray(Activity activity, Context context, ArrayList<ArrayList<String>> urls){
         super(context);
+        this.activity = activity;
         this.context = context;
         this.urls = urls;
     }
@@ -43,7 +46,7 @@ public class DownloadImageArray extends AsyncTaskLoader{
             images.add(new ArrayList<Bitmap>()); //Adds an empty ArrayList to first row
             for(int j = 0; j < urls.get(i).size(); j++) { //Populates all images into the newly created row
                 Log.i("LoginActivity", urls.get(i).get(j));
-                Bitmap image = NetworkJSONUtils.downloadBitmap(context, urls.get(i).get(j));
+                Bitmap image = NetworkJSONUtils.downloadBitmap(activity, context, urls.get(i).get(j));
                 images.get(i).add(image);
             }
         }

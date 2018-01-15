@@ -1,5 +1,6 @@
 package com.walowtech.fblaapplication.Utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -38,10 +39,6 @@ import javax.net.ssl.HttpsURLConnection;
 //Created 9/13/2017
 public class NetworkJSONUtils {
 
-    public static boolean validateName(){
-        return false;
-    }
-
     /**
      * Checks the current network status
      *
@@ -63,7 +60,7 @@ public class NetworkJSONUtils {
      * @param url the connection is made to the URL specified
      * @return the input stream of the URL is returned
      */
-    public static InputStream retrieveInputStream(Context context, URL url){
+    public static InputStream retrieveInputStream(final Activity activity, Context context, URL url){
         HttpsURLConnection urlConnection;
         InputStream inputStream = null;
 
@@ -105,7 +102,12 @@ public class NetworkJSONUtils {
             }
         }catch(IOException IOE){
             IOE.printStackTrace();
-            ErrorUtils.errorDialog(context, "Connection Error", "There was an error with your network connection. Check your connection and retry.");
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ErrorUtils.errorDialog(activity, "Connection Error", "There was an error with your network connection. Check your connection and retry.");
+                }
+            });
             return null;
         }
 
@@ -125,14 +127,19 @@ public class NetworkJSONUtils {
      * @return the JSON object created from the input stream. @return
      * will be null if @param is is null
      */
-    public static JSONObject retrieveJSON(Context context, InputStream is){
+    public static JSONObject retrieveJSON(final Activity activity, Context context, InputStream is){
         JSONObject json = null;
         StringBuilder response = new StringBuilder();
         InputStreamReader streamReader = null;
         BufferedReader bufferedReader = null;
 
         if(is == null) {
-            //ErrorUtils.errorDialog(context, "Server Error", "It seems no data could be downloaded from the server. Please try again later."); //TODO may need to fix all errors
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ErrorUtils.errorDialog(activity, "Server Error", "It seems no data could be downloaded from the server. Please try again later.");
+                }
+            });
             return null;
         }
 
@@ -149,17 +156,27 @@ public class NetworkJSONUtils {
             json = new JSONObject(response.toString());
         }catch (IOException IOE){
             IOE.printStackTrace();
-            ErrorUtils.errorDialog(context, "Connection Error", "There was an error with your network connection. Check your connection and retry.");
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ErrorUtils.errorDialog(activity, "Connection Error", "There was an error with your network connection. Check your connection and retry.");
+                }
+            });
             return null;
         }catch (JSONException JE){
             JE.printStackTrace();
-            ErrorUtils.errorDialog(context, "Data Format Error", "There was an error with the data format. Please try again later.");
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ErrorUtils.errorDialog(activity, "Data Format Error", "There was an error with the data format. Please try again later.");
+                }
+            });
             return null;
         }
         return json;
     }
 
-    public static Bitmap downloadBitmap(Context context, String url){
+    public static Bitmap downloadBitmap(final Activity activity, Context context, String url){
         Bitmap bitmap = null;
 
         try {
@@ -167,10 +184,22 @@ public class NetworkJSONUtils {
             bitmap = BitmapFactory.decodeStream(is);
         }catch(MalformedURLException MURLE){
             MURLE.printStackTrace();
-            ErrorUtils.errorDialog(context, "URL Error", "There was an error with the URL request. Please try again later.");
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ErrorUtils.errorDialog(activity, "URL Error", "There was an error with the URL request. Please try again later.");
+                }
+            });
+            return null;
         }catch(IOException IOE){
             IOE.printStackTrace();
-            ErrorUtils.errorDialog(context, "Connection Error", "There was an error with your network connection. Check your connection and retry.");
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ErrorUtils.errorDialog(activity, "Connection Error", "There was an error with your network connection. Check your connection and retry.");
+                }
+            });
+            return null;
         }
 
         return bitmap;

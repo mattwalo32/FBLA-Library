@@ -2,6 +2,7 @@
 <resources>
     <!-- Dimensions for text sizes -->
     <dimen name="text_h1">60sp</dimen>
+    <dimen name="text_action_title">42sp</dimen>
     <dimen name="text_h2">30sp</dimen>
     <dimen name="text">20sp</dimen>
 

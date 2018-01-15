@@ -12,6 +12,8 @@ import com.walowtech.fblaapplication.ViewPagerItem;
 
 import org.json.JSONObject;
 
+import java.io.IOError;
+import java.io.IOException;
 import java.util.ArrayList;
 import static com.walowtech.fblaapplication.MainActivity.subjectsLastVis;
 
@@ -80,11 +82,15 @@ public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
                     if (url != null && !url.equals("")) {
                         image = null;
                         try{
-                            image = NetworkJSONUtils.downloadBitmap(context, url);
+                            image = NetworkJSONUtils.downloadBitmap(activity, context, url);
                         }catch(Exception e){
                             e.printStackTrace();
-                            //TODO this causes an error
-                           // ErrorUtils.errorDialog(activity.getApplicationContext(), "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ErrorUtils.errorDialog(activity, "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
+                                }
+                            });
                         }
                         categories.get(i).books.get(j).coverSmall = image;
                     } else {
@@ -95,7 +101,7 @@ public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
                         @Override
                         public void run() {
                             if (i < categories.size()) {
-                                mainActivity.updateUIImage(i, j, image); //TODO out of bounds exception 8 was 8
+                                mainActivity.updateUIImage(i, j, image);
                             }
                         }
                     });
@@ -107,12 +113,12 @@ public class DownloadImageLoader extends AsyncTaskLoader<JSONObject> {
                     String url = slides.get(i).imageURL;
                     image = null;
                     try{
-                        image = NetworkJSONUtils.downloadBitmap(context, url);
+                        image = NetworkJSONUtils.downloadBitmap(activity, context, url);
                     }catch(Exception e){
                         e.printStackTrace();
                         ErrorUtils.errorDialog(context, "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
                     }
-                    slides.get(i).image = image; //TODO Crash from null object reference java.lang.NullPointerException: Attempt to invoke virtual method 'int java.util.ArrayList.size()' on a null object reference
+                    slides.get(i).image = image;
                 }
 
         }

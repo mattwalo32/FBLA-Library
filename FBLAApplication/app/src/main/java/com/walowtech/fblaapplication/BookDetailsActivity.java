@@ -17,6 +17,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
@@ -55,7 +56,9 @@ import org.w3c.dom.Text;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 import static android.view.View.GONE;
 
@@ -178,6 +181,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     private boolean descriptionExpanded;
     private boolean liked;
     private boolean hasReview;
+    private boolean fromAccount;
     private boolean updating;
     private boolean checkedOut = true;
     private int userReviewRating = 0;
@@ -190,6 +194,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     private final int UPLOAD_COMMENT_LOADER = 2;
     private final int CHECKOUT_BOOK_LOADER = 3;
     private final int RETURN_BOOK_LOADER = 4;
+    private final String GOOGLE_BASE_LINK = "https://books.google.com/books?vid=ISBN";
 
     private AlarmManager alarmManager;
 
@@ -289,6 +294,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         Intent thisIntent = getIntent();
         VALUE_GID = thisIntent.getStringExtra("GID");
         Bitmap bookCover = (Bitmap)thisIntent.getParcelableExtra("BOOK_IMAGE");
+        fromAccount = thisIntent.getBooleanExtra("FROMACCOUNT", false);
         //Set Book Cover. Set background until better quality loaded
         if(bookCover != null) {
             mBookImage.setImageBitmap(bookCover);
@@ -350,6 +356,31 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
             }
         });
 
+        mInfoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(currentBook.ISBN13 != null){//If the data for ISBN has been retrieved
+                    //Open browser with information
+                    String bookLink = GOOGLE_BASE_LINK + currentBook.ISBN13;
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW);
+                    browserIntent.setData(Uri.parse(bookLink));
+                    startActivity(browserIntent);
+                }else{
+                    Toast.makeText(BookDetailsActivity.this, "Book is still loading...", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(fromAccount) {
+            Intent startMain = new Intent(this, MainActivity.class);
+            startActivity(startMain);
+        }else{
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -375,9 +406,9 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
             * the URL arguments and then JSON needs to be downloaded to figure the response
             * and success that was given*/
 
-            return new DownloadJSONLoader(this, requestURL);
+            return new DownloadJSONLoader(this, this, requestURL);
         } else if(id == DOWNLOAD_DETAILED_IMAGE_LOADER) {
-            return new DownloadDetailedImageLoader(this, currentBook.thumbnail);
+            return new DownloadDetailedImageLoader(this, this, currentBook.thumbnail);
         }
         return null;
     }
@@ -525,7 +556,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                         break;
                     }else{
                         checkedOut = false;
-                        mCheckout.setText("Checkout");
+                        mCheckout.setText(getResources().getString(R.string.checkout));
                     }
 
 
@@ -560,7 +591,6 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                 displayBookInfo();
             }else if(success == 11){
                 //Comment successfully added
-                //TODO change success to success codes
                 boolean authSuccess = json.getBoolean(KEY_AUTH_SUCCESS);
                 Log.i("LoginActivity", "AUTH SUCCESS: " + authSuccess);
                 if(authSuccess){
@@ -625,6 +655,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     public void configureReturnAlarm(int BID){
         alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
 
+        //Configure intent with proper information
         Intent intent = new Intent(this, RequestPushService.class);
 
         intent.putExtra("TO", FirebaseInstanceId.getInstance().getToken());
@@ -634,15 +665,28 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         intent.putExtra("ALARM_TYPE", getResources().getInteger(R.integer.ALARM_5_DAY_WARNING));
         PendingIntent serviceIntent = PendingIntent.getService(this, getResources().getInteger(R.integer.ALARM_5_DAY_WARNING) + BID, intent, 0);
 
+        //Calculate ring time from now in ms
         long currentTime = System.currentTimeMillis();
         long oneDay = 60 * 60 * 24 * 1000;
         long nineDays = oneDay * 9;
 
+        //Set alarm
         alarmManager.set(
                 AlarmManager.RTC,
                 currentTime + nineDays,
                 serviceIntent
         );
+
+        //Save alarm so it can be reset in case of reboot
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor prefEditor = sharedPreferences.edit();
+        prefEditor.putString("ALARM" +  BID + "-TO", FirebaseInstanceId.getInstance().getToken());
+        prefEditor.putString("ALARM" +  BID + "-BODY", "This is just a reminder that a book you have checked out is due in 5 days.");
+        prefEditor.putString("ALARM" +  BID + "-TITLE", "Don't forget to return your book!");
+        prefEditor.putInt("ALARM-BID" + BID, BID);
+        prefEditor.putInt("ALARM" +  BID + "-TYPE", getResources().getInteger(R.integer.ALARM_5_DAY_WARNING));
+        prefEditor.putLong("ALARM" +  BID + "-RING-TIME", currentTime + nineDays);
+        prefEditor.apply();
     }
 
     /**
@@ -908,6 +952,16 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
 
         //Start Loader
         getLoaderManager().initLoader(RETURN_BOOK_LOADER, null, this);
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor prefEditor = sharedPreferences.edit();
+        prefEditor.remove("ALARM" + BID + "-TO");
+        prefEditor.remove("ALARM" + BID + "-BODY");
+        prefEditor.remove("ALARM" + BID + "-TITLE");
+        prefEditor.remove("ALARM-BID" + BID);
+        prefEditor.remove("ALARM" + BID + "-TYPE");
+        prefEditor.remove("ALARM" + BID + "-RING-TIME");
+        prefEditor.apply();
     }
 
     /**

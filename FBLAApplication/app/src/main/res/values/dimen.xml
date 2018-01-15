@@ -26,6 +26,7 @@
     <dimen name="text_h1">35sp</dimen>
     <dimen name="text_h2">23sp</dimen>
     <dimen name="text">19sp</dimen>
+    <dimen name="text_action_title">30sp</dimen>
 
     <!-- Login Activity -->
     <dimen name="input_bar_width">200dp</dimen>

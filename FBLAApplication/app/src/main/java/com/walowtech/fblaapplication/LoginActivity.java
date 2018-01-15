@@ -99,9 +99,10 @@ public class LoginActivity extends BaseActivity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        //Set app version to check
         APP_VERSION = getResources().getString(R.string.app_version);
 
+        //Find resources
         topPanel = (FrameLayout) findViewById(R.id.l_fl_top_panel);
         bottomPanel = (LinearLayout) findViewById(R.id.l_ll_bottom_panel);
 
@@ -123,16 +124,16 @@ public class LoginActivity extends BaseActivity{
         textPassword.setTypeface(handWriting);
         createAccount.setTypeface(handWriting);
 
-        setElevations();
-        setEditTextColors(ets, R.color.colorPrimary300);
+        setElevations(); //Puts shadow under all items
+        setEditTextColors(ets, R.color.colorPrimary300); //Sets colors of ets
 
         SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         email = sharedPref.getString("EMAIL", null);
         password = sharedPref.getString("PASSWORD", null);
 
-        queue = Volley.newRequestQueue(this);
+        queue = Volley.newRequestQueue(this); //Init queue
 
-        if(NetworkJSONUtils.checkInternetConnection(this)) {
+        if(NetworkJSONUtils.checkInternetConnection(this)) { //If there is internet
             if (email != null && password != null) {
                 bypassInputs = true;
                 login(null);
@@ -160,11 +161,12 @@ public class LoginActivity extends BaseActivity{
 
         setEditTextColors(new EditText[] {editPassword}, R.color.colorPrimary300);
 
-        if(!bypassInputs) {
+        if(!bypassInputs) { //If the user has not logged in before
             email = editEmail.getText().toString();
             password = editPassword.getText().toString();
         }
 
+        //Build URI
         Uri.Builder builder = new Uri.Builder();
         builder.scheme(SCHEME)
                 .authority(BASE_URL)
@@ -178,6 +180,7 @@ public class LoginActivity extends BaseActivity{
                 .build();
         String urlString = builder.toString();
 
+        //Attempt to log in with server
         StringRequest stringRequest = new StringRequest(Request.Method.GET, urlString,
                 new Response.Listener<String>() {
                     @Override
@@ -193,6 +196,7 @@ public class LoginActivity extends BaseActivity{
             @Override
             public void onErrorResponse(VolleyError error) {
                 ErrorUtils.errorDialog(LoginActivity.this, "Could not connect to server", "No information was retrieved from the server. Please try again later.");
+                stopLoadingAnimation();
             }
         });
 
@@ -217,6 +221,7 @@ public class LoginActivity extends BaseActivity{
                 UID = jsonObject.getInt(KEY_UID);
                 name = jsonObject.getString(KEY_NAME);
 
+                //Save settings
                 SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
                 SharedPreferences.Editor sharedPrefEditor = sharedPref.edit();
                 sharedPrefEditor.putInt("UID", UID);
@@ -277,6 +282,7 @@ public class LoginActivity extends BaseActivity{
     public void launchCreateAccount(View v){
         Intent i = new Intent(this, CreateAccountActivity.class);
 
+        //Config pairs for transition
         Pair<View, String> p1 = Pair.create((View)createAccount, getString(R.string.trans_create_account));
         Pair<View, String> p2 = Pair.create((View)topPanel, getString(R.string.trans_top_panel));
         Pair<View, String> p3 = Pair.create((View)bottomPanel, getString(R.string.trans_bottom_panel));

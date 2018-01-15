@@ -180,6 +180,7 @@ public class GridViewActivity extends NavDrawerActivity {
         }else{
             searchBar.setQuery(extraQuery, false);
         }
+        //TODO if text submitted while searching causes error thrown
         searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

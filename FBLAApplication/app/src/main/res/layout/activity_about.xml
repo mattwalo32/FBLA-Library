@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!--<android.support.v7.widget.Toolbar
+        <android.support.v7.widget.Toolbar
             android:id="@+id/aba_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,17 +24,11 @@
             app:contentInsetRight="0dp"
             app:contentInsetEnd="0dp">
 
-        </android.support.v7.widget.Toolbar> -->
+            <include layout="@layout/actionbar_title" />
 
-        <TextView
-            android:id="@+id/aba_school_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/margin"
-            android:textSize="@dimen/text_h1"
-            android:textColor="@android:color/black"
-            android:textAlignment="center"
-            android:text="@string/school_name" />
+        </android.support.v7.widget.Toolbar>
+
+
 
         <!-- Main Content -->
         <LinearLayout
@@ -42,31 +36,14 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin"
             android:background="@color/colorPrimary300">
 
-            <android.support.v4.view.ViewPager
-                android:id="@+id/aa_pager"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/map_height_default"
-                android:padding="@dimen/margin"
-                android:layout_gravity="center_horizontal" />
 
-            <TextView
-                android:id="@+id/aba_about_school"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin"
-                android:textSize="@dimen/text"
-                android:textColor="@android:color/black"
-                android:text="@string/about_school" />
-
-            <!-- Second Layer - Adds elevated effect -->
+            <!-- First Layer - Adds elevated effect -->
             <LinearLayout
                 android:id="@+id/aba_second_layer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_large"
                 android:background="@color/colorPrimary500"
                 android:orientation="vertical">
 
@@ -86,6 +63,34 @@
                     android:text="@string/about_app" />
 
             </LinearLayout>
+
+            <!-- Second Layer -->
+            <TextView
+                android:id="@+id/aba_school_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/margin"
+                android:textSize="@dimen/text_h1"
+                android:textColor="@android:color/black"
+                android:textAlignment="center"
+                android:text="@string/school_name" />
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/aa_pager"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/map_height_default"
+                android:padding="@dimen/margin"
+                android:layout_gravity="center_horizontal" />
+
+            <TextView
+                android:id="@+id/aba_about_school"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin"
+                android:textSize="@dimen/text"
+                android:textColor="@android:color/black"
+                android:text="@string/about_school" />
+
 
         </LinearLayout>
 

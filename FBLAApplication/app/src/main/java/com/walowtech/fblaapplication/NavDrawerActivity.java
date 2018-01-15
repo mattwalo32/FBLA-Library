@@ -106,6 +106,7 @@ public class NavDrawerActivity extends BaseActivity {
 
         drawerList = (ListView) findViewById(R.id.nav_layout);
         header = getLayoutInflater().inflate(R.layout.navbar_header, null);
+        setElevation(header, 10);
         drawerList.addHeaderView(header, null, false);
 
         drawerList.setAdapter(navbarAdapter);

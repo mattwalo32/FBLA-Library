@@ -146,7 +146,7 @@ public class CreateAccountActivity extends Activity implements LoaderManager.Loa
     @Override
     public Loader<JSONObject> onCreateLoader(int id, Bundle args) {
         jsonResponse = null;
-        return new DownloadJSONLoader(this, requestURL);
+        return new DownloadJSONLoader(this, this, requestURL);
     }
 
     @Override

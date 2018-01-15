@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.provider.SyncStateContract;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
@@ -52,20 +53,17 @@ public class RequestPushService extends Service {
     String PARAM_BODY = "\"body\"";
     String PARAM_PRIORITY = "\"priority\"";
     String PARAM_NOTIFICATION = "\"notification\"";
-    String PARAM_RESTRICTED_PACKAGE_NAME = "\"restricted_package_name\"";
 
     String VALUE_TO;
     String VALUE_TITLE;
     String VALUE_BODY;
     String VALUE_PRIORITY = "\"high\"";
-    final String DEVELOPMENT_ENDPOINT = "gcm-preprod.googleapis.com:5236";
-    final String PRODUCTION_ENDPOINT = "gcm-xmpp.googleapis.com:5235";
 
     private int BID;
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    private static final String LEGACY_SERVER_KEY = CENSORED FOR SECUIRTY
-    private static final String SERVER_KEY = CENSORED FOR SECURITY
+    //private static final String LEGACY_SERVER_KEY = "AIzaSyC1auk985MDvJhQWq64m_brOIa90DdoBMM";
+    private static final String SERVER_KEY = *GONE FOR SECURITY*;
     //String VALUE_RESTRICTED_PACKAGE_NAME = getPackageName();
 
     JSONObject jsonRequest;
@@ -85,7 +83,7 @@ public class RequestPushService extends Service {
         VALUE_TO = "\"" + intent.getStringExtra("TO") + "\"";
         boolean demonstration = intent.getBooleanExtra("DEMONSTRATION", false);
 
-        if(!demonstration){ //If this is not invoked for demonstartion purposes
+        if(!demonstration){ //If this is not invoked for demonstration purposes
             VALUE_BODY = "\"" + intent.getStringExtra("BODY") + "\"";
             VALUE_TITLE = "\"" + intent.getStringExtra("TITLE") + "\"";
             int alarmType = intent.getIntExtra("ALARM_TYPE", -1);
@@ -246,5 +244,16 @@ public class RequestPushService extends Service {
                 ringTime + System.currentTimeMillis(),
                 serviceIntent
         );
+
+        //Save alarm so it can be reset in case of reboot
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor prefEditor = sharedPreferences.edit();
+        prefEditor.putString("ALARM" + BID + "-TO", FirebaseInstanceId.getInstance().getToken());
+        prefEditor.putString("ALARM" + BID + "-BODY", body);
+        prefEditor.putString("ALARM" + BID + "-TITLE", title);
+        prefEditor.putInt("ALARM-BID" + BID, BID);
+        prefEditor.putInt("ALARM" + BID + "-TYPE", getResources().getInteger(alarmType));
+        prefEditor.putLong("ALARM" + BID +"-RING-TIME", ringTime + System.currentTimeMillis());
+        prefEditor.apply();
     }
 }

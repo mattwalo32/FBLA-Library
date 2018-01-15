@@ -1,11 +1,13 @@
 package com.walowtech.fblaapplication.Utils;
 
+import android.app.Activity;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -25,12 +27,14 @@ public class DownloadJSONArray extends AsyncTaskLoader {
 
     ArrayList<ArrayList<URL>> urls;
     Context context;
+    Activity activity;
 
     //Constructor
-    public DownloadJSONArray(Context context, ArrayList<ArrayList<URL>> urls){
+    public DownloadJSONArray(Activity activity, Context context, ArrayList<ArrayList<URL>> urls){
         super(context);
         this.urls = urls;
         this.context = context;
+        this.activity = activity;
     }
 
     @Override
@@ -49,12 +53,16 @@ public class DownloadJSONArray extends AsyncTaskLoader {
                 //Log.i("LoginActivity", urls[i].toString());
                 JSONObject jsonObject = null;
                 try {
-                    InputStream is = NetworkJSONUtils.retrieveInputStream(context, urls.get(i).get(j));
-                    jsonObject = NetworkJSONUtils.retrieveJSON(context, is);
+                    InputStream is = NetworkJSONUtils.retrieveInputStream(activity, context, urls.get(i).get(j));
+                    jsonObject = NetworkJSONUtils.retrieveJSON(activity, context, is);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    //TODO fix this because it is calling UID from background https://stackoverflow.com/questions/17379002/java-lang-runtimeexception-cant-create-handler-inside-thread-that-has-not-call
-                    //ErrorUtils.errorDialog(context, "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ErrorUtils.errorDialog(activity, "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
+                        }
+                    });
                 }
                 JSONResponses.get(i).add(jsonObject);
             }

@@ -1,5 +1,6 @@
 package com.walowtech.fblaapplication.Utils;
 
+import android.app.Activity;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.util.Log;
@@ -27,11 +28,13 @@ public class DownloadJSONLoader extends AsyncTaskLoader<JSONObject> {
 
     URL url;
     Context context;
+    Activity activity;
 
-    public DownloadJSONLoader(Context context, URL url){
+    public DownloadJSONLoader(Activity activity, Context context, URL url){
         super(context);
         this.url = url;
         this.context = context;
+        this.activity = activity;
     }
 
     @Override
@@ -43,13 +46,17 @@ public class DownloadJSONLoader extends AsyncTaskLoader<JSONObject> {
     public JSONObject loadInBackground() {
         Log.i("LoginActivity", url.toString());
         try {
-            InputStream is = NetworkJSONUtils.retrieveInputStream(context, url);
-            JSONObject jsonObject = NetworkJSONUtils.retrieveJSON(context, is);
+            InputStream is = NetworkJSONUtils.retrieveInputStream(activity, context, url);
+            JSONObject jsonObject = NetworkJSONUtils.retrieveJSON(activity, context, is);
             return jsonObject;
         }catch(Exception e){
             e.printStackTrace();
-            //TODO fix this because it is calling UID from background https://stackoverflow.com/questions/17379002/java-lang-runtimeexception-cant-create-handler-inside-thread-that-has-not-call
-            //ErrorUtils.errorDialog(context, "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ErrorUtils.errorDialog(activity, "Unexpected Error", "An error occurred while retrieving data. Make sure you have a good internet connection, and don't switch networks while downloading data.");
+                }
+            });
         }
         return null;
     }

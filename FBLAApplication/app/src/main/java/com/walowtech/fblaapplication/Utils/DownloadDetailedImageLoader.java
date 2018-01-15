@@ -15,13 +15,19 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 /**
- * Created by mattw on 10/15/2017.
+ * AsyncTaskLoader that downloads a bitmap, in high detail, from a given source.
+ *
+ * @author Matthew Walowski
+ * @version 1.0
+ * @since 1.0
  */
 
+//Created 10/15/2017
 public class DownloadDetailedImageLoader extends AsyncTaskLoader<Bitmap> {
 
     public String urlString;
     public Context context;
+    public Activity activity;
 
     /**
      * Default constructor for DownloadImageLoader class.
@@ -29,9 +35,10 @@ public class DownloadDetailedImageLoader extends AsyncTaskLoader<Bitmap> {
      * @param context The context of the calling class
      * @param url The url to download the image from
      */
-    public DownloadDetailedImageLoader(Context context, String url){
+    public DownloadDetailedImageLoader(Activity activity, Context context, String url){
         super(context);
         this.context = context;
+        this.activity = activity;
         urlString = url;
     }
 
@@ -47,7 +54,7 @@ public class DownloadDetailedImageLoader extends AsyncTaskLoader<Bitmap> {
         //Log.i("LoginActivity", urlString);
         //urlString = urlString.replace("&zoom=1", "&zoom=5");
         Log.i("LoginActivity", urlString);
-        Bitmap image = NetworkJSONUtils.downloadBitmap(context, urlString);
+        Bitmap image = NetworkJSONUtils.downloadBitmap(activity, context, urlString);
         return image;
     }
 }

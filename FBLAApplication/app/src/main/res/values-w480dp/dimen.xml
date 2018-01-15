@@ -9,6 +9,7 @@
 
     <!-- General Dimensions for text -->
     <dimen name="text_h1">55sp</dimen>
+    <dimen name="text_action_title">35sp</dimen>
     <dimen name="text_h2">20sp</dimen>
 
     <!-- Login Activity -->

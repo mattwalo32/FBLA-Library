@@ -168,18 +168,20 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
         setElevation(mTopRowLayout, 12);
         setElevation(mFavoritesLayout, 6);
         //setElevation(mProfile, 40);
+        Log.i("LoginActivity", "OnCreate");
     }
 
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
         if(id == DOWNLOAD_BOOK_JSON_LOADER) {
-            return new DownloadJSONArray(this, JSONRequestURLs);
+            return new DownloadJSONArray(this, this, JSONRequestURLs);
         }else if(id == DOWNLOAD_IMAGE_ARRAY_LOADER) {
-            Log.i("LoginActivity", "ARRAY LOADER");
-            return new DownloadImageArray(this, imageURLs);
+            return new DownloadImageArray(this, this, imageURLs);
         }
         return null;
     }
+
+    //TODO touch listener is only on image of checkedout book
 
     @Override
     public void onLoadFinished(Loader loader, Object data) {
@@ -216,6 +218,7 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
         checkedOut.clear();
         waitListed.clear();
         liked.clear();
+        rows.clear();
         checkedOutViews.clear();
         waitListedViews.clear();
         TextView title = null;
@@ -316,7 +319,7 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
      * passed to the loader after it is created during onCreateLoader.
      */
     public void getBookJSON() {
-
+        Log.i("LoginActivity", "Getting Book JSON");
         JSONRequestURLs = new ArrayList<>();
         URL currentURL;
 
@@ -544,6 +547,7 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
 
                 bookDetailsIntent.putExtra("GID", GID);
                 bookDetailsIntent.putExtra("BOOK_IMAGE", currentList.get(j).bitmap);
+                bookDetailsIntent.putExtra("FROMACCOUNT", true); //TODO this is a temp fix
                 startActivity(bookDetailsIntent/*, options.toBundle()*/);
             }
         });

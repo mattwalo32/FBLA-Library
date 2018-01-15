@@ -11,6 +11,7 @@
 
     <!-- General dimensions for text -->
     <dimen name="text_h1">60sp</dimen>
+    <dimen name="text_action_title">37sp</dimen>
     <dimen name="text_h2">25sp</dimen>
     <dimen name="text">18sp</dimen>
 

@@ -14,6 +14,7 @@ import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -62,6 +63,7 @@ import org.w3c.dom.Text;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Map;
 
 import static android.view.View.GONE;
 
@@ -151,6 +153,20 @@ public class MainActivity extends NavDrawerActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         super.onCreateDrawer();
+
+
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        //Get all pref
+        Map<String, ?> keys = sharedPreferences.getAll();
+        for(Map.Entry<String, ?>entry : keys.entrySet()) { //Loop through all pref
+            if (entry.getKey().contains("ALARM-BID")) { //If this is an alarm pref
+                //Get all items under alarm
+                int BID = Integer.parseInt(entry.getValue().toString());
+                Log.i("LoginActivity", "BID" + BID);
+            }
+        }
+
 
         //Initialize main content
         mainContent = (ListView) findViewById(R.id.m_lv_main_content);
@@ -333,13 +349,13 @@ public class MainActivity extends NavDrawerActivity{
                             JSONObject jsonResponse = new JSONObject(response);
                             parseBookJSON(jsonResponse);
                         }catch(JSONException JSONE){
-                            ErrorUtils.errorDialog(getApplicationContext(), "Data Error", "There was an error with the data format. Please try again later.");
+                            ErrorUtils.errorDialog(MainActivity.this, "Data Error", "There was an error with the data format. Please try again later.");
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                ErrorUtils.errorDialog(getApplicationContext(), "Could not connect to server", "No information was retrieved from the server. Please try again later.");
+                ErrorUtils.errorDialog(MainActivity.this, "Could not connect to server", "No information was retrieved from the server. Please try again later.");
             }
         });
 
@@ -359,17 +375,15 @@ public class MainActivity extends NavDrawerActivity{
 
         categories.get(i).books.get(j).coverSmall = bitmap;
 
-        //TODO fix the the screen is updated
         if(i <= subjectsLastVis){
             subjectAdapter.notifyDataSetChanged();
         }else {
             try {
-                categories.get(i).bookAdapter.notifyItemRangeChanged(j-1, j+1); //TODO can be index out of bounds
+                categories.get(i).bookAdapter.notifyItemRangeChanged(j-1, j+1);
             } catch (NullPointerException NPE) {
-                //Log.i("LoginActivity", "EXCEPTION THROWN in " + i + ", " + j);
-                NPE.printStackTrace();
+                NPE.printStackTrace(); //This exception is expected to be thrown as off screen images are attemtped to be displayed
             } catch (Exception e){
-                Toast.makeText(this, "An unexpected error occurred while. Some books may display wrong.", Toast.LENGTH_SHORT);
+                Toast.makeText(this, "An unexpected error occurred while. Some books may display wrong.", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         }
@@ -467,13 +481,13 @@ public class MainActivity extends NavDrawerActivity{
                             JSONObject jsonResponse = new JSONObject(response);
                             parseBookJSON(jsonResponse);
                         }catch(JSONException JSONE){
-                            ErrorUtils.errorDialog(getApplicationContext(), "Data Error", "There was an error with the data format. Please try again later.");
+                            ErrorUtils.errorDialog(MainActivity.this, "Data Error", "There was an error with the data format. Please try again later.");
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                ErrorUtils.errorDialog(getApplicationContext(), "Could not connect to server", "No information was retrieved from the server. Please try again later.");
+                ErrorUtils.errorDialog(MainActivity.this, "Could not connect to server", "No information was retrieved from the server. Please try again later.");
             }
         });
 
@@ -492,7 +506,6 @@ public class MainActivity extends NavDrawerActivity{
      * @param json The JSON to be parsed.
      */
     private void parseBookJSON(JSONObject json){
-        //TODO move to background thread
         //Try to parse JSON
         try {
             int success = json.getInt(KEY_SUCCESS);
@@ -573,7 +586,7 @@ public class MainActivity extends NavDrawerActivity{
                     }, 0, 0, null,
                     new Response.ErrorListener() {
                         public void onErrorResponse(VolleyError error) {
-                            ErrorUtils.errorDialog(getApplicationContext(), "Server Error", "The data from the server could not be read correctly. Please try again later.");
+                            ErrorUtils.errorDialog(MainActivity.this, "Server Error", "The data from the server could not be read correctly. Please try again later.");
                         }
                     });
 
@@ -603,7 +616,7 @@ public class MainActivity extends NavDrawerActivity{
                             }, 0, 0, null,
                             new Response.ErrorListener() {
                                 public void onErrorResponse(VolleyError error) {
-                                    ErrorUtils.errorDialog(getApplicationContext(), "Server Error", "The data from the server could not be read correctly. Please try again later.");
+                                    ErrorUtils.errorDialog(MainActivity.this, "Server Error", "The data from the server could not be read correctly. Please try again later.");
                                 }
                             });
                     requestQueue.add(imageRequest);

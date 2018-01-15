@@ -70,7 +70,7 @@ public class AboutActivity extends BaseActivity {
         pagerAdapter = new SlideshowAdapter(this, slides, false);
         mPager.setAdapter(pagerAdapter);
 
-        //configActionBar();
+        configActionBar();
     }
 
 
@@ -81,15 +81,18 @@ public class AboutActivity extends BaseActivity {
          * are set on the toggle button and SearchView
          */
     private void configActionBar(){
-        /*Toolbar toolbar = (Toolbar) findViewById(R.id.aba_toolbar);//Find toolbar in layout
+        Toolbar toolbar = (Toolbar) findViewById(R.id.aba_toolbar);//Find toolbar in layout
         setSupportActionBar(toolbar);//Set the toolbar as the actionbar
 
         //Set background to a drawable blue background
         ActionBar actionBar = getSupportActionBar();
         actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_drawable));
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setTitle(""); //TODO make better*/
+        actionBar.setDisplayHomeAsUpEnabled(true); //Back button
+        actionBar.setDisplayShowHomeEnabled(true); //Allows back button
+        actionBar.setTitle(""); //Ensures no double titles
 
+        //Set title typeface
+        TextView title = (TextView) toolbar.findViewById(R.id.action_title);
+        title.setTypeface(handWriting);
     }
 }
