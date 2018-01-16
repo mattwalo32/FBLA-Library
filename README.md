@@ -10,7 +10,7 @@ To run this application, the device being used must run Android SDK version 16 (
 
 ### Installation
 
-Download this app off the Google Play Store for Android devices or Amazon for Kindle devices. ADD LINKS HERE
+Download this app off the [Google Play Store](https://play.google.com/store/apps/details?id=com.walowtech.fblaapplication&hl=en) for Android devices or Amazon for Kindle devices.
 
 ### Running the App
 
