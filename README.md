@@ -16,12 +16,19 @@ Download this app off the [Google Play Store](https://play.google.com/store/apps
 
 An account is required to access any point further than the login screen. All information collected is completley confidential.
 
-## Authors
+### Errors
+
+Preface has been tested extensively to remove any bugs that may exist. However, rare errors may occur outside of the app that reduce functionality temporarily.
+If any type of server error is seen on the app, this is a problem with the database that stores all book and user information. This is not a bug in the app, and is purely the result of either a bad internet connection on the user’s end or the server being temporarily down. If this occurs, the user should check his or her network connection, close the app, and reopen it.  It is important that the app is completely closed by launching the recent applications menu and swiping the app to the right.
+If the server error persists, wait a few hours before opening the app again.
+
+
+### Authors
 * Matthew Walowski - Created and designed database and application.
 
 To report any issues within the app contact Matthew Walowski (mattwalowski@gmail.com)
 
-## Software Used
+### Software Used
 * [Android Studio](https://developer.android.com/studio/index.html) 2.3.3 - Integrated Development Envrionment
 * [Simple Rating Bar](https://github.com/FlyingPumba/SimpleRatingBar) 0.1.5 - Rating bar used on book details activity
 * [ACRA](https://github.com/ACRA/acra) 4.10.0 - Crash reporting
@@ -33,7 +40,7 @@ All pieces of software have been used legally and under their proper liscense
    Simple Rating Bar, ACRA, and OKHTTP are libraries used within the application
    and fall under fair use by the Apache V2 License
 
-## Assets Used
+### Assets Used
 
 * [A Sensible Armadillo](http://www.1001fonts.com/a-sensible-armadillo-font.html) - Font used across app
 * [Bathroom Icon](https://commons.wikimedia.org/wiki/File:Bathroom-gender-sign.png) - Used in school map
@@ -43,11 +50,11 @@ All assets have been used legally and under their proper liscense.
    A Sensible Armadillo Font and Bathroom Icon are in the public domain.
 
 
-## Versioning
+### Versioning
 
 [Semantic Versioning](https://semver.org/) is used. The most recent version is 1.0.0
 
-## Liscense
+### Liscense
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
