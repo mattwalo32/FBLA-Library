@@ -16,8 +16,6 @@ Download this app off the [Google Play Store](https://play.google.com/store/apps
 
 An account is required to access any point further than the login screen. All information collected is completley confidential.
 
-## Versioning
-
 ## Authors
 * Matthew Walowski - Created and designed database and application.
 
