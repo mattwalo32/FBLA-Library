@@ -43,7 +43,7 @@ All assets have been used legally and under proper liscense.
 
 ## Versioning
 
-[Semantic Versioning](https://semver.org/) is used. The most recent version is 0.1.0
+[Semantic Versioning](https://semver.org/) is used. The most recent version is 1.0.0
 
 
 
