@@ -43,7 +43,7 @@ All assets have been used legally and under proper liscense.
 
 [Semantic Versioning](https://semver.org/) is used. The most recent version is 1.0.0
 
-#Liscense
+## Liscense
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
