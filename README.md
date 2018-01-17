@@ -29,7 +29,9 @@ To report any issues within the app contact Matthew Walowski (mattwalowski@gmail
 * [OkHTTP](https://github.com/square/okhttp) 3.9.1 - Sending HTTP POST Requests
 * [Android Asset Studio](https://romannurik.github.io/AndroidAssetStudio/) - Utility to create icons of different pixel densities
 
-All pieces of software have been used legally and under the proper liscense
+All pieces of software have been used legally and under their proper liscense
+   Simple Rating Bar, ACRA, and OKHTTP are libraries used within the application
+   and fall under fair use by the Apache V2 License
 
 ## Assets Used
 
@@ -37,7 +39,9 @@ All pieces of software have been used legally and under the proper liscense
 * [Bathroom Icon](https://commons.wikimedia.org/wiki/File:Bathroom-gender-sign.png) - Used in school map
 * All other Icons are original and created by Matthew Walowski
 
-All assets have been used legally and under proper liscense.
+All assets have been used legally and under their proper liscense.
+   A Sensible Armadillo Font and Bathroom Icon are in the public domain.
+
 
 ## Versioning
 
