@@ -265,6 +265,17 @@
                     android:layout_margin="@dimen/margin"
                     android:scaleType="centerCrop"
                     app:srcCompat="@drawable/ic_share_black" />
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/bd_facebook_button"
+                    android:layout_width="@dimen/ic_diameter"
+                    android:layout_height="@dimen/ic_diameter"
+                    android:layout_toLeftOf="@id/bd_share_button"
+                    android:scaleType="centerCrop"
+                    android:layout_margin="@dimen/margin"
+                    android:layout_centerInParent="true"
+                    android:onClick="facebookPost"
+                    android:src="@drawable/twitter"/>
             </RelativeLayout>
 
             <!-- Description FAB -->

@@ -185,11 +185,6 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
 
     @Override
     public void onLoadFinished(Loader loader, Object data) {
-        /*for(int i = 0; i < json.size(); i++){
-            for(int j = 0; j < json.get(i).size(); j++){
-                Log.i("LoginActivity", json.get(i).get(j).toString());
-            }
-        }*/
         if(loader.getId() == DOWNLOAD_BOOK_JSON_LOADER){
             ArrayList<ArrayList<JSONObject>> json = (ArrayList<ArrayList<JSONObject>>) data;
             if(!json.isEmpty())

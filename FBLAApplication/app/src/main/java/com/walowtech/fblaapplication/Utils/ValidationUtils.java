@@ -26,7 +26,7 @@ public class ValidationUtils{
 
 
     /**
-     * Validates a name
+     * Validates a name to be between 5 and 50
      *
      * @param name The name to be validated
      * @return A pair is returned with a boolean signifying if
@@ -36,17 +36,17 @@ public class ValidationUtils{
         Pattern p = Pattern.compile("^[\\p{L} .'-]+$");
         Matcher m = p.matcher(name);
 
-        if(name.length() >= 50)
+        if(name.length() > 50)
             return new Pair<>(false, "Name must be shorter than 50 characters");
         if(m.matches() && name.length() > 5)
             return new Pair<>(true, null);
-        if(m.matches() && (name.length() <= 5))
-            return new Pair<>(false, "Name must be longer than 5 characters");
+        if(m.matches() && (name.length() <= 4))
+            return new Pair<>(false, "Name must be longer than 4 characters");
         return new Pair<>(false, "Type your first and last name with no special characters");
     }
 
     /**
-     * Validates an email
+     * Validates email between 5 and 50 characters and must be valid.
      *
      * @param email The email to be validated
      * @return A pair is returned with a boolean signifying if
@@ -63,15 +63,15 @@ public class ValidationUtils{
     }
 
     /**
-     * Validates a password
+     * Validates password between 5 and 35 characters
      *
      * @param password The password to be validated
      * @return A pair is returned with a boolean signifying if
      * a password is valid, and a message with it
      */
     public static Pair<Boolean, String> validatePassword(String password){
-        if(password.length() >= 35)
-            return new Pair<>(false, "Password must be shorter than 35 characters");
+        if(password.length() >= 50)
+            return new Pair<>(false, "Password must be shorter than 50 characters");
         if(password.length() > 5)
             return new Pair<>(true, null);
         return new Pair<>(false, "Password must be longer than 5 characters");

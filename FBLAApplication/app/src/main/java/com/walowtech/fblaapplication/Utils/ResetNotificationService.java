@@ -37,7 +37,7 @@ public class ResetNotificationService extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        /*SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         //Get all pref
         Map<String, ?> keys = sharedPreferences.getAll();
         for(Map.Entry<String, ?>entry : keys.entrySet()){ //Loop through all pref
@@ -66,6 +66,6 @@ public class ResetNotificationService extends BroadcastReceiver {
 
                 alarmManager.set(AlarmManager.RTC, ringTime, service);
             }
-        }
+        }*/
     }
 }

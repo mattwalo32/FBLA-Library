@@ -63,7 +63,7 @@ public class RequestPushService extends Service {
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     //private static final String LEGACY_SERVER_KEY = "AIzaSyC1auk985MDvJhQWq64m_brOIa90DdoBMM";
-    private static final String SERVER_KEY = *GONE FOR SECURITY*;
+    private static final String SERVER_KEY = "AAAA9YXaDZM:APA91bH-1Z73NzH6IQfMQMGaqji1nTt1upI4YZ5hNCou51SAo4Xn6-VCFdisI7m0OBd93STHrO5bbN08ICWpra9cP3qhIUNo6fIhE-gKuY5YHJF6phgtB3FcxWabHODXwwccaRosEmpt";
     //String VALUE_RESTRICTED_PACKAGE_NAME = getPackageName();
 
     JSONObject jsonRequest;

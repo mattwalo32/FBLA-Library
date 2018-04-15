@@ -12,9 +12,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -356,6 +354,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
             }
         });
 
+        //Set on click listener for info button
         mInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1093,6 +1092,16 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
             getLoaderManager().restartLoader(UPLOAD_COMMENT_LOADER, null, this);
         else
             getLoaderManager().initLoader(UPLOAD_COMMENT_LOADER, null, this);
+    }
+
+    /**
+     * Handles the click on the facebook share button. Allows
+     * the user to share information on facebook via facebook API
+     *
+     * @param view The calling view
+     */
+    public void facebookPost(View view){
+        //ShareLinkContent content = new ShareLinkContent.Builder()
     }
 
     /**
