@@ -2,6 +2,8 @@ package com.walowtech.fblaapplication;
 
 import android.app.Application;
 
+import com.google.firebase.FirebaseApp;
+
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -15,5 +17,6 @@ public class FBLAApplication extends Application {
     public void onCreate() {
         super.onCreate();
         ACRA.init(this);
+        FirebaseApp.initializeApp(this);//TODO research
     }
 }

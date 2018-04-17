@@ -40,5 +40,6 @@
         android:text="@string/checkout"
         android:textAlignment="center"
         android:textColor="@android:color/white"
+        android:onClick="checkoutReturnPressed"
         android:textSize="@dimen/text_h2" />
 </LinearLayout>

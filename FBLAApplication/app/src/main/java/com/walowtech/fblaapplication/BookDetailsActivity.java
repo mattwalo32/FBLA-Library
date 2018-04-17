@@ -2,31 +2,22 @@ package com.walowtech.fblaapplication;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.DialogFragment;
-import android.app.LoaderManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
-import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -45,25 +36,15 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
-import com.walowtech.fblaapplication.Utils.DownloadDetailedImageLoader;
-import com.walowtech.fblaapplication.Utils.DownloadImageLoader;
-import com.walowtech.fblaapplication.Utils.DownloadJSONLoader;
 import com.walowtech.fblaapplication.Utils.ErrorUtils;
-import com.walowtech.fblaapplication.Utils.FirebaseIDService;
 import com.walowtech.fblaapplication.Utils.NetworkJSONUtils;
 import com.walowtech.fblaapplication.Utils.RequestPushService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
 
 import static android.view.View.GONE;
 
@@ -77,29 +58,34 @@ import static android.view.View.GONE;
  *
  * @author Matthew Walowski
  * @version 1.0
- * @since 1.0
+ * @since 10/7/2017
  */
 
 //Created 10/7/2017
-public class BookDetailsActivity extends Activity  implements LoaderManager.LoaderCallbacks{
+public class BookDetailsActivity extends BaseActivity{
 
-    private FloatingActionButton mFAB;
-    private SimpleRatingBar mBookRating;
-
-    private ImageView mBackgroundImage;
-    private ImageView mBookImage;
-    private ImageView mShareButton;
-    private ImageView mLikeButton;
-    private ImageView mInfoButton;
+    //Declare layouts
     private FrameLayout mLeaveReview;
-    private RelativeLayout mBaseLayout;
     private LinearLayout mAdditionalDetailsLayout;
     private LinearLayout mDescriptionLayout;
     private LinearLayout mReviews;
     private RelativeLayout mReviewsLayout;
     private RelativeLayout mTopRowLayout;
     private RelativeLayout mSocialLayout;
+    private RelativeLayout mBaseLayout;
+
+    //Declare views
+    private View mSeparator;
     private ScrollView mScrollView;
+
+    //Declare Images
+    private ImageView mBackgroundImage;
+    private ImageView mBookImage;
+    private ImageView mShareButton;
+    private ImageView mLikeButton;
+    private ImageView mInfoButton;
+
+    //Declare TextViews
     private TextView mSeeAll;
     private TextView mDescription;
     private TextView mTitle;
@@ -114,69 +100,17 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     private TextView mCopies;
     private TextView mISBN10;
     private TextView mISBN13;
-    private View mSeparator;
 
-    public static Typeface handWriting;
+    //Misc. Screen elements
+    private FloatingActionButton mFAB;
+    private SimpleRatingBar mBookRating;
 
-    public URL requestURL;
-
-    private final String PARAM_ACTION = "ACTION";
-    private final String PARAM_GID = "GID";
-    private final String PARAM_UID = "UID";
-    private final String PARAM_PASSWORD = "PASSWORD";
-    private final String PARAM_BID = "BID";
-    private final String PARAM_RATING = "RATING";
-    private final String PARAM_COMMENT = "COMMENT";
-    private final String PARAM_TITLE = "TITLE";
-
-    private final String VALUE_ACTION_RETRIEVE_DETAILED_DATA = "ACTION_RETRIEVE_DETAILED_BOOK_DATA";
-    private final String VALUE_ACTION_ADD_REVIEW = "ACTION_ADD_REVIEW";
-    private final String VALUE_ACTION_CHECKOUT = "ACTION_CHECKOUT_BOOK";
-    private final String VALUE_ACTION_WAITLIST = "ACTION_ADD_TO_WAIT_LIST";
-    private final String VALUE_ACTION_RETURN = "ACTION_RETURN_BOOK";
     private String VALUE_GID;
-    private static int VALUE_UID;
-    private static String VALUE_PASSWORD;
-    private int VALUE_RATING;
     private String VALUE_COMMENT;
     private String VALUE_TITLE;
-
-    private final String BASE_URL = "walowtech.com";
-    private final String PATH0 = "apis";
-    private final String PATH1 = "FBLALibrary";
-    private final String PATH2 = "api.php";
-    private final String SCHEME = "https";
-
-    private final String KEY_SUCCESS = "Success";
-    private final String KEY_JSON = "JSON";
-    private final String KEY_TITLE = "Title";
-    private final String KEY_SUB_TITLE = "SubTitle";
-    private final String KEY_SUBJECT = "Subject";
-    private final String KEY_DESCRIPTION = "Description";
-    private final String KEY_AUTHORS = "Authors";
-    private final String KEY_BOOK_DETAILS = "BOOK_DETAILS";
-    private final String KEY_THUMBNAIL = "Thumbnail";
-    private final String KEY_COPIES = "Copies";
-    private final String KEY_ISBN10 = "ISBN10";
-    private final String KEY_ISBN13 = "ISBN13";
-    private final String KEY_NUMBER_RATINGS = "NumberRatings";
-    private final String KEY_AVG_RATING = "AverageRating";
-    private final String KEY_COPY_DETAILS = "CopyDetails";
-    private final String KEY_BID = "BID";
-    private final String KEY_CHECKOUT_TIME = "CheckoutTimestamp";
-    private final String KEY_RETURN_TIME = "ReturnTimestamp";
-    private final String KEY_WAITLIST_SIZE = "WaitingListAmount";
-    private final String KEY_AVAILABLE_COPIES = "AvailableCopies";
-    private final String KEY_REVIEWS = "Reviews";
-    private final String KEY_CID = "CID";
-    private final String KEY_UID = "UID";
-    private final String KEY_RATING = "Rating";
-    private final String KEY_NAME = "Name";
-    private final String KEY_COMMENT = "Comment";
-    private final String KEY_COMMENT_TITLE = "Title";
-    private final String KEY_COMMENT_TIME = "Timestamp";
-    private final String KEY_AUTH_SUCCESS = "validationSuccess";
-    private final String KEY_MESSAGE = "message";
+    private static String VALUE_PASSWORD;
+    private int VALUE_RATING;
+    private static int VALUE_UID;
 
     private JSONObject jsonResponse;
 
@@ -185,21 +119,10 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
 
     private boolean descriptionExpanded;
     private boolean liked;
-    private boolean hasReview;
     private boolean fromAccount;
-    private boolean updating;
     private boolean checkedOut = true;
-    private int userReviewRating = 0;
-    private int likeIndex;
 
     ArrayList<Review> reviews = new ArrayList<>();
-
-    private final int DOWNLOAD_DETAILED_JSON_LOADER = 0;
-    private final int DOWNLOAD_DETAILED_IMAGE_LOADER = 1;
-    private final int UPLOAD_COMMENT_LOADER = 2;
-    private final int CHECKOUT_BOOK_LOADER = 3;
-    private final int RETURN_BOOK_LOADER = 4;
-    private final String GOOGLE_BASE_LINK = "https://books.google.com/books?vid=ISBN";
 
     private AlarmManager alarmManager;
     private RequestQueue queue;
@@ -208,55 +131,57 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //Set the layout of the screen
         setContentView(R.layout.activity_book_details);
 
+        //Get the user's credentials from memory
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         VALUE_UID = sharedPref.getInt("UID", -1);
         VALUE_PASSWORD = sharedPref.getString("PASSWORD", null);
 
+        //Initialize the volley queue
         queue = Volley.newRequestQueue(this);
 
         //Create custom font typeface
         handWriting = Typeface.createFromAsset(getAssets(), "fonts/hand_writing.ttf");
 
         //Initialize all Views
-        mFAB = (FloatingActionButton) findViewById(R.id.bd_fab_description);
-        mBookRating = (SimpleRatingBar) findViewById(R.id.bd_ratingbar);
-        mBackgroundImage = (ImageView) findViewById(R.id.bd_background_image);
-        mScrollView = (ScrollView) findViewById(R.id.bd_scrollview);
-        mDescription = (TextView) findViewById(R.id.bd_description);
-        mTitle = (TextView) findViewById(R.id.bd_title);
-        mSeeAll = (TextView) findViewById(R.id.bd_view_all_reviews);
-        mReviews = (LinearLayout) findViewById(R.id.bd_reviews_view);
-        mReviewsLayout = (RelativeLayout) findViewById(R.id.bd_reviews_layout);
-        mSubTitle = (TextView) findViewById(R.id.bd_subtitle);
-        mAuthors = (TextView) findViewById(R.id.bd_authors);
-        mCheckout = (TextView) findViewById(R.id.bd_checkout);
-        mAvgRating = (TextView) findViewById(R.id.bd_avg_rating);
-        mNumRatings = (TextView) findViewById(R.id.bd_num_ratings);
-        mBaseLayout = (RelativeLayout) findViewById(R.id.bd_base_layout);
-        mBookImage = (ImageView) findViewById(R.id.bd_small_image);
-        mTopRowLayout = (RelativeLayout) findViewById(R.id.bd_top_row_layout);
-        mSocialLayout = (RelativeLayout) findViewById(R.id.bd_social_layout);
-        mShareButton = (ImageView) findViewById(R.id.bd_share_button);
-        mLikeButton = (ImageView) findViewById(R.id.bd_favorite);
-        mInfoButton = (ImageView) findViewById(R.id.bd_info);
-        mDescriptionLayout = (LinearLayout) findViewById(R.id.bd_description_layout);
+        mFAB = findViewById(R.id.bd_fab_description);
+        mBookRating = findViewById(R.id.bd_ratingbar);
+        mBackgroundImage = findViewById(R.id.bd_background_image);
+        mScrollView = findViewById(R.id.bd_scrollview);
+        mDescription = findViewById(R.id.bd_description);
+        mTitle = findViewById(R.id.bd_title);
+        mSeeAll = findViewById(R.id.bd_view_all_reviews);
+        mReviews =  findViewById(R.id.bd_reviews_view);
+        mReviewsLayout = findViewById(R.id.bd_reviews_layout);
+        mSubTitle = findViewById(R.id.bd_subtitle);
+        mAuthors = findViewById(R.id.bd_authors);
+        mCheckout = findViewById(R.id.bd_checkout);
+        mAvgRating = findViewById(R.id.bd_avg_rating);
+        mNumRatings = findViewById(R.id.bd_num_ratings);
+        mBaseLayout = findViewById(R.id.bd_base_layout);
+        mBookImage = findViewById(R.id.bd_small_image);
+        mTopRowLayout = findViewById(R.id.bd_top_row_layout);
+        mSocialLayout = findViewById(R.id.bd_social_layout);
+        mShareButton = findViewById(R.id.bd_share_button);
+        mLikeButton = findViewById(R.id.bd_favorite);
+        mInfoButton = findViewById(R.id.bd_info);
+        mDescriptionLayout = findViewById(R.id.bd_description_layout);
         mSeparator = findViewById(R.id.bd_separator);
-
-        mAdditionalDetailsLayout = (LinearLayout) findViewById(R.id.bd_additional_info);
-        mFullTitle = (TextView) findViewById(R.id.bd_full_title);
-        mFullAuthors = (TextView) findViewById(R.id.bd_full_authors);
-        mSubject = (TextView) findViewById(R.id.bd_subject);
-        mCopies = (TextView) findViewById(R.id.bd_copies);
-        mISBN10 = (TextView) findViewById(R.id.bd_isbn10);
-        mISBN13 = (TextView) findViewById(R.id.bd_isbn13);
+        mAdditionalDetailsLayout = findViewById(R.id.bd_additional_info);
+        mFullTitle = findViewById(R.id.bd_full_title);
+        mFullAuthors = findViewById(R.id.bd_full_authors);
+        mSubject = findViewById(R.id.bd_subject);
+        mCopies = findViewById(R.id.bd_copies);
+        mISBN10 = findViewById(R.id.bd_isbn10);
+        mISBN13 = findViewById(R.id.bd_isbn13);
 
         //Inflate and set leave comment view
-        mLeaveReview = (FrameLayout) findViewById(R.id.bd_review_header);
-        TextView mHeaderTitle = (TextView) mLeaveReview.findViewById(R.id.comment_h_title);
-        TextView mHeaderBody = (TextView) mLeaveReview.findViewById(R.id.comment_h_body);
-        TextView mHeaderString = (TextView) mLeaveReview.findViewById(R.id.comment_h_tv);
+        mLeaveReview = findViewById(R.id.bd_review_header);
+        TextView mHeaderTitle =  mLeaveReview.findViewById(R.id.comment_h_title);
+        TextView mHeaderBody = mLeaveReview.findViewById(R.id.comment_h_body);
+        TextView mHeaderString = mLeaveReview.findViewById(R.id.comment_h_tv);
         mHeaderString.setTypeface(handWriting);
         mHeaderBody.setTypeface(handWriting);
         mHeaderTitle.setTypeface(handWriting);
@@ -265,9 +190,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         Display display = getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-
         float height = outMetrics.heightPixels;
-
         mBaseLayout.setPadding(0, (int)height, 0, 0);
 
         //Set typefaces
@@ -303,6 +226,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         VALUE_GID = thisIntent.getStringExtra("GID");
         Bitmap bookCover = (Bitmap)thisIntent.getParcelableExtra("BOOK_IMAGE");
         fromAccount = thisIntent.getBooleanExtra("FROMACCOUNT", false);
+
         //Set Book Cover. Set background until better quality loaded
         if(bookCover != null) {
             mBookImage.setImageBitmap(bookCover);
@@ -316,37 +240,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
             liked = true;
         }
 
-        //Set checkoutButton listener
-        mCheckout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    if (currentBook.copies != null) {
-                        if (!checkedOut) {
-                            DialogFragment bookFragment = SelectBookFragment.newInstance(BookDetailsActivity.this, currentBook.copies, currentBook.availableCopies);
-                            bookFragment.show(getFragmentManager(), "TestDialog");
-                        } else if (mCopy != null) {
-                            Log.i("LoginActivity", "RETURNED");
-                            returnBook(mCopy);
-                        }
-                    } else {
-                        Toast.makeText(BookDetailsActivity.this, "Book is still loading.", Toast.LENGTH_SHORT).show();
-                    }
-                }catch(Exception E){
-                    E.printStackTrace();
-                    Toast.makeText(BookDetailsActivity.this, "Book is still loading.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        //Check for network connection
-        if(NetworkJSONUtils.checkInternetConnection(this)) {
-            //Retrieve JSON for Book Info
-            updating = false;
-            retrieveDetailedBookInfo();
-        }else{
-            ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
-        }
+        retrieveDetailedBookInfo();
 
         //Set on click listener for sharing
         mShareButton.setOnClickListener(new View.OnClickListener() {
@@ -404,51 +298,6 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         animator.start();
     }
 
-
-    @Override
-    public Loader onCreateLoader(int id, Bundle args) {
-        jsonResponse = null;
-        Log.i("LoginActivity", "Creating");
-        //If downloading detailed JSON or uploading comment
-        if(id == DOWNLOAD_DETAILED_JSON_LOADER || id == UPLOAD_COMMENT_LOADER || id == CHECKOUT_BOOK_LOADER || id == RETURN_BOOK_LOADER) {
-            /*This can be used for uploading, because the data to be uploaded is coming from
-            * the URL arguments and then JSON needs to be downloaded to figure the response
-            * and success that was given*/
-
-            return new DownloadJSONLoader(this, this, requestURL);
-        } else if(id == DOWNLOAD_DETAILED_IMAGE_LOADER) {
-            return new DownloadDetailedImageLoader(this, this, currentBook.thumbnail);
-        }
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(Loader loader, Object data) {
-        if(!(data == null || data == " ")) {
-            if (loader.getId() == DOWNLOAD_DETAILED_JSON_LOADER || loader.getId() == UPLOAD_COMMENT_LOADER || loader.getId() == CHECKOUT_BOOK_LOADER || loader.getId() == RETURN_BOOK_LOADER) {
-                try {
-                    jsonResponse = new JSONObject(data.toString());
-                    parseJSON(jsonResponse);
-                } catch (JSONException JSONE) {
-                    JSONE.printStackTrace();
-                    ErrorUtils.errorDialog(this, "Data Error", "There was an error with the data format. Please try again later.");
-                    return;
-                }
-            }else if(loader.getId() == DOWNLOAD_DETAILED_IMAGE_LOADER){
-                Bitmap image = (Bitmap) data;
-                mBackgroundImage.setImageBitmap(image);
-                mBookImage.setImageBitmap(image); // Sets cover in case book was called from context where no cover provided
-            }
-        }else{
-            ErrorUtils.errorDialog(this, "Could not connect to server", "No information was retrieved from the server. Please try again later.");
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader loader) {
-
-    }
-
     /**
      * Sends request for book information based on GID received as extra.
      *
@@ -475,8 +324,43 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                 .build();
         String urlString = builder.toString();
 
+        //Download and parse JSON
+        downloadJSON(urlString);
+    }
+
+    /**
+     * Retrieves a more detailed image of the book from the URL specified. This
+     * uses the Volley ImageRequest
+     */
+    public void retrieveDetailedImage(){
         //Build request for raw JSON data
-        StringRequest jsonRequest = new StringRequest(Request.Method.GET, urlString, new Response.Listener<String>() {
+        ImageRequest imageRequest = new ImageRequest(currentBook.thumbnail, new Response.Listener<Bitmap>() {
+            @Override
+            public void onResponse(Bitmap image) {
+                //Image is returned
+                mBackgroundImage.setImageBitmap(image);
+                mBookImage.setImageBitmap(image); // Sets cover in case book was called from context where no cover provided
+            }
+        }, 5000, 5000, ImageView.ScaleType.CENTER, Bitmap.Config.RGB_565,
+                new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Print error
+                ErrorUtils.errorDialog(BookDetailsActivity.this, "Could not connect to the server", "Could not connect to the server at this time, please try again later.");
+            }
+        });
+        //Start the JSON request
+        queue.add(imageRequest);
+    }
+
+    /**
+     * Downloads and parses JSON through Volley library
+     *
+     * @param url The url to download from
+     */
+    public void downloadJSON(String url){
+        //Build request for raw JSON data
+        StringRequest jsonRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
@@ -487,10 +371,9 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                     //Print error if there was one
                     JSONE.printStackTrace();
                     ErrorUtils.errorDialog(BookDetailsActivity.this, "Data Error", "There was an error with the data format. Please try again later.");
-                    return;
                 }
             }
-            }, new Response.ErrorListener() {
+        }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 //Print error
@@ -499,27 +382,6 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         });
         //Start the JSON request
         queue.add(jsonRequest);
-    }
-
-    public void retrieveDetailedImage(){
-        //Build request for raw JSON data
-        ImageRequest imageRequest = new ImageRequest(currentBook.thumbnail, new Response.Listener<Bitmap>() {
-            @Override
-            public void onResponse(Bitmap image) {
-                //Image is returned
-                mBackgroundImage.setImageBitmap(image);
-                mBookImage.setImageBitmap(image); // Sets cover in case book was called from context where no cover provided
-            }
-        }, 5000, 5000, Bitmap.Config.RGB_565,
-                new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //Print error
-                ErrorUtils.errorDialog(BookDetailsActivity.this, "Could not connect to the server", "Could not connect to the server at this time, please try again later.");
-            }
-        });
-        //Start the JSON request
-        queue.add(imageRequest);
     }
 
     /**
@@ -554,7 +416,6 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                 JSONObject jsonResponse = json.getJSONObject(KEY_JSON);
                 String title = jsonResponse.getString(KEY_TITLE);
                 String subTitle = jsonResponse.getString(KEY_SUB_TITLE);
-
                 String subject = jsonResponse.getString(KEY_SUBJECT);
                 String description = jsonResponse.getString(KEY_DESCRIPTION);
                 String authors = jsonResponse.getString(KEY_AUTHORS);
@@ -601,7 +462,6 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
 
 
                 }
-                hasReview = false;
 
                 //Loop through Reviews
                 for(int i = 0; i < reviews.length(); i++){
@@ -619,14 +479,11 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                     //If the current user already added a review, display it at the top.
                     if(UID == VALUE_UID) {
                         currentBook.reviews.add(0, curReview);
-                        hasReview = true;
-                        userReviewRating = rating;
                     }else {
                         currentBook.reviews.add(curReview);
                     }
                 }
-                if(!updating)
-                    getLoaderManager().initLoader(DOWNLOAD_DETAILED_IMAGE_LOADER, null, this);
+                retrieveDetailedImage();
                 displayBookInfo();
             }else if(success == 11){
                 //Comment successfully added
@@ -637,7 +494,6 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                     Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
                     //Updates new info
                     Log.i("LoginActivity", "UPDATE INITIATED");
-                    updating = true;
                     retrieveDetailedBookInfo();
                 }else{
                     ErrorUtils.errorDialog(this, "Authentication Error", "The user's credentials could not be authenticated, so the review was not uploaded. Please try logging out and baack in.");
@@ -904,10 +760,36 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     }
 
     /**
+     * This method is called when the checkout/return button is pressed. If the book is not
+     * yet checked out, then the checkout dialog appears. If the book is out, then the book will
+     * be returned
+     *
+     * @param view The view invoking the method
+     */
+    public void checkoutReturnPressed(View view){
+        try {
+            if (currentBook.copies != null) {
+                if (!checkedOut) {
+                    DialogFragment bookFragment = SelectBookFragment.newInstance(BookDetailsActivity.this, currentBook.copies, currentBook.availableCopies);
+                    bookFragment.show(getFragmentManager(), "TestDialog");
+                } else if (mCopy != null) {
+                    Log.i("LoginActivity", "RETURNED");
+                    returnBook(mCopy);
+                }
+            } else {
+                Toast.makeText(BookDetailsActivity.this, "Book is still loading.", Toast.LENGTH_SHORT).show();
+            }
+        }catch(Exception E){
+            E.printStackTrace();
+            Toast.makeText(BookDetailsActivity.this, "Book is still loading.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
      * Method is called when checkout or waitlist is selected. A URI is
      * constructed with URL arguments detailing the UID, password, BID,
      * and the action to perform based on weather or not the book is being
-     * waitlisted. The URI is converted to a URL and a loader to send the
+     * waitlisted. The URI is converted to a String and uses Volley to send the
      * request and parse the response is created.
      *
      * @param copy The copy of the book to checkout or waitlist.
@@ -937,26 +819,14 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
 
         String urlString = builder.toString();
 
-
-        //Try to create URL from Uri
-        try{
-            requestURL = new URL(urlString);
-        }catch(MalformedURLException MURLE){
-            MURLE.printStackTrace();
-            ErrorUtils.errorDialog(this, "There was an error with the url", "Currently the server can not be reached. Make sure your username and password are entered correctly");
-            return;
-        }
-
-
-        //Start Loader
-        getLoaderManager().initLoader(CHECKOUT_BOOK_LOADER, null, this);
+        downloadJSON(urlString);
     }
 
     /**
      * Method is called when return button is pressed. A URI is
      * constructed with URL arguments detailing the UID, password, BID,
-     * and the action to return the book. The URI is converted to a URL and a loader to send the
-     * request and parse the response is created.
+     * and the action to return the book. The URI is converted to a String and uses
+     * Volley to send the request and parse the response.
      *
      * @param copy The copy of the book to be returned
      */
@@ -977,20 +847,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                 .build();
 
         String urlString = builder.toString();
-
-
-        //Try to create URL from Uri
-        try{
-            requestURL = new URL(urlString);
-        }catch(MalformedURLException MURLE){
-            MURLE.printStackTrace();
-            ErrorUtils.errorDialog(this, "There was an error with the url", "Currently the server can not be reached. Make sure your username and password are entered correctly");
-            return;
-        }
-
-
-        //Start Loader
-        getLoaderManager().initLoader(RETURN_BOOK_LOADER, null, this);
+        downloadJSON(urlString);
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor prefEditor = sharedPreferences.edit();
@@ -1059,8 +916,9 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     /**
      * Submits comment
      *
-     * Creates URI and URL to request to add the comment. Then starts loader
-     * and clears EditTexts.
+     * Creates URI and URL string to request to add the comment. Then volley is
+     * used to ping the url and add comment to database.
+     * Edit Texts are also cleared.
      *
      * @param v The caller view
      */
@@ -1116,22 +974,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         builder.build();
         String urlString = builder.toString();
 
-
-        //Try to create URL from Uri
-        try {
-            requestURL = new URL(urlString);
-        } catch (MalformedURLException MURLE) {
-            MURLE.printStackTrace();
-            ErrorUtils.errorDialog(this, "There was an error with the url", "Currently the server can not be reached. Make sure your username and password are entered correctly");
-            return;
-        }
-
-
-        //Start Loader
-        if (updating)
-            getLoaderManager().restartLoader(UPLOAD_COMMENT_LOADER, null, this);
-        else
-            getLoaderManager().initLoader(UPLOAD_COMMENT_LOADER, null, this);
+       downloadJSON(urlString);
     }
 
     /**
@@ -1142,15 +985,5 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
      */
     public void facebookPost(View view){
         //ShareLinkContent content = new ShareLinkContent.Builder()
-    }
-
-    /**
-     * Sets elevation of a view using ViewCompat
-     *
-     * @param view The view to set the elevation of.
-     * @param elevation The height to set the elevation to.
-     */
-    private void setElevation(View view, int elevation){
-        ViewCompat.setElevation(view, elevation);
     }
 }

@@ -60,9 +60,9 @@ import static com.walowtech.fblaapplication.MainActivity.handWriting;
  *
  * @author Matthew Walowski
  * @version 1.0
- * @since 1.0
+ * @since 10/7/2017
  */
-public class AccountActivity extends Activity implements LoaderManager.LoaderCallbacks {
+public class AccountActivity extends BaseActivity implements LoaderManager.LoaderCallbacks {
 //TODO change profile
     CircleImageView mProfile;
     LinearLayout mRowsLayout;
@@ -80,36 +80,9 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
 
     BookAdapter likedAdapter;
 
-    private final String BASE_URL = "walowtech.com";
-    private final String PATH0 = "apis";
-    private final String PATH1 = "FBLALibrary";
-    private final String PATH2 = "api.php";
-    private final String SCHEME = "https";
-
-    private final String PARAM_ACTION = "ACTION";
-    private final String PARAM_SEARCH_BID = "BID";
-    private final String PARAM_GID = "GID";
-    private final String PARAM_SEARCH_ITEM = "SEARCHITEM";
-
-    private final String VALUE_ACTION_RETRIEVE_DETAILED_DATA = "ACTION_RETRIEVE_DETAILED_BOOK_DATA";
-    private final String VALUE_ACTION_SEARCH = "ACTION_RETRIEVE_BOOK_DATA";
     private final String VALUE_SEARCH_ITEM = "BID";
     private int VALUE_SEARCH_BID;
     private String VALUE_GID;
-
-    private final String KEY_AVG_RATING = "AverageRating";
-    private final String KEY_AUTHORS = "Authors";
-    private final String KEY_CHECKOUT_TIME = "CheckoutTimestamp";
-    private final String KEY_RETURN_TIME = "ReturnTimestamp";
-    private final String KEY_GID = "GID";
-    private final String KEY_JSON = "JSON";
-    private final String KEY_MESSAGE = "message";
-    private final String KEY_NUM_SUBJECTS = "numSubjects";
-    private final String KEY_SMALL_THUMBNAIL = "SmallThumbnail";
-    private final String KEY_SUBJECT = "Subject";
-    private final String KEY_SUCCESS = "Success";
-    private final String KEY_TITLE = "Title";
-    private final String KEY_SUBTITLE = "SubTitle";
 
     ArrayList<Copy> checkedOut = new ArrayList<>();
     ArrayList<Copy> waitListed = new ArrayList<>();
@@ -126,7 +99,7 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
     private final int DOWNLOAD_IMAGE_ARRAY_LOADER = 1;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account);
 
@@ -465,7 +438,7 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
 
                         JSONObject jsonResponse = json.getJSONObject(KEY_JSON);
                         currentList.get(j).title = jsonResponse.getString(KEY_TITLE);
-                        currentList.get(j).subtitle = jsonResponse.getString(KEY_SUBTITLE);
+                        currentList.get(j).subtitle = jsonResponse.getString(KEY_SUB_TITLE);
                         currentList.get(j).GID = jsonResponse.getString(KEY_GID);
                         currentList.get(j).returnTime = jsonResponse.getString(KEY_RETURN_TIME);
                         currentList.get(j).authors = jsonResponse.getString(KEY_AUTHORS);
@@ -547,18 +520,6 @@ public class AccountActivity extends Activity implements LoaderManager.LoaderCal
             }
         });
     }
-
-
-    /**
-     * Sets elevation of a view using ViewCompat
-     *
-     * @param view The view to set the elevation of.
-     * @param elevation The height to set the elevation to.
-     */
-    private void setElevation(View view, int elevation){
-        ViewCompat.setElevation(view, elevation);
-    }
-
 
     /**
      * The adapter between the books and their subject row.

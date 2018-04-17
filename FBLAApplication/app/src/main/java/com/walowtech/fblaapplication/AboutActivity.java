@@ -27,8 +27,9 @@ import java.util.ArrayList;
  *
  * @author Matthew Walowski
  * @version 1.0
- * @since 1.0
+ * @since 10/7/2017
  */
+
 public class AboutActivity extends BaseActivity {
 
     private LinearLayout mMainLayout;
