@@ -36,6 +36,13 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.walowtech.fblaapplication.Utils.DownloadDetailedImageLoader;
@@ -195,6 +202,7 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
     private final String GOOGLE_BASE_LINK = "https://books.google.com/books?vid=ISBN";
 
     private AlarmManager alarmManager;
+    private RequestQueue queue;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -205,6 +213,8 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         VALUE_UID = sharedPref.getInt("UID", -1);
         VALUE_PASSWORD = sharedPref.getString("PASSWORD", null);
+
+        queue = Volley.newRequestQueue(this);
 
         //Create custom font typeface
         handWriting = Typeface.createFromAsset(getAssets(), "fonts/hand_writing.ttf");
@@ -444,12 +454,12 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
      *
      * The GID of the book from the previous activity is passed to this activity
      * as an extra. That GID is used to create a URL that requests detailed information
-     * about a book. The requested is initiated by initializing an AsyncLoader
+     * about a book. The requested is initiated by utilizing volley.
      */
     public void retrieveDetailedBookInfo(){
         //Check for internet connection
         if(!NetworkJSONUtils.checkInternetConnection(this)) {
-            ErrorUtils.errorDialog(this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
+            ErrorUtils.errorDialog(BookDetailsActivity.this, "Network Error", "It seems you don't have any network connection. Reset your connection and try again.");
             return;
         }
 
@@ -465,21 +475,51 @@ public class BookDetailsActivity extends Activity  implements LoaderManager.Load
                 .build();
         String urlString = builder.toString();
 
-        //Try to create URL from Uri
-        try{
-            requestURL = new URL(urlString);
-        }catch(MalformedURLException MURLE){
-            MURLE.printStackTrace();
-            ErrorUtils.errorDialog(this, "There was an error with the url", "Currently the server can not be reached. Make sure your username and password are entered correctly");
-            return;
-        }
+        //Build request for raw JSON data
+        StringRequest jsonRequest = new StringRequest(Request.Method.GET, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    //When data is received, convert to JSONObject and try to parse
+                    jsonResponse = new JSONObject(response);
+                    parseJSON(jsonResponse);
+                } catch (JSONException JSONE) {
+                    //Print error if there was one
+                    JSONE.printStackTrace();
+                    ErrorUtils.errorDialog(BookDetailsActivity.this, "Data Error", "There was an error with the data format. Please try again later.");
+                    return;
+                }
+            }
+            }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Print error
+                ErrorUtils.errorDialog(BookDetailsActivity.this, "Could not connect to the server", "Could not connect to the server at this time, please try again later.");
+            }
+        });
+        //Start the JSON request
+        queue.add(jsonRequest);
+    }
 
-        //If updating reset loader, if not initialize loader
-        if(updating)
-            getLoaderManager().restartLoader(DOWNLOAD_DETAILED_JSON_LOADER, null, this);
-        else
-            getLoaderManager().initLoader(DOWNLOAD_DETAILED_JSON_LOADER, null, this);
-
+    public void retrieveDetailedImage(){
+        //Build request for raw JSON data
+        ImageRequest imageRequest = new ImageRequest(currentBook.thumbnail, new Response.Listener<Bitmap>() {
+            @Override
+            public void onResponse(Bitmap image) {
+                //Image is returned
+                mBackgroundImage.setImageBitmap(image);
+                mBookImage.setImageBitmap(image); // Sets cover in case book was called from context where no cover provided
+            }
+        }, 5000, 5000, Bitmap.Config.RGB_565,
+                new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Print error
+                ErrorUtils.errorDialog(BookDetailsActivity.this, "Could not connect to the server", "Could not connect to the server at this time, please try again later.");
+            }
+        });
+        //Start the JSON request
+        queue.add(imageRequest);
     }
 
     /**
