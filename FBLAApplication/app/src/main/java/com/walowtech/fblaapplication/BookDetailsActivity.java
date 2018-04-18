@@ -40,7 +40,11 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.facebook.share.ShareApi;
+import com.facebook.share.model.ShareContent;
 import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.model.ShareMediaContent;
+import com.facebook.share.model.SharePhoto;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.walowtech.fblaapplication.Utils.ErrorUtils;
@@ -277,7 +281,7 @@ public class BookDetailsActivity extends BaseActivity{
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(mCallbackManager.onActivityResult(requestCode, resultCode, data)) {
-            boolean loggedIn = AccessToken.getCurrentAccessToken() == null;
+            boolean loggedIn = AccessToken.getCurrentAccessToken() != null;
             if(loggedIn)
                 facebookPost(null);
             else
@@ -667,6 +671,7 @@ public class BookDetailsActivity extends BaseActivity{
                 try{
                     parent.removeViewAt(i);
                 }catch(Exception e){
+                    //If no old view exists, exception will be caught and program continues
                     e.printStackTrace();
                 }
                 View view = getLayoutInflater().inflate(R.layout.review, parent, false);
@@ -1032,10 +1037,25 @@ public class BookDetailsActivity extends BaseActivity{
      * @param view The calling view
      */
     public void facebookPost(View view){
-        boolean loggedIn = AccessToken.getCurrentAccessToken() == null;
+        boolean loggedIn = AccessToken.getCurrentAccessToken() != null;
+        boolean publishPermission = AccessToken.getCurrentAccessToken().getPermissions().contains("publish_actions");
+
         Log.i("INTERNET", "Posting to FB");
-        if(!loggedIn)
-            LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile"));
-        Log.i("INTERNET", "LOGIN SUCCESS");
+        //Check if the user is already logged into facebook
+        if(!loggedIn || !publishPermission) {
+            //If not already logged in, then Log in
+            LoginManager.getInstance().logInWithPublishPermissions(this, Arrays.asList("publish_actions"));
+        }else{
+            Log.i("INTERNET", "LOGIN SUCCESS");
+            SharePhoto shareCover = new SharePhoto.Builder()
+                    .setBitmap(currentBook.coverSmall)
+                    .build();
+
+            ShareContent content = new ShareMediaContent.Builder()
+                    .addMedium(shareCover)
+                    .build();
+
+            ShareApi.share(content, null);
+        }
     }
 }
