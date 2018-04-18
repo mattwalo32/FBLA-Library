@@ -34,6 +34,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.share.model.ShareLinkContent;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.walowtech.fblaapplication.Utils.ErrorUtils;
@@ -45,6 +52,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static android.view.View.GONE;
 
@@ -126,6 +134,7 @@ public class BookDetailsActivity extends BaseActivity{
 
     private AlarmManager alarmManager;
     private RequestQueue queue;
+    private CallbackManager mCallbackManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -141,6 +150,27 @@ public class BookDetailsActivity extends BaseActivity{
 
         //Initialize the volley queue
         queue = Volley.newRequestQueue(this);
+
+        //Initialize callback manager for facebook sharing
+        mCallbackManager = new CallbackManager.Factory().create();
+        LoginManager.getInstance().registerCallback(mCallbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        Log.i("INTERNET", "LoginSuccess");
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        Log.i("INTERNET", "LoginCanceled");
+                    }
+
+                    @Override
+                    public void onError(FacebookException error) {
+                        Log.i("INTERNET", "LoginError");
+                        ErrorUtils.errorDialog(BookDetailsActivity.this, "Error Logging In", "An error ocurred while logging into Facebook. Please try again later.");
+                    }
+                });
 
         //Create custom font typeface
         handWriting = Typeface.createFromAsset(getAssets(), "fonts/hand_writing.ttf");
@@ -241,39 +271,20 @@ public class BookDetailsActivity extends BaseActivity{
         }
 
         retrieveDetailedBookInfo();
+    }
 
-        //Set on click listener for sharing
-        mShareButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Create an intent to share
-                Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-                sharingIntent.setType("text/plain");
-                String shareBody = "You should check out " + getString(R.string.app_name) + ", an app where you can easily find books at the school library!";
-                if(currentBook.title != null)
-                    shareBody = "Check out \"" + currentBook.title + "\", a book that I found with the app, " + getString(R.string.app_name);
-                sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "" + getString(R.string.app_name));
-                sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
-                startActivity(Intent.createChooser(sharingIntent, "Share via"));
-            }
-        });
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(mCallbackManager.onActivityResult(requestCode, resultCode, data)) {
+            boolean loggedIn = AccessToken.getCurrentAccessToken() == null;
+            if(loggedIn)
+                facebookPost(null);
+            else
+                ErrorUtils.errorDialog(BookDetailsActivity.this, "Error Loggin In", "There was an issue encountered while logging into Facebook. Please try again later. ");
 
-        //Set on click listener for info button
-        mInfoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(currentBook.ISBN13 != null){//If the data for ISBN has been retrieved
-                    //Open browser with information
-                    String bookLink = GOOGLE_BASE_LINK + currentBook.ISBN13;
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW);
-                    browserIntent.setData(Uri.parse(bookLink));
-                    startActivity(browserIntent);
-                }else{
-                    Toast.makeText(BookDetailsActivity.this, "Book is still loading...", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
+            return;
+        }
     }
 
     @Override
@@ -883,6 +894,43 @@ public class BookDetailsActivity extends BaseActivity{
     }
 
     /**
+     * This method uses the default sharing intent within the Android
+     * framework to allow the user to share books on various social media
+     * platforms.
+     *
+     * @param view The view invoking the method.
+     */
+    public void share(View view){
+        //Create an intent to share
+        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        String shareBody = "You should check out " + getString(R.string.app_name) + ", an app where you can easily find books at the school library!";
+        if(currentBook.title != null)
+            shareBody = "Check out \"" + currentBook.title + "\", a book that I found with the app, " + getString(R.string.app_name);
+        sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "" + getString(R.string.app_name));
+        sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+        startActivity(Intent.createChooser(sharingIntent, "Share via"));
+    }
+
+    /**
+     * Uses the BrowserIntent to link take user to
+     * web page that displays more information about the book.
+     *
+     * @param view The view that invokes the method.
+     */
+    public void viewInfo(View view){
+        if(currentBook.ISBN13 != null){//If the data for ISBN has been retrieved
+            //Open browser with information
+            String bookLink = GOOGLE_BASE_LINK + currentBook.ISBN13;
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW);
+            browserIntent.setData(Uri.parse(bookLink));
+            startActivity(browserIntent);
+        }else{
+            Toast.makeText(BookDetailsActivity.this, "Book is still loading...", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
      * Adds book to liked and changes icon. If the book is already
      * liked then the book is removed from the 'liked' list that is
      * stored in SharedPreferences and the icon is changed back.
@@ -984,6 +1032,10 @@ public class BookDetailsActivity extends BaseActivity{
      * @param view The calling view
      */
     public void facebookPost(View view){
-        //ShareLinkContent content = new ShareLinkContent.Builder()
+        boolean loggedIn = AccessToken.getCurrentAccessToken() == null;
+        Log.i("INTERNET", "Posting to FB");
+        if(!loggedIn)
+            LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile"));
+        Log.i("INTERNET", "LOGIN SUCCESS");
     }
 }

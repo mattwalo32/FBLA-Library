@@ -2,6 +2,7 @@ package com.walowtech.fblaapplication;
 
 import android.app.Application;
 
+import com.facebook.FacebookSdk;
 import com.google.firebase.FirebaseApp;
 
 import org.acra.ACRA;

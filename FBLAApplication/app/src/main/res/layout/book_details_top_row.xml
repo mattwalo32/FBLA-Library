@@ -15,7 +15,8 @@
             android:layout_width="@dimen/ic_diameter"
             android:layout_height="@dimen/ic_diameter"
             android:scaleType="centerCrop"
-            app:srcCompat="@drawable/ic_info_blue" />
+            app:srcCompat="@drawable/ic_info_blue"
+            android:onClick="viewInfo"/>
 
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/bd_favorite"
