@@ -38,13 +38,19 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.internal.Utility;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.share.ShareApi;
+import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareContent;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.model.ShareMediaContent;
+import com.facebook.share.model.ShareOpenGraphAction;
+import com.facebook.share.model.ShareOpenGraphContent;
+import com.facebook.share.model.ShareOpenGraphObject;
 import com.facebook.share.model.SharePhoto;
+import com.facebook.share.widget.ShareDialog;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.walowtech.fblaapplication.Utils.ErrorUtils;
@@ -74,7 +80,7 @@ import static android.view.View.GONE;
  */
 
 //Created 10/7/2017
-public class BookDetailsActivity extends BaseActivity{
+public class BookDetailsActivity extends BaseActivity implements FacebookCallback<Sharer.Result>{
 
     //Declare layouts
     private FrameLayout mLeaveReview;
@@ -161,18 +167,17 @@ public class BookDetailsActivity extends BaseActivity{
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
-                        Log.i("INTERNET", "LoginSuccess");
+                        facebookPost(null);
                     }
 
                     @Override
                     public void onCancel() {
-                        Log.i("INTERNET", "LoginCanceled");
+                        Toast.makeText(BookDetailsActivity.this, "Login Cancelled", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onError(FacebookException error) {
-                        Log.i("INTERNET", "LoginError");
-                        ErrorUtils.errorDialog(BookDetailsActivity.this, "Error Logging In", "An error ocurred while logging into Facebook. Please try again later.");
+                        Toast.makeText(BookDetailsActivity.this, "Cannot log in at this time, please try again later.", Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -280,15 +285,7 @@ public class BookDetailsActivity extends BaseActivity{
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(mCallbackManager.onActivityResult(requestCode, resultCode, data)) {
-            boolean loggedIn = AccessToken.getCurrentAccessToken() != null;
-            if(loggedIn)
-                facebookPost(null);
-            else
-                ErrorUtils.errorDialog(BookDetailsActivity.this, "Error Loggin In", "There was an issue encountered while logging into Facebook. Please try again later. ");
-
-            return;
-        }
+        mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -793,11 +790,11 @@ public class BookDetailsActivity extends BaseActivity{
                     returnBook(mCopy);
                 }
             } else {
-                Toast.makeText(BookDetailsActivity.this, "Book is still loading.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Book is still loading.", Toast.LENGTH_SHORT).show();
             }
         }catch(Exception E){
             E.printStackTrace();
-            Toast.makeText(BookDetailsActivity.this, "Book is still loading.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Book is still loading.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -906,6 +903,7 @@ public class BookDetailsActivity extends BaseActivity{
      * @param view The view invoking the method.
      */
     public void share(View view){
+        Toast.makeText(this, "Loading share options ...", Toast.LENGTH_SHORT).show();
         //Create an intent to share
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
@@ -931,7 +929,7 @@ public class BookDetailsActivity extends BaseActivity{
             browserIntent.setData(Uri.parse(bookLink));
             startActivity(browserIntent);
         }else{
-            Toast.makeText(BookDetailsActivity.this, "Book is still loading...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Book is still loading...", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -1031,31 +1029,75 @@ public class BookDetailsActivity extends BaseActivity{
     }
 
     /**
-     * Handles the click on the facebook share button. Allows
-     * the user to share information on facebook via facebook API
+     * Handles the click on the facebook share button. First it is checked if the user
+     * is logged into their facebook account and has granted posting permissions to Preface.
+     * Then a post is created and the user is allowed to look over the post via the dialog box
+     * to confirm or edit their post.
      *
      * @param view The calling view
      */
     public void facebookPost(View view){
         boolean loggedIn = AccessToken.getCurrentAccessToken() != null;
-        boolean publishPermission = AccessToken.getCurrentAccessToken().getPermissions().contains("publish_actions");
+        boolean publishPermission = true;
+        boolean isLoading = currentBook.description == null;
 
-        Log.i("INTERNET", "Posting to FB");
+        //Try to check permission, but if user has not logged in yet, exception will be caught
+        try{
+           publishPermission = AccessToken.getCurrentAccessToken().getPermissions().contains("publish_actions");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //If the book info is still loading, then wait to share
+        if(isLoading){
+            Toast.makeText(BookDetailsActivity.this, "Cannot post right now, this book is still loading", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         //Check if the user is already logged into facebook
         if(!loggedIn || !publishPermission) {
             //If not already logged in, then Log in
             LoginManager.getInstance().logInWithPublishPermissions(this, Arrays.asList("publish_actions"));
         }else{
-            Log.i("INTERNET", "LOGIN SUCCESS");
-            SharePhoto shareCover = new SharePhoto.Builder()
-                    .setBitmap(currentBook.coverSmall)
+            //If description is longer than 100 chars, then cut at next word and add ellipses
+            String description = currentBook.description.length() <= 100 ? currentBook.description :
+                    (currentBook.description.substring(0, currentBook.description.indexOf(" ", 100)) + " ...");
+
+            //If already logged in and with permission, then share
+            ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
+                    .putString("og:type", "books.book")
+                    .putString("og:title", currentBook.title)
+                    .putString("og:description", description)
+                    .putString("books:isbn", currentBook.ISBN10)
                     .build();
 
-            ShareContent content = new ShareMediaContent.Builder()
-                    .addMedium(shareCover)
+            ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
+                    .setActionType("books.reads")
+                    .putObject("book", object)
+                    .build();
+            ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
+                    .setPreviewPropertyName("book")
+                    .setAction(action)
                     .build();
 
-            ShareApi.share(content, null);
+            //Show the post dialog
+            ShareDialog.show(this, content);
         }
+    }
+
+    @Override
+    public void onSuccess(Sharer.Result result) {
+        Toast.makeText(this, "Post shared on your timeline!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCancel() {
+        Toast.makeText(this, "You have cancelled your post.", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onError(FacebookException error) {
+        error.printStackTrace();
+        Toast.makeText(this, "Your post cannot be made at this time", Toast.LENGTH_SHORT).show();
     }
 }
