@@ -1057,9 +1057,11 @@ public class BookDetailsActivity extends BaseActivity implements FacebookCallbac
         //Check if the user is already logged into facebook
         if(!loggedIn || !publishPermission) {
             //If not already logged in, then Log in
+            Toast.makeText(this, "Loading Facebook login ...", Toast.LENGTH_SHORT).show();
             LoginManager.getInstance().logInWithPublishPermissions(this, Arrays.asList("publish_actions"));
         }else{
             //If description is longer than 100 chars, then cut at next word and add ellipses
+            Toast.makeText(this, "Loading Facebook ...", Toast.LENGTH_SHORT).show();
             String description = currentBook.description.length() <= 100 ? currentBook.description :
                     (currentBook.description.substring(0, currentBook.description.indexOf(" ", 100)) + " ...");
 

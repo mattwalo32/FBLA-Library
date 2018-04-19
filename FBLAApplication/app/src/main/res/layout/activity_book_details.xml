@@ -276,7 +276,7 @@
                     android:layout_margin="@dimen/margin"
                     android:layout_centerInParent="true"
                     android:onClick="facebookPost"
-                    android:src="@drawable/twitter"/>
+                    android:src="@drawable/facebook_logo"/>
 
             </RelativeLayout>
 
