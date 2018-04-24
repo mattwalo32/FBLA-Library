@@ -154,8 +154,6 @@ public class AccountActivity extends BaseActivity implements LoaderManager.Loade
         return null;
     }
 
-    //TODO touch listener is only on image of checkedout book
-
     @Override
     public void onLoadFinished(Loader loader, Object data) {
         if(loader.getId() == DOWNLOAD_BOOK_JSON_LOADER){
@@ -497,21 +495,11 @@ public class AccountActivity extends BaseActivity implements LoaderManager.Loade
             bookSubtitle.setVisibility(GONE);
         }
 
-        image.setOnClickListener(new View.OnClickListener() {
+        baseView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String GID = currentList.get(j).GID;
                 Intent bookDetailsIntent = new Intent(AccountActivity.this, BookDetailsActivity.class);
-
-                    /*android.support.v4.util.Pair<View, String> p1 = android.support.v4.util.Pair.create((View)image, getString(R.string.trans_iv_book_cover));
-                    ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, p1);
-                    BitmapDrawable drawable = (BitmapDrawable) image.getDrawable();
-                    Bitmap bitmap;
-                    try {
-                        bitmap = drawable.getBitmap();
-                    }catch(NullPointerException NPE){
-                        bitmap = null;
-                    }*/
 
                 bookDetailsIntent.putExtra("GID", GID);
                 bookDetailsIntent.putExtra("BOOK_IMAGE", currentList.get(j).bitmap);
