@@ -47,6 +47,7 @@ dependencies {
     implementation 'com.facebook.android:facebook-login:4.32.0'
     implementation 'com.facebook.android:facebook-share:4.32.0'
     implementation 'com.facebook.android:facebook-android-sdk:4.32.0'
+
     testImplementation 'junit:junit:4.12'
 
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {

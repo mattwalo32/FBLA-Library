@@ -1,7 +1,10 @@
 package com.walowtech.fblaapplication;
 
 import android.app.SearchManager;
+import android.content.Intent;
+import android.drm.DrmStore;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -31,6 +34,9 @@ import java.util.ArrayList;
  */
 
 public class AboutActivity extends BaseActivity {
+
+    private static final String TWITTER_URL = "https://twitter.com/PrefaceApp/";
+    private static final String FACEBOOK_URL = "https://www.facebook.com/matthew.walowski.7";
 
     private LinearLayout mMainLayout;
     private LinearLayout mSecondLayer;
@@ -95,5 +101,33 @@ public class AboutActivity extends BaseActivity {
         //Set title typeface
         TextView title = (TextView) toolbar.findViewById(R.id.action_title);
         title.setTypeface(handWriting);
+    }
+
+    public void visitSocialMedia(View v){
+        int viewID = v.getId();
+        String url = null;
+
+        //Check with  view was clicked on
+        switch(viewID){
+            //Twitter was clicked on
+            case R.id.aa_twitter:
+                url = TWITTER_URL;
+                break;
+            //Facebook was clicked on
+            case R.id.aa_facebook:
+                url = FACEBOOK_URL;
+                break;
+            /*//Twitter was clicked on
+            case R.id.aa_twitter:
+                url = TWITTER_URL;
+                break;
+            //Facebook was clicked on
+            case R.id.aa_facebook:
+                url = FACEBOOK_URL;
+                break;*/
+        }
+
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW);
+        browserIntent.setData(Uri.parse(url));
     }
 }

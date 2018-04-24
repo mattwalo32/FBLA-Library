@@ -94,6 +94,58 @@
 
         </LinearLayout>
 
+        <!-- Third layer with social media -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/margin"
+            android:background="@color/colorPrimary100">
+
+            <!-- Title -->
+            <TextView
+                android:id="@+id/aa_follow_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/margin"
+                android:textSize="@dimen/text_h2"
+                android:textColor="@android:color/black"
+                android:textAlignment="center"
+                android:layout_alignParentTop="true"
+                android:text="@string/follow_us"/>
+
+            <!-- Social media icons -->
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/aa_follow_text"
+                android:layout_centerHorizontal="true">
+
+                <!-- Twitter -->
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/aa_twitter"
+                    android:layout_width="@dimen/ic_diameter"
+                    android:layout_height="@dimen/ic_diameter"
+                    android:layout_margin="@dimen/margin"
+                    app:srcCompat="@drawable/ic_twitter"
+                    android:onClick="visitSocialMedia"/>
+
+                <!-- Facebook -->
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/aa_facebook"
+                    android:layout_width="@dimen/ic_diameter"
+                    android:layout_height="@dimen/ic_diameter"
+                    android:layout_margin="@dimen/margin"
+                    app:srcCompat="@drawable/facebook_logo"
+                    android:onClick="visitSocialMedia"
+                    android:layout_toRightOf="@id/aa_twitter"/>
+
+                <!-- Google Plus -->
+
+                <!--Instagram -->
+
+            </RelativeLayout>
+
+        </RelativeLayout>
     </LinearLayout>
 
 </ScrollView>
