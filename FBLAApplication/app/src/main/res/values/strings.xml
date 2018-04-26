@@ -59,6 +59,7 @@
     <string name="version">1.0.2</string>
     <string name="release_date">January 15, 2018</string> <!-- TODO set info -->
 
+    <!-- About Activity Strings -->
     <string name="about_school">Since its founding, WT High School has been committed to advancing the education of its community by providing limitless free
     resources to its student body and teachers. We are proud that our library contains a vast wealth of utilities for all to benefit from. With our app, Preface, we
     are achieving our mission of providing educational resources to those eager to learn. See a map of our prestigious school and library above.</string>
@@ -68,5 +69,7 @@
         out a book on the app, it will be ready for pick up, and as the due date approches, they will receive notifications, reminding them that a book is due soon.\n\n This app was
         created by Matthew Walowski for the 2018 FBLA Mobile Application Development Competition. WT Highschool and any books checked out on this app are factitious. All book covers
         are rightfully retrieved from Google Books service. </string>
+
+    <string name="follow_us">Follow us on social media!</string>
 
 </resources>
