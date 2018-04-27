@@ -79,7 +79,21 @@ public class SelectBookFragment extends DialogFragment {
                 //Adapt information
                 String bookInfoText = currentCopy.copyInfo;
                 int listSize = currentCopy.waitingListAmount;
-                String listSizeText = (listSize - 1) + " in line";
+                int secondDigit = listSize % 10;
+
+                //Find appropriate number ending
+                String numberAppendix = null;
+
+                //If the list size is greater than 20, use the second digit to find the appropriate ending
+                if(listSize > 20)
+                numberAppendix = secondDigit == 1 ? "st" :
+                        (secondDigit == 2 ? "nd" :
+                                (secondDigit == 3 ? "rd" : "th"));
+                else //If list smaller than 20, use size to determine suffix
+                    numberAppendix = listSize == 1 ? "st" :
+                            (listSize == 2 ? "nd" :
+                                    (listSize == 3 ? "rd" : "th"));
+                String listSizeText =  listSize + numberAppendix + " in line";
                 if(bookInfoText == null || bookInfoText.trim().equals(""))
                     bookInfoText = "Paperback";
                 bookInfo.setText(bookInfoText);
