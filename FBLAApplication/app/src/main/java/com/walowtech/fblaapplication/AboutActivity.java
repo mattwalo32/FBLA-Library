@@ -30,6 +30,7 @@ public class AboutActivity extends BaseActivity {
 
     private static final String TWITTER_URL = "https://twitter.com/PrefaceApp/";
     private static final String FACEBOOK_URL = "https://www.facebook.com/Preface-443875659398043/";
+    private static final String FACEBOOK_APP_URL = "fb://page/443875659398043";
     private static final String GOOGLE_PLUS_URL = "https://plus.google.com/u/2/109307757009188455261";
     private static final String INSTAGRAM_URL = "https://www.instagram.com/prefaceapplication/";
 
@@ -124,11 +125,6 @@ public class AboutActivity extends BaseActivity {
                 url = TWITTER_URL;
                 browserIntent.setPackage("com.twitter.android");
                 break;
-            //Facebook was clicked on
-            case R.id.aa_facebook:
-                url = FACEBOOK_URL;
-                browserIntent.setPackage("com.facebook.android");
-                break;
             //Google Plus was clicked on
             case R.id.aa_google_plus:
                 url = GOOGLE_PLUS_URL;
@@ -139,6 +135,15 @@ public class AboutActivity extends BaseActivity {
                 url = INSTAGRAM_URL;
                 browserIntent.setPackage("com.instagram.android");
                 break;
+            //Facebook was clicked on
+            case R.id.aa_facebook:
+                try {
+                    browserIntent.setData(Uri.parse(FACEBOOK_APP_URL));
+                    startActivity(browserIntent);
+                }catch(ActivityNotFoundException e){
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(FACEBOOK_URL)));
+                }
+                return;
         }
         //Set the url to visit
         browserIntent.setData(Uri.parse(url));
