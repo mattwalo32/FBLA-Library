@@ -3,6 +3,11 @@
   <component name="WizardSettings">
     <option name="children">
       <map>
+        <entry key="imageWizard">
+          <value>
+            <PersistentState />
+          </value>
+        </entry>
         <entry key="vectorWizard">
           <value>
             <PersistentState>
@@ -13,7 +18,7 @@
                       <PersistentState>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="ic_twitter" />
+                            <entry key="outputName" value="ic_google_plus" />
                             <entry key="sourceFile" value="C:\Users\mattw" />
                           </map>
                         </option>

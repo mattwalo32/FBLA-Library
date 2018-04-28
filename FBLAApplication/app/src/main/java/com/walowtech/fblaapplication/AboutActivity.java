@@ -1,25 +1,18 @@
 package com.walowtech.fblaapplication;
 
-import android.app.SearchManager;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.drm.DrmStore;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
-
 import com.walowtech.fblaapplication.Utils.SlideshowAdapter;
-import com.walowtech.fblaapplication.Utils.SuggestionCursorAdapter;
-
 import java.util.ArrayList;
 
 /**
@@ -36,14 +29,18 @@ import java.util.ArrayList;
 public class AboutActivity extends BaseActivity {
 
     private static final String TWITTER_URL = "https://twitter.com/PrefaceApp/";
-    private static final String FACEBOOK_URL = "https://www.facebook.com/matthew.walowski.7";
+    private static final String FACEBOOK_URL = "https://www.facebook.com/Preface-443875659398043/";
+    private static final String GOOGLE_PLUS_URL = "https://plus.google.com/u/2/109307757009188455261";
+    private static final String INSTAGRAM_URL = "https://www.instagram.com/prefaceapplication/";
 
     private LinearLayout mMainLayout;
     private LinearLayout mSecondLayer;
-    private TextView mSchoolName;
+    private ViewPager mPager;
+
     private TextView mAboutSchool;
     private TextView mAboutApp;
-    private ViewPager mPager;
+    private TextView mSchoolName;
+    private TextView mFollowUs;
 
     private SearchView searchBar;
 
@@ -55,17 +52,22 @@ public class AboutActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
-        mMainLayout = (LinearLayout) findViewById(R.id.aba_main_layout);
-        mSecondLayer = (LinearLayout) findViewById(R.id.aba_second_layer);
-        mSchoolName = (TextView) findViewById(R.id.aba_school_name);
-        mAboutSchool = (TextView) findViewById(R.id.aba_about_school);
-        mAboutApp = (TextView) findViewById(R.id.aba_about_app);
-        mPager = (ViewPager) findViewById(R.id.aa_pager);
+        //Init vars
+        mMainLayout = findViewById(R.id.aba_main_layout);
+        mSecondLayer = findViewById(R.id.aba_second_layer);
+        mSchoolName = findViewById(R.id.aba_school_name);
+        mAboutSchool = findViewById(R.id.aba_about_school);
+        mFollowUs = findViewById(R.id.aa_follow_text);
+        mAboutApp = findViewById(R.id.aba_about_app);
+        mPager = findViewById(R.id.aa_pager);
 
+        //Set fonts
         mSchoolName.setTypeface(handWriting);
         mAboutSchool.setTypeface(handWriting);
         mAboutApp.setTypeface(handWriting);
+        mFollowUs.setTypeface(handWriting);
 
+        //Create shadows
         setElevation(mMainLayout, 6);
         setElevation(mSecondLayer, 12);
 
@@ -88,7 +90,7 @@ public class AboutActivity extends BaseActivity {
          * are set on the toggle button and SearchView
          */
     private void configActionBar(){
-        Toolbar toolbar = (Toolbar) findViewById(R.id.aba_toolbar);//Find toolbar in layout
+        Toolbar toolbar = findViewById(R.id.aba_toolbar);//Find toolbar in layout
         setSupportActionBar(toolbar);//Set the toolbar as the actionbar
 
         //Set background to a drawable blue background
@@ -99,35 +101,53 @@ public class AboutActivity extends BaseActivity {
         actionBar.setTitle(""); //Ensures no double titles
 
         //Set title typeface
-        TextView title = (TextView) toolbar.findViewById(R.id.action_title);
+        TextView title = toolbar.findViewById(R.id.action_title);
         title.setTypeface(handWriting);
     }
 
+    /**
+     * This method checks which media icon was pressed and then constructs
+     * the appropriate URL to take the user to. Then an intent for
+     * the respective application on the device is constructed and launched. If
+     * the respective application is not installed on the device, the user
+     * will be taken to an online version of the social media source.
+     * @param v The view that invokes this method.
+     */
     public void visitSocialMedia(View v){
         int viewID = v.getId();
         String url = null;
-
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW);
         //Check with  view was clicked on
         switch(viewID){
             //Twitter was clicked on
             case R.id.aa_twitter:
                 url = TWITTER_URL;
+                browserIntent.setPackage("com.twitter.android");
                 break;
             //Facebook was clicked on
             case R.id.aa_facebook:
                 url = FACEBOOK_URL;
+                browserIntent.setPackage("com.facebook.android");
                 break;
-            /*//Twitter was clicked on
-            case R.id.aa_twitter:
-                url = TWITTER_URL;
+            //Google Plus was clicked on
+            case R.id.aa_google_plus:
+                url = GOOGLE_PLUS_URL;
+                browserIntent.setPackage("com.google.android.apps.plus");
                 break;
             //Facebook was clicked on
-            case R.id.aa_facebook:
-                url = FACEBOOK_URL;
-                break;*/
+            case R.id.aa_instagram:
+                url = INSTAGRAM_URL;
+                browserIntent.setPackage("com.instagram.android");
+                break;
         }
-
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW);
+        //Set the url to visit
         browserIntent.setData(Uri.parse(url));
+
+        //Try to launch in native application, but launch in browser if app is not installed
+        try {
+            startActivity(browserIntent);
+        }catch(ActivityNotFoundException e){
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        }
     }
 }
