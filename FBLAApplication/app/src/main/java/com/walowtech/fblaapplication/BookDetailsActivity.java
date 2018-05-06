@@ -34,17 +34,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.facebook.share.Sharer;
-import com.facebook.share.model.ShareOpenGraphAction;
-import com.facebook.share.model.ShareOpenGraphContent;
-import com.facebook.share.model.ShareOpenGraphObject;
-import com.facebook.share.widget.ShareDialog;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.walowtech.fblaapplication.Utils.ErrorUtils;
@@ -74,7 +63,7 @@ import static android.view.View.GONE;
  */
 
 //Created 10/7/2017
-public class BookDetailsActivity extends BaseActivity implements FacebookCallback<Sharer.Result>{
+public class BookDetailsActivity extends BaseActivity{
 
     //Declare layouts
     private FrameLayout mLeaveReview;
@@ -138,7 +127,6 @@ public class BookDetailsActivity extends BaseActivity implements FacebookCallbac
 
     private AlarmManager alarmManager;
     private RequestQueue queue;
-    private CallbackManager mCallbackManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -154,26 +142,6 @@ public class BookDetailsActivity extends BaseActivity implements FacebookCallbac
 
         //Initialize the volley queue
         queue = Volley.newRequestQueue(this);
-
-        //Initialize callback manager for facebook sharing
-        mCallbackManager = new CallbackManager.Factory().create();
-        LoginManager.getInstance().registerCallback(mCallbackManager,
-                new FacebookCallback<LoginResult>() {
-                    @Override
-                    public void onSuccess(LoginResult loginResult) {
-                        facebookPost(null);
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        Toast.makeText(BookDetailsActivity.this, "Login Cancelled", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onError(FacebookException error) {
-                        Toast.makeText(BookDetailsActivity.this, "Cannot log in at this time, please try again later.", Toast.LENGTH_SHORT).show();
-                    }
-                });
 
         //Create custom font typeface
         handWriting = Typeface.createFromAsset(getAssets(), "fonts/hand_writing.ttf");
@@ -274,12 +242,6 @@ public class BookDetailsActivity extends BaseActivity implements FacebookCallbac
         }
 
         retrieveDetailedBookInfo();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -1023,77 +985,19 @@ public class BookDetailsActivity extends BaseActivity implements FacebookCallbac
     }
 
     /**
-     * Handles the click on the facebook share button. First it is checked if the user
-     * is logged into their facebook account and has granted posting permissions to Preface.
-     * Then a post is created and the user is allowed to look over the post via the dialog box
-     * to confirm or edit their post.
-     *
+     * Handles the click on the snapchat share button. Start an intent to the
+     * snapchat application and then send the snap.
      * @param view The calling view
      */
-    public void facebookPost(View view){
-        boolean loggedIn = AccessToken.getCurrentAccessToken() != null;
-        boolean publishPermission = true;
-        boolean isLoading = currentBook.description == null;
-
-        //Try to check permission, but if user has not logged in yet, exception will be caught
-        try{
-           publishPermission = AccessToken.getCurrentAccessToken().getPermissions().contains("publish_actions");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //If the book info is still loading, then wait to share
-        if(isLoading){
-            Toast.makeText(BookDetailsActivity.this, "Cannot post right now, this book is still loading", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        //Check if the user is already logged into facebook
-        if(!loggedIn || !publishPermission) {
-            //If not already logged in, then Log in
-            Toast.makeText(this, "Loading Facebook login ...", Toast.LENGTH_SHORT).show();
-            LoginManager.getInstance().logInWithPublishPermissions(this, Arrays.asList("publish_actions"));
-        }else{
-            //If description is longer than 100 chars, then cut at next word and add ellipses
-            Toast.makeText(this, "Loading Facebook ...", Toast.LENGTH_SHORT).show();
-            String description = currentBook.description.length() <= 100 ? currentBook.description :
-                    (currentBook.description.substring(0, currentBook.description.indexOf(" ", 100)) + " ...");
-
-            //If already logged in and with permission, then share
-            ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
-                    .putString("og:type", "books.book")
-                    .putString("og:title", currentBook.title)
-                    .putString("og:description", description)
-                    .putString("books:isbn", currentBook.ISBN10)
-                    .build();
-
-            ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
-                    .setActionType("books.reads")
-                    .putObject("book", object)
-                    .build();
-            ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
-                    .setPreviewPropertyName("book")
-                    .setAction(action)
-                    .build();
-
-            //Show the post dialog
-            ShareDialog.show(this, content);
-        }
-    }
-
-    @Override
-    public void onSuccess(Sharer.Result result) {
-        Toast.makeText(this, "Post shared on your timeline!", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onCancel() {
-        Toast.makeText(this, "You have cancelled your post.", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onError(FacebookException error) {
-        error.printStackTrace();
-        Toast.makeText(this, "Your post cannot be made at this time", Toast.LENGTH_SHORT).show();
+    public void snapchatPost(View view) {
+        Intent snapIntent = new Intent(Intent.ACTION_SEND);
+        snapIntent.setPackage("com.snapchat.android");
+        snapIntent.setType("text/plain");
+        String shareBody = "You should check out " + getString(R.string.app_name) + ", an app where you can easily find books at the school library!";
+        if(currentBook.title != null)
+            shareBody = "Check out \"" + currentBook.title + "\", a book that I found with the app, " + getString(R.string.app_name);
+        snapIntent.putExtra(Intent.EXTRA_SUBJECT, "" + getString(R.string.app_name));
+        snapIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+        startActivity(snapIntent);
     }
 }

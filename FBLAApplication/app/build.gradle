@@ -7,8 +7,8 @@ android {
         applicationId "com.walowtech.fblaapplication"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 4
-        versionName "1.0.2"
+        versionCode 5
+        versionName "1.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -39,14 +39,9 @@ dependencies {
     implementation 'com.android.support:support-vector-drawable:27.1.1'
     implementation 'com.faendir:acra:4.10.0'
     implementation 'com.android.volley:volley:1.1.0'
-    implementation 'com.google.firebase:firebase-core:15.0.0'
-    implementation 'com.google.firebase:firebase-messaging:15.0.0'
+    implementation 'com.google.firebase:firebase-core:15.0.2'
+    implementation 'com.google.firebase:firebase-messaging:15.0.2'
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
-    implementation 'com.facebook.android:facebook-core:4.32.0'
-    implementation 'com.facebook.android:facebook-common:4.32.0'
-    implementation 'com.facebook.android:facebook-login:4.32.0'
-    implementation 'com.facebook.android:facebook-share:4.32.0'
-    implementation 'com.facebook.android:facebook-android-sdk:4.32.0'
 
     testImplementation 'junit:junit:4.12'
 

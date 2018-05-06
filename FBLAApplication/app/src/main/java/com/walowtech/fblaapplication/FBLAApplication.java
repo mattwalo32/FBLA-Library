@@ -2,7 +2,6 @@ package com.walowtech.fblaapplication;
 
 import android.app.Application;
 
-import com.facebook.FacebookSdk;
 import com.google.firebase.FirebaseApp;
 
 import org.acra.ACRA;
@@ -18,6 +17,5 @@ public class FBLAApplication extends Application {
     public void onCreate() {
         super.onCreate();
         ACRA.init(this);
-        FirebaseApp.initializeApp(this);//TODO research
     }
 }

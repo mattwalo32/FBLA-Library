@@ -4,8 +4,6 @@
     <string name="school_name">WT High School</string>
     <string name="preference_file_key">FBLAApplicationUserData</string>
     <string name="string_empty"></string>
-    <string name="facebook_app_id">335945573476200</string>
-    <string name="fb_login_protocol_scheme">fb335945573476200</string>
     <string name="crash_toast_text">Please press send in the email to send a crash report.</string>
 
     <!-- Login Activity -->
