@@ -52,7 +52,7 @@ All assets have been used legally and under their proper liscense.
 
 ### Versioning
 
-[Semantic Versioning](https://semver.org/) is used. The most recent version is 1.0.0
+[Semantic Versioning](https://semver.org/) is used. The most recent version is 1.0.3
 
 ### Liscense
 Licensed under the Apache License, Version 2.0 (the "License");
