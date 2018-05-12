@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.walowtech.fblaapplication.Utils.SlideshowAdapter;
 import java.util.ArrayList;
 
@@ -122,21 +124,25 @@ public class AboutActivity extends BaseActivity {
         switch(viewID){
             //Twitter was clicked on
             case R.id.aa_twitter:
+                Toast.makeText(this, "Loading Twitter ...", Toast.LENGTH_LONG).show();
                 url = TWITTER_URL;
                 browserIntent.setPackage("com.twitter.android");
                 break;
             //Google Plus was clicked on
             case R.id.aa_google_plus:
+                Toast.makeText(this, "Loading Google Plus ...", Toast.LENGTH_LONG).show();
                 url = GOOGLE_PLUS_URL;
                 browserIntent.setPackage("com.google.android.apps.plus");
                 break;
-            //Facebook was clicked on
+            //Instagram was clicked on
             case R.id.aa_instagram:
+                Toast.makeText(this, "Loading Instagram ...", Toast.LENGTH_LONG).show();
                 url = INSTAGRAM_URL;
                 browserIntent.setPackage("com.instagram.android");
                 break;
             //Facebook was clicked on
             case R.id.aa_facebook:
+                Toast.makeText(this, "Loading Facebook ...", Toast.LENGTH_LONG).show();
                 try {
                     browserIntent.setData(Uri.parse(FACEBOOK_APP_URL));
                     startActivity(browserIntent);

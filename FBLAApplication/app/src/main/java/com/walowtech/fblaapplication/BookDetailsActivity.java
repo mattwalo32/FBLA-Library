@@ -122,6 +122,7 @@ public class BookDetailsActivity extends BaseActivity{
     private boolean liked;
     private boolean fromAccount;
     private boolean checkedOut = true;
+    private boolean restartOnFinished;
 
     ArrayList<Review> reviews = new ArrayList<>();
 
@@ -131,6 +132,8 @@ public class BookDetailsActivity extends BaseActivity{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        restartOnFinished = false;
 
         //Set the layout of the screen
         setContentView(R.layout.activity_book_details);
@@ -480,6 +483,12 @@ public class BookDetailsActivity extends BaseActivity{
                 mCheckout.setText("Return");
 
                 configureReturnAlarm(BID);
+
+                if(restartOnFinished){
+                    restartOnFinished = false;
+                    refreshScreen();
+                }
+
             }else if(success == 15){
                 //Successfully added to wait list
                 int BID = json.getInt(KEY_BID);
@@ -489,6 +498,12 @@ public class BookDetailsActivity extends BaseActivity{
 
                 String message = json.getString(KEY_MESSAGE);
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+
+                if(restartOnFinished) {
+                    restartOnFinished = false;
+                    refreshScreen();
+                }
+
             }else if(success == 16){
                 //Successfully returned
                 int BID = json.getInt(KEY_BID);
@@ -501,6 +516,11 @@ public class BookDetailsActivity extends BaseActivity{
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
                 checkedOut = false;
                 mCheckout.setText("Checkout");
+
+                if(restartOnFinished) {
+                    restartOnFinished = false;
+                    refreshScreen();
+                }
 
                 Log.i("LoginActivity", "SUCCESS RETURNED");
             }
@@ -740,7 +760,7 @@ public class BookDetailsActivity extends BaseActivity{
             if (currentBook.copies != null) {
                 if (!checkedOut) {
                     DialogFragment bookFragment = SelectBookFragment.newInstance(BookDetailsActivity.this, currentBook.copies, currentBook.availableCopies);
-                    bookFragment.show(getFragmentManager(), "TestDialog");
+                    bookFragment.show(getFragmentManager(), "Choose Book");
                 } else if (mCopy != null) {
                     Log.i("LoginActivity", "RETURNED");
                     returnBook(mCopy);
@@ -788,6 +808,8 @@ public class BookDetailsActivity extends BaseActivity{
 
         String urlString = builder.toString();
 
+        restartOnFinished = true;
+
         downloadJSON(urlString);
     }
 
@@ -816,7 +838,8 @@ public class BookDetailsActivity extends BaseActivity{
                 .build();
 
         String urlString = builder.toString();
-        downloadJSON(urlString);
+
+        restartOnFinished = true;
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor prefEditor = sharedPreferences.edit();
@@ -827,6 +850,8 @@ public class BookDetailsActivity extends BaseActivity{
         prefEditor.remove("ALARM" + BID + "-TYPE");
         prefEditor.remove("ALARM" + BID + "-RING-TIME");
         prefEditor.apply();
+
+        downloadJSON(urlString);
     }
 
     /**
@@ -985,19 +1010,29 @@ public class BookDetailsActivity extends BaseActivity{
     }
 
     /**
-     * Handles the click on the snapchat share button. Start an intent to the
-     * snapchat application and then send the snap.
-     * @param view The calling view
+     * Refreshes the screen data by restarting
+     * the activity.
      */
-    public void snapchatPost(View view) {
-        Intent snapIntent = new Intent(Intent.ACTION_SEND);
-        snapIntent.setPackage("com.snapchat.android");
-        snapIntent.setType("text/plain");
-        String shareBody = "You should check out " + getString(R.string.app_name) + ", an app where you can easily find books at the school library!";
-        if(currentBook.title != null)
-            shareBody = "Check out \"" + currentBook.title + "\", a book that I found with the app, " + getString(R.string.app_name);
-        snapIntent.putExtra(Intent.EXTRA_SUBJECT, "" + getString(R.string.app_name));
-        snapIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
-        startActivity(snapIntent);
+    private void refreshScreen(){
+        Intent thisIntent = getIntent();
+        finish();
+        startActivity(thisIntent);
     }
+
+//    /**
+//     * Handles the click on the snapchat share button. Start an intent to the
+//     * snapchat application and then send the snap.
+//     * @param view The calling view
+//     */
+//    public void snapchatPost(View view) {
+//        Intent snapIntent = new Intent(Intent.ACTION_SEND);
+//        snapIntent.setPackage("com.snapchat.android");
+//        snapIntent.setType("text/plain");
+//        String shareBody = "You should check out " + getString(R.string.app_name) + ", an app where you can easily find books at the school library!";
+//        if(currentBook.title != null)
+//            shareBody = "Check out \"" + currentBook.title + "\", a book that I found with the app, " + getString(R.string.app_name);
+//        snapIntent.putExtra(Intent.EXTRA_SUBJECT, "" + getString(R.string.app_name));
+//        snapIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+//        startActivity(snapIntent);
+//    }
 }
