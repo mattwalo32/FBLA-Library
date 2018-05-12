@@ -36,7 +36,7 @@ To report any issues within the app contact Matthew Walowski (mattwalowski@gmail
 * [OkHTTP](https://github.com/square/okhttp) 3.9.1 - Sending HTTP POST Requests
 * [Android Asset Studio](https://romannurik.github.io/AndroidAssetStudio/) - Utility to create icons of different pixel densities
 
-All pieces of software have been used legally and under their proper liscense
+All pieces of software have been used legally and under their proper license
    Simple Rating Bar, ACRA, and OKHTTP are libraries used within the application
    and fall under fair use by the Apache V2 License
 
@@ -46,27 +46,30 @@ All pieces of software have been used legally and under their proper liscense
 * [Bathroom Icon](https://commons.wikimedia.org/wiki/File:Bathroom-gender-sign.png) - Used in school map
 * All other Icons are original and created by Matthew Walowski
 
-All assets have been used legally and under their proper liscense.
+All assets have been used legally and under their proper license.
    A Sensible Armadillo Font and Bathroom Icon are in the public domain.
+   Any other unspecified assets are in the public domain.
 
 
 ### Versioning
 
-[Semantic Versioning](https://semver.org/) is used. The most recent version is 1.0.3
+[Semantic Versioning](https://semver.org/) is used. 
+The most recent version is 1.0.5 as of May 11, 2018.
 
-### Liscense
+### License
+Copyright 2018 Matthew Walowski
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-   [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
 
 
 
