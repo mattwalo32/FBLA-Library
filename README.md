@@ -54,7 +54,7 @@ All assets have been used legally and under their proper license.
 ### Versioning
 
 [Semantic Versioning](https://semver.org/) is used. 
-The most recent version is 1.0.5 as of May 11, 2018
+The most recent version is 1.0.5 as of May 11, 2018.
 
 ### License
 Copyright 2018 Matthew Walowski
