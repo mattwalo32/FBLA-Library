@@ -133,18 +133,18 @@
 
 
             <!-- Images that go between layers -->
-            <de.hdodenhof.circleimageview.CircleImageView
+            <ImageView
                 android:layout_width="@dimen/large_profile_diameter"
                 android:layout_height="@dimen/large_profile_diameter"
-                android:src="@drawable/ic_circle_white"
+                app:srcCompat="@drawable/ic_circle_white"
                 app:layout_anchor="@id/aa_layout_top_row"
                 app:layout_anchorGravity="bottom|center_horizontal"/>
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <ImageView
                 android:id="@+id/aa_profile"
                 android:layout_width="@dimen/large_profile_diameter"
                 android:layout_height="@dimen/large_profile_diameter"
-                android:src="@drawable/ic_account_circle_100dp"
+                app:srcCompat="@drawable/ic_account_circle_100dp"
                 app:layout_anchor="@id/aa_layout_top_row"
                 app:layout_anchorGravity="bottom|center_horizontal" />
 

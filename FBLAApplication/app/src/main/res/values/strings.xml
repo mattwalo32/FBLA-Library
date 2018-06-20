@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Preface</string>
-    <string name="app_version">1.0.4</string>
+    <string name="app_version">1.0.6</string>
     <string name="school_name">WT High School</string>
     <string name="preference_file_key">FBLAApplicationUserData</string>
     <string name="string_empty"></string>
@@ -54,7 +54,7 @@
     <string name="clear_liked_books">Clear liked books</string>
 
     <string name="about">About</string>
-    <string name="version">1.0.2</string>
+    <string name="version">1.0.6</string>
     <string name="release_date">May 6, 2018</string>
 
     <!-- About Activity Strings -->

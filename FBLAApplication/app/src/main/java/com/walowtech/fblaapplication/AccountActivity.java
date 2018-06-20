@@ -45,9 +45,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.Inflater;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.view.View.GONE;
 import static com.walowtech.fblaapplication.MainActivity.handWriting;
@@ -64,7 +62,7 @@ import static com.walowtech.fblaapplication.MainActivity.handWriting;
  */
 public class AccountActivity extends BaseActivity implements LoaderManager.LoaderCallbacks {
 //TODO change profile
-    CircleImageView mProfile;
+    ImageView mProfile;
     LinearLayout mRowsLayout;
     LinearLayout mFavoritesLayout;
     RecyclerView mRecyclerLiked;
@@ -103,7 +101,7 @@ public class AccountActivity extends BaseActivity implements LoaderManager.Loade
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account);
 
-        mProfile = (CircleImageView) findViewById(R.id.aa_profile);
+        mProfile = (ImageView) findViewById(R.id.aa_profile);
         mRowsLayout = (LinearLayout) findViewById(R.id.aa_ll_rows);
         mFavoritesLayout = (LinearLayout) findViewById(R.id.aa_favorites);
         mRecyclerLiked = (RecyclerView) findViewById(R.id.aa_rv_books);
@@ -169,8 +167,20 @@ public class AccountActivity extends BaseActivity implements LoaderManager.Loade
     }
 
     @Override
-    public void onLoaderReset(Loader loader) {
+    protected void onResume() {
+        super.onResume();
 
+        for(Book book : liked) {
+            if (!sharedPreferences.contains("LIKED" + book.GID)) {
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);
+            }
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader loader) {
     }
 
     /**

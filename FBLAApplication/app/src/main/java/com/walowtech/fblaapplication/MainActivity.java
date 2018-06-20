@@ -775,11 +775,11 @@ public class MainActivity extends NavDrawerActivity{
         @Override
         public void onBindViewHolder(final BookAdapter.MyViewHolder holder, final int position) {
             //Get current item and set text, typeface, and image
-            final Book currentBook = books.get(position);
+            final Book currentBook = books.get(holder.getAdapterPosition());
             holder.rating.setText(String.format("%.01f", currentBook.averageRating));
             holder.rating.setTypeface(handWriting);
 
-            books.get(position).imageView = holder.image;
+            books.get(holder.getAdapterPosition()).imageView = holder.image;
 
             //If a cover has been downloaded, remove loading indicator
             if(currentBook.coverSmall != null) {
@@ -791,7 +791,7 @@ public class MainActivity extends NavDrawerActivity{
                 currentBook.imageView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Log.i("LoginActivity", "BOOK PRESSED AT " + currentBook.subject + ", " + position + ". GID: " + currentBook.GID);
+                        Log.i("LoginActivity", "BOOK PRESSED AT " + currentBook.subject + ", " + holder.getAdapterPosition() + ". GID: " + currentBook.GID);
                         launchActivityDetailedBook(currentBook.imageView, currentBook.GID);
                     }
                 });
